@@ -1,0 +1,59 @@
+template<typename T>
+struct SegTree {
+    int n;
+    vector<T> t;
+    T neutral;
+    function<T(const T&, const T&)> combine;
+
+    SegTree(int _n, T _neutral, function<T(const T&, const T&)> _combine) {
+        this->n = _n;
+        this->neutral = _neutral;
+        this->combine = _combine;
+        this->t.assign(4 * this->n, this->neutral);
+    }
+
+    SegTree(vector<T>& _a, T _neutral, function<T(const T&, const T&)> _combine) {
+        this->n = _a.size();
+        this->neutral = _neutral;
+        this->combine = _combine;
+        this->t.assign(4 * this->n, this->neutral);
+        this->build(1, 0, this->n - 1, _a);
+    }
+
+    void build(int pos, int tl, int tr, vector<T>& a) {
+        if (tl == tr) {
+            this->t[pos] = a[tl];
+            return;
+        }
+        int tm = tl + (tr - tl) / 2;
+        this->build(2 * pos, tl, tm, a);
+        this->build(2 * pos + 1, tm + 1, tr, a);
+        this->t[pos] = this->combine(this->t[2 * pos], this->t[2 * pos + 1]);
+    }
+
+    void update(int i, T val, int pos, int tl, int tr) {
+        if (tl == tr) {
+            this->t[pos] = val;
+            return;
+        }
+        int tm = tl + (tr - tl) / 2;
+        if (i <= tm) this->update(i, val, 2 * pos, tl, tm);
+        else this->update(i, val, 2 * pos + 1, tm + 1, tr);
+        this->t[pos] = this->combine(this->t[2 * pos], this->t[2 * pos + 1]);
+    }
+
+    void update(int i, T val) {
+        this->update(i, val, 1, 0, this->n - 1);
+    }
+
+    T query(int l, int r, int pos, int tl, int tr) {
+        if (r < tl || tr < l) return this->neutral;
+        if (l <= tl && tr <= r) return this->t[pos];
+        int tm = tl + (tr - tl) / 2;
+        return this->combine(this->query(l, r, 2 * pos, tl, tm), this->query(l, r, 2 * pos + 1, tm + 1, tr));
+    }
+
+    T query(int l, int r) {
+        return this->query(l, r, 1, 0, this->n - 1);
+    }
+};
