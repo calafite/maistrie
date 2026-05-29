@@ -7,12 +7,12 @@ struct SegTree{
 
 	SegTree(int _n, T _neutral, F _combine)
 		: n(_n), neutral(_neutral), combine(_combine){
-		t.assign(4*n, neutral);
+		this->t.assign(4*n, neutral);
 	}
 
 	SegTree(const vector<T> &_a, T _neutral, F _combine)
 		: n((int)_a.size()), neutral(_neutral), combine(_combine){
-		t.assign(4*n, neutral);
+		this->t.assign(4*n, neutral);
 		build(1, 0, n-1, _a);
 	}
 	void build(int pos, int tl, int tr, const vector<T> &a){
