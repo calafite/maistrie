@@ -24,7 +24,7 @@ struct Sieve{
 
     T count(T x){
         x = min(x, this->n);
-        return (T)upper_bound(all(this->primes), x) - this->primes.begin();
+        return (T)upper_bound(all(this->primes), x)-this->primes.begin();
     }
 
     void build_spf(){
