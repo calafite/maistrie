@@ -2,27 +2,58 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-template <typename T, typename F> struct SparseTable {
-  vector<vector<T>> table;
-  int length, max_log;
-  F operation;
+template <typename T = int> struct LinearSieve {
+  static_assert(
+      is_integral_v<T> && is_signed_v<T> && sizeof(T) >= 4,
+      "T must be a signed integer of at least 32 bits (int, long, long long)");
 
-  SparseTable(const vector<T> &vec, F operation)
-      : length(static_cast<int>(vec.size())),
-        max_log(length > 0 ? __lg(length) : 0), operation(move(operation)) {
-    if (length == 0)
-      return;
-    table.assign(max_log + 1, vector<T>(length));
-    for (int j = 0; j < length; j++)
-      table[0][j] = vec[j];
-    for (int i = 1; i <= max_log; i++)
-      for (int j = 0; j + (1 << i) <= length; j++)
-        table[i][j] =
-            this->operation(table[i - 1][j], table[i - 1][j + (1 << (i - 1))]);
+  int n;
+  vector<int> primes;
+  vector<int> spf;
+
+  LinearSieve(int n) : n(n), spf(n + 1, 0) {
+    if (n >= 2) {
+      primes.reserve(n / log(n) * 1.2 + 16);
+    }
+    for (int i = 2; i <= n; i++) {
+      if (spf[i] == 0) {
+        spf[i] = i;
+        primes.push_back(i);
+      }
+      for (int p : primes) {
+        if (p > spf[i] || 1LL * i * p > n)
+          break;
+        spf[i * p] = p;
+      }
+    }
   }
 
-  T query(int left, int right) const {
-    int i = __lg(right - left + 1);
-    return operation(table[i][left], table[i][right - (1 << i) + 1]);
+  bool is_prime(T x) const {
+    if (x < 2 || x > n)
+      return false;
+    return spf[x] == x;
+  }
+
+  T count(T x) const {
+    x = min(static_cast<T>(n), x);
+    if (x < 2)
+      return 0;
+    return upper_bound(primes.begin(), primes.end(), static_cast<int>(x)) -
+           primes.begin();
+  }
+
+  vector<pair<T, int>> factorize(T x) const {
+    assert(x >= 1 && x <= n);
+    vector<pair<T, int>> factors;
+    while (x > 1) {
+      T p = spf[x];
+      int e = 0;
+      do {
+        e++;
+        x /= p;
+      } while (x > 1 && spf[x] == p);
+      factors.push_back({p, e});
+    }
+    return factors;
   }
 };
