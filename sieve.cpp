@@ -14,7 +14,7 @@ template <typename T> struct Sieve {
     is_prime[0] = is_prime[1] = false;
     for (T i = 4; i <= n; i += 2)
       is_prime[i] = false;
-    for (T p = 3; p <= n / p; p += 2) { 
+    for (T p = 3; p <= n / p; p += 2) {
       if (is_prime[p])
         for (T i = p * p; i <= n; i += p + p)
           is_prime[i] = false;

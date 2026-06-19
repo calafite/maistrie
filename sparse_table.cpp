@@ -10,7 +10,7 @@ template <typename T, typename F> struct SparseTable {
   SparseTable(const vector<T> &vec, F operation)
       : length(static_cast<int>(vec.size())),
         max_log(length > 0 ? __lg(length) : 0), operation(move(operation)) {
-   if (length == 0)
+    if (length == 0)
       return;
     table.assign(max_log + 1, vector<T>(length));
     for (int j = 0; j < length; j++)
