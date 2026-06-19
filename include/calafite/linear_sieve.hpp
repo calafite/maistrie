@@ -1,5 +1,8 @@
 #pragma once
-#include <bits/stdc++.h>
+#include <cmath>
+#include <vector>
+#include <cassert>
+
 
 namespace calafite {
 template <typename T> struct LinearSieve {

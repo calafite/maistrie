@@ -1,5 +1,5 @@
 #pragma once
-#include <bits/stdc++.h>
+#include <vector>
 
 namespace calafite {
 template <typename T, typename F> struct SparseTable {
