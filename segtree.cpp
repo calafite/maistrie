@@ -2,58 +2,38 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-template <typename T, typename F> struct SegTree {
+template <typename T, typename F> struct SegTreeIterative {
   int n;
   vector<T> t;
   T neutral;
-  mutable F combine;
+  F combine;
 
-  SegTree(int n, T neutral, F combine)
-      : n(n), neutral(neutral), combine(move(combine)) {
-    t.assign(4 * n, neutral);
+  SegTreeIterative(int n, T neutral, F combine)
+      : n(n), t(2 * n, neutral), neutral(neutral), combine(move(combine)) {}
+
+  SegTreeIterative(const vector<T> &a, T neutral, F combine)
+      : n((int)a.size()), t(2 * a.size(), neutral), neutral(neutral),
+        combine(move(combine)) {
+    for (int i = 0; i < n; i++)
+      t[n + i] = a[i];
+    for (int i = n - 1; i > 0; i--)
+      t[i] = combine(t[i << 1], t[i << 1 | 1]);
   }
 
-  SegTree(const vector<T> &a, T neutral, F combine)
-      : n((int)a.size()), neutral(neutral), combine(move(combine)) {
-    t.assign(4 * n, neutral);
-    build(1, 0, n - 1, a);
-  }
-
-  void build(int pos, int tl, int tr, const vector<T> &a) {
-    if (tl == tr) {
-      t[pos] = a[tl];
-      return;
+  void update(int p, T val) {
+    for (t[p += n] = val; p >>= 1;) {
+      t[p] = combine(t[p << 1], t[p << 1 | 1]);
     }
-    int tm = tl + (tr - tl) / 2;
-    build(2 * pos, tl, tm, a);
-    build(2 * pos + 1, tm + 1, tr, a);
-    t[pos] = combine(t[2 * pos], t[2 * pos + 1]);
   }
 
-  void update(int i, T val, int pos, int tl, int tr) {
-    if (tl == tr) {
-      t[pos] = val;
-      return;
+  T query(int l, int r) const {
+    T resL = neutral, resR = neutral;
+    for (l += n, r += n + 1; l < r; l >>= 1, r >>= 1) {
+      if (l & 1)
+        resL = combine(resL, t[l++]);
+      if (r & 1)
+        resR = combine(t[--r], resR);
     }
-    int tm = tl + (tr - tl) / 2;
-    if (i <= tm)
-      update(i, val, 2 * pos, tl, tm);
-    else
-      update(i, val, 2 * pos + 1, tm + 1, tr);
-    t[pos] = combine(t[2 * pos], t[2 * pos + 1]);
+    return combine(resL, resR);
   }
-
-  void update(int i, T val) { update(i, val, 1, 0, n - 1); }
-
-  T query(int l, int r, int pos, int tl, int tr) const {
-    if (r < tl || tr < l)
-      return neutral;
-    if (l <= tl && tr <= r)
-      return t[pos];
-    int tm = tl + (tr - tl) / 2;
-    return combine(query(l, r, 2 * pos, tl, tm),
-                   query(l, r, 2 * pos + 1, tm + 1, tr));
-  }
-
-  T query(int l, int r) const { return query(l, r, 1, 0, n - 1); }
 };
