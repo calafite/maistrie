@@ -9,11 +9,11 @@ template <typename T, typename F> struct SegTreeIterative {
   F combine;
 
   SegTreeIterative(int n, T neutral, F combine)
-      : n(n), t(2 * n, neutral), neutral(neutral), combine(move(combine)) {}
+      : n(n), t(2 * n, neutral), neutral(neutral), combine(std::move(combine)) {}
 
   SegTreeIterative(const std::vector<T> &a, T neutral, F combine)
       : n((int)a.size()), t(2 * a.size(), neutral), neutral(neutral),
-        combine(move(combine)) {
+        combine(std::move(combine)) {
     for (int i = 0; i < n; i++)
       t[n + i] = a[i];
     for (int i = n - 1; i > 0; i--)
