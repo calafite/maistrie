@@ -7,6 +7,7 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
+#include "fvec.hpp"
 
 #if defined(_WIN32)
 #include <io.h>
@@ -129,6 +130,15 @@ struct Printer {
     return *this;
   }
 
+  template <typename T> inline Printer &operator<<(const fvec<T> &v) {
+    for (size_t i = 0; i < v.size(); i++) {
+      *this << v[i];
+      if (i + 1 < v.size())
+        put_char(' ');
+    }
+    return *this;
+  }
+
   template <typename T, size_t N>
   inline Printer &operator<<(const std::array<T, N> &a) {
     for (size_t i = 0; i < N; i++) {
@@ -243,6 +253,12 @@ struct Scanner {
   }
 
   template <typename T> inline Scanner &operator>>(std::vector<T> &v) {
+    for (auto &x : v)
+      *this >> x;
+    return *this;
+  }
+
+  template <typename T> inline Scanner &operator>>(fvec<T> &v) {
     for (auto &x : v)
       *this >> x;
     return *this;

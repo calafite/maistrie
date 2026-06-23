@@ -1,14 +1,14 @@
 #pragma once
-#include <vector>
+#include "fvec.hpp"
 
 namespace calafite {
 template <typename T> struct FenwickTree {
   int sz;
-  std::vector<T> bits;
+  fvec<T> bits;
 
   FenwickTree(int n) : sz(n), bits(n + 1, T(0)) {}
 
-  FenwickTree(const std::vector<T> &a)
+  FenwickTree(const fvec<T> &a)
       : sz((int)a.size()), bits(a.size() + 1, T(0)) {
     for (int i = 1; i <= sz; i++) {
       bits[i] += a[i - 1];
