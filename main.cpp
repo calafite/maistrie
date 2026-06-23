@@ -26,23 +26,13 @@
 #define LLINF 0x3f3f3f3f3f3f3f3fLL
 #define LNINF (-0x3f3f3f3f3f3f3f3fLL)
 
-#define fast_io()                                                              \
-  do {                                                                         \
-    ios::sync_with_stdio(false);                                               \
-    cin.tie(nullptr);                                                          \
-  } while (0)
-
 #define dbg(x) cerr << #x << " = " << x << "\n"
 
-#define endl "\n"
-
 using namespace std;
+using namespace calafite;
 
-CALAFITE_MAKE_ARENA_GLOBAL()
+CALAFITE_MAKE_ARENA_GLOBAL
 
 int main() {
-  fast_io();
-
   calafite::arena::ScopedArena _arena;
-
 }

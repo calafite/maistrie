@@ -93,7 +93,7 @@ struct ScopedArena {
 #define CALAFITE_ALIGNED_FREE(ptr) std::free(ptr)
 #endif
 
-#define CALAFITE_MAKE_ARENA_GLOBAL()                                           \
+#define CALAFITE_MAKE_ARENA_GLOBAL                                             \
   void *operator new(size_t size) {                                            \
     if (calafite::arena::active)                                               \
       return calafite::arena::allocate(size);                                  \
