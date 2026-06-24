@@ -9,3 +9,5 @@
 #include "sparse_table.hpp"
 #include "fvec.hpp"
 #include "hash_map.hpp"
+#include "op.hpp"
+#include "compressor.hpp"
