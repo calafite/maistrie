@@ -1,15 +1,16 @@
 #pragma once
 
+#include "../core/fvec.hpp"
 #include <chrono>
 #include <cstdint>
-#include <utility>
 #include <functional>
-#include "../core/fvec.hpp"
+#include <utility>
 
 namespace calafite {
 
 template <typename T> struct is_pair : std::false_type {};
-template <typename T1, typename T2> struct is_pair<std::pair<T1, T2>> : std::true_type {};
+template <typename T1, typename T2>
+struct is_pair<std::pair<T1, T2>> : std::true_type {};
 
 template <typename T> struct CustomHash {
   static uint64_t splitmix64(uint64_t x) {
@@ -22,10 +23,11 @@ template <typename T> struct CustomHash {
   size_t operator()(const T &x) const {
     static const uint64_t FIXED_RANDOM =
         std::chrono::steady_clock::now().time_since_epoch().count();
-    
+
     if constexpr (is_pair<T>::value) {
       size_t seed = std::hash<typename T::first_type>{}(x.first);
-      seed ^= std::hash<typename T::second_type>{}(x.second) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+      seed ^= std::hash<typename T::second_type>{}(x.second) + 0x9e3779b9 +
+              (seed << 6) + (seed >> 2);
       return splitmix64(seed + FIXED_RANDOM);
     } else {
       return splitmix64(std::hash<T>{}(x) + FIXED_RANDOM);
@@ -33,7 +35,8 @@ template <typename T> struct CustomHash {
   }
 };
 
-template <typename K, typename V, typename Hash = CustomHash<K>> struct hash_map {
+template <typename K, typename V, typename Hash = CustomHash<K>>
+struct hash_map {
   struct Entry {
     K key;
     V val;
@@ -74,7 +77,7 @@ template <typename K, typename V, typename Hash = CustomHash<K>> struct hash_map
     }
   }
 
-  inline int lookup(const K& key) const {
+  inline int lookup(const K &key) const {
     int pos = hasher(key) & (cap - 1);
     while (table[pos].occupied && table[pos].key != key) {
       pos = (pos + 1) & (cap - 1);
@@ -82,7 +85,7 @@ template <typename K, typename V, typename Hash = CustomHash<K>> struct hash_map
     return pos;
   }
 
-  V &operator[](const K& key) {
+  V &operator[](const K &key) {
     check_expand();
     int pos = lookup(key);
     if (!table[pos].occupied) {
@@ -107,7 +110,7 @@ template <typename K, typename V, typename Hash = CustomHash<K>> struct hash_map
     }
   }
 
-  bool count(const K& key) const {
+  bool count(const K &key) const {
     int pos = lookup(key);
     return table[pos].occupied;
   }

@@ -1,8 +1,8 @@
 #pragma once
-#include <cmath>
+#include "../core/fvec.hpp"
 #include <algorithm>
 #include <cassert>
-#include "../core/fvec.hpp"
+#include <cmath>
 
 namespace calafite {
 template <typename T> struct LinearSieve {

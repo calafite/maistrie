@@ -17,7 +17,7 @@ template <typename T> struct Compressor {
   inline void add(const T &x) { vals.push_back(x); }
 
   inline void build() {
-    vals.sort();   
+    vals.sort();
     vals.unique();
   }
 

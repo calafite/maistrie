@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../core/fvec.hpp"
 #include <array>
 #include <cstdio>
 #include <cstring>
@@ -7,7 +8,6 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
-#include "../core/fvec.hpp"
 
 #if defined(_WIN32)
 #include <io.h>

@@ -1,8 +1,8 @@
 #pragma once
+#include "../core/fvec.hpp"
 #include <algorithm>
 #include <cassert>
 #include <cmath>
-#include "../core/fvec.hpp"
 
 namespace calafite {
 template <typename T = int> struct Sieve {
