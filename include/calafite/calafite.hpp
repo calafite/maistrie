@@ -7,6 +7,13 @@
 
 // container
 #include "container/hashMap.hpp"
+#include "container/priorityQueue.hpp"
+
+// dynamic programming
+#include "dp/knapsack.hpp"
+#include "dp/lcs.hpp"
+#include "dp/lis.hpp"
+#include "dp/sos.hpp"
 
 // data structures
 #include "ds/compressor.hpp"
