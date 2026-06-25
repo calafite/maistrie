@@ -1,12 +1,21 @@
-#include "../core/fvec.hpp"
+#pragma once
+
+#include "../core/fastVector.hpp"
 #include <algorithm>
+#include <cstddef>
 
 namespace calafite {
-template <typename T> inline int lb(const fvec<T> &a, const T &x) {
-  return static_cast<int>(std::lower_bound(a.begin(), a.end(), x) - a.begin());
-}
+    namespace utility {
 
-template <typename T> inline int ub(const fvec<T> &a, const T &x) {
-  return static_cast<int>(std::upper_bound(a.begin(), a.end(), x) - a.begin());
+        template<typename Type>
+        inline size_t lowerBound(const core::FastVector<Type>& vector, const Type& value) {
+            return static_cast<size_t>(std::lower_bound(vector.begin(), vector.end(), value) - vector.begin());
+        }
+
+        template<typename Type>
+        inline size_t upperBound(const core::FastVector<Type>& vector, const Type& value) {
+            return static_cast<size_t>(std::upper_bound(vector.begin(), vector.end(), value) - vector.begin());
+        }
+
+    }
 }
-} // namespace calafite

@@ -1,7 +1,8 @@
 #pragma once
 
-#include "../core/fvec.hpp"
+#include "../core/fastVector.hpp"
 #include <array>
+#include <cassert>
 #include <cstdio>
 #include <cstring>
 #include <string>
@@ -11,12 +12,12 @@
 
 #if defined(_WIN32)
 #include <io.h>
-#define CALAFITE_READ(buf, sz) _read(0, buf, (unsigned int)(sz))
-#define CALAFITE_WRITE(buf, sz) _write(1, buf, (unsigned int)(sz))
+#define CALAFITE_READ(buffer, size) _read(0, buffer, static_cast<unsigned int>(size))
+#define CALAFITE_WRITE(buffer, size) _write(1, buffer, static_cast<unsigned int>(size))
 #else
 #include <unistd.h>
-#define CALAFITE_READ(buf, sz) read(0, buf, sz)
-#define CALAFITE_WRITE(buf, sz) write(1, buf, sz)
+#define CALAFITE_READ(buffer, size) read(0, buffer, size)
+#define CALAFITE_WRITE(buffer, size) write(1, buffer, size)
 #endif
 
 #if defined(__GNUC__) || defined(__clang__)
@@ -26,269 +27,260 @@
 #endif
 
 namespace calafite {
-namespace io {
+    namespace io {
 
-struct Printer {
-  static constexpr int BUF_SIZE = 1 << 17;
-  char buf[BUF_SIZE];
-  char *ptr = buf;
-  char num_lut[200];
+        struct Printer {
+            static constexpr size_t BUFFER_SIZE = 1 << 17;
+            char buffer[BUFFER_SIZE];
+            char* pointer = buffer;
+            char numberLookupTable[200];
 
-  Printer() {
-    for (int i = 0; i < 100; i++) {
-      num_lut[i * 2] = (char)('0' + i / 10);
-      num_lut[i * 2 + 1] = (char)('0' + i % 10);
+            Printer() {
+                for (size_t index = 0; index < 100; ++index) {
+                    numberLookupTable[index * 2] = static_cast<char>('0' + index / 10);
+                    numberLookupTable[index * 2 + 1] = static_cast<char>('0' + index % 10);
+                }
+            }
+
+            ~Printer() { flush(); }
+
+            inline void flush() {
+                if (pointer != buffer) {
+                    CALAFITE_WRITE(buffer, pointer - buffer);
+                    pointer = buffer;
+                }
+            }
+
+            inline void putChar(char character) {
+                if (CALAFITE_UNLIKELY(pointer + 1 >= buffer + BUFFER_SIZE)) flush();
+                *pointer++ = character;
+            }
+
+            template<typename Type>
+            inline std::enable_if_t<std::is_integral_v<Type>, Printer&> operator<<(Type value) {
+                if (CALAFITE_UNLIKELY(pointer + 32 >= buffer + BUFFER_SIZE)) flush();
+
+                using UnsignedType = std::make_unsigned_t<Type>;
+                UnsignedType unsignedValue = value;
+                if constexpr (std::is_signed_v<Type>) {
+                    if (value < 0) {
+                        *pointer++ = '-';
+                        unsignedValue = 0 - unsignedValue;
+                    }
+                }
+
+                if (unsignedValue == 0) {
+                    *pointer++ = '0';
+                    return *this;
+                }
+
+                char temporary[24];
+                size_t index = 24;
+
+                while (unsignedValue >= 100) {
+                    index -= 2;
+                    UnsignedType remainder = unsignedValue % 100;
+                    unsignedValue /= 100;
+                    temporary[index] = numberLookupTable[remainder * 2];
+                    temporary[index + 1] = numberLookupTable[remainder * 2 + 1];
+                }
+                
+                if (unsignedValue < 10) {
+                    temporary[--index] = static_cast<char>('0' + unsignedValue);
+                } else {
+                    index -= 2;
+                    temporary[index] = numberLookupTable[unsignedValue * 2];
+                    temporary[index + 1] = numberLookupTable[unsignedValue * 2 + 1];
+                }
+
+                size_t length = 24 - index;
+                std::memcpy(pointer, temporary + index, length);
+                pointer += length;
+                return *this;
+            }
+
+            inline Printer& operator<<(char character) {
+                putChar(character);
+                return *this;
+            }
+
+            inline Printer& operator<<(const char* string) {
+                assert(string != nullptr);
+                while (*string) putChar(*string++);
+                return *this;
+            }
+
+            inline Printer& operator<<(const std::string& string) {
+                for (char character : string) putChar(character);
+                return *this;
+            }
+
+            template<typename Type1, typename Type2>
+            inline Printer& operator<<(const std::pair<Type1, Type2>& pair) {
+                return *this << pair.first << ' ' << pair.second;
+            }
+
+            template<typename Type>
+            inline Printer& operator<<(const std::vector<Type>& vector) {
+                for (size_t index = 0; index < vector.size(); ++index) {
+                    *this << vector[index];
+                    if (index + 1 < vector.size()) putChar(' ');
+                }
+                return *this;
+            }
+
+            template<typename Type>
+            inline Printer& operator<<(const core::FastVector<Type>& vector) {
+                for (size_t index = 0; index < vector.size(); ++index) {
+                    *this << vector[index];
+                    if (index + 1 < vector.size()) putChar(' ');
+                }
+                return *this;
+            }
+
+            template<typename Type, size_t Size>
+            inline Printer& operator<<(const std::array<Type, Size>& array) {
+                for (size_t index = 0; index < Size; ++index) {
+                    *this << array[index];
+                    if (index + 1 < Size) putChar(' ');
+                }
+                return *this;
+            }
+        };
+
+        inline Printer out;
+
+        struct Scanner {
+            static constexpr size_t BUFFER_SIZE = 1 << 17;
+            char buffer[BUFFER_SIZE];
+            char* pointer = buffer;
+            char* end = buffer;
+            bool endOfFileFlag = false;
+
+            inline bool reload() {
+                out.flush();
+                int result = CALAFITE_READ(buffer, BUFFER_SIZE);
+                if (result <= 0) {
+                    endOfFileFlag = true;
+                    return false;
+                }
+                pointer = buffer;
+                end = buffer + result;
+                return true;
+            }
+
+            inline int getChar() {
+                if (CALAFITE_UNLIKELY(pointer == end)) {
+                    if (endOfFileFlag || !reload()) return EOF;
+                }
+                return static_cast<unsigned char>(*pointer++);
+            }
+
+            inline int skipWhitespace() {
+                int character;
+                while ((character = getChar()) != EOF && character <= ' ') {}
+                return character;
+            }
+
+            explicit operator bool() const { return !endOfFileFlag; }
+
+            template<typename Type>
+            inline std::enable_if_t<std::is_integral_v<Type>, Scanner&> operator>>(Type& value) {
+                value = 0;
+                int character = skipWhitespace();
+                if (CALAFITE_UNLIKELY(character == EOF)) return *this;
+
+                bool negative = false;
+                if constexpr (std::is_signed_v<Type>) {
+                    if (character == '-') {
+                        negative = true;
+                        character = getChar();
+                    }
+                }
+
+                for (; static_cast<unsigned char>(character - '0') < 10; character = getChar()) {
+                    value = value * 10 + (character - '0');
+                }
+
+                if constexpr (std::is_signed_v<Type>) {
+                    if (negative) value = -value;
+                }
+                return *this;
+            }
+
+            inline Scanner& operator>>(char& character) {
+                int result = skipWhitespace();
+                if (result != EOF) character = static_cast<char>(result);
+                return *this;
+            }
+
+            inline Scanner& operator>>(std::string& string) {
+                string.clear();
+                int character = skipWhitespace();
+                if (CALAFITE_UNLIKELY(character == EOF)) return *this;
+                do {
+                    string.push_back(static_cast<char>(character));
+                    character = getChar();
+                } while (character != EOF && character > ' ');
+                return *this;
+            }
+
+            inline Scanner& operator>>(char* string) {
+                assert(string != nullptr);
+                int character = skipWhitespace();
+                if (CALAFITE_UNLIKELY(character == EOF)) {
+                    *string = '\0';
+                    return *this;
+                }
+                do {
+                    *string++ = static_cast<char>(character);
+                    character = getChar();
+                } while (character != EOF && character > ' ');
+                *string = '\0';
+                return *this;
+            }
+
+            template<typename Type1, typename Type2>
+            inline Scanner& operator>>(std::pair<Type1, Type2>& pair) {
+                return *this >> pair.first >> pair.second;
+            }
+
+            template<typename Type>
+            inline Scanner& operator>>(std::vector<Type>& vector) {
+                for (Type& element : vector) *this >> element;
+                return *this;
+            }
+
+            template<typename Type>
+            inline Scanner& operator>>(core::FastVector<Type>& vector) {
+                for (Type& element : vector) *this >> element;
+                return *this;
+            }
+
+            template<typename Type, size_t Size>
+            inline Scanner& operator>>(std::array<Type, Size>& array) {
+                for (Type& element : array) *this >> element;
+                return *this;
+            }
+        };
+
+        inline Scanner in;
+
+        template<typename... Args> inline void read(Args&... arguments) {
+            (in >> ... >> arguments);
+        }
+
+        template<typename First, typename... Rest>
+        inline void print(const First& first, const Rest&... rest) {
+            out << first;
+            ((out << ' ' << rest), ...);
+        }
+        inline void print() {}
+
+        template<typename... Args> inline void println(const Args&... arguments) {
+            print(arguments...);
+            out << '\n';
+        }
+
     }
-  }
-
-  ~Printer() { flush(); }
-
-  inline void flush() {
-    if (ptr != buf) {
-      CALAFITE_WRITE(buf, ptr - buf);
-      ptr = buf;
-    }
-  }
-
-  inline void put_char(char c) {
-    if (CALAFITE_UNLIKELY(ptr + 1 >= buf + BUF_SIZE))
-      flush();
-    *ptr++ = c;
-  }
-
-  template <typename T>
-  inline std::enable_if_t<std::is_integral_v<T>, Printer &> operator<<(T val) {
-    if (CALAFITE_UNLIKELY(ptr + 32 >= buf + BUF_SIZE))
-      flush();
-
-    using U = std::make_unsigned_t<T>;
-    U uval = val;
-    if constexpr (std::is_signed_v<T>) {
-      if (val < 0) {
-        *ptr++ = '-';
-        uval = 0 - uval;
-      }
-    }
-
-    if (uval == 0) {
-      *ptr++ = '0';
-      return *this;
-    }
-
-    char temp[24];
-    int idx = 24;
-
-    while (uval >= 100) {
-      idx -= 2;
-      int rem = uval % 100;
-      uval /= 100;
-      temp[idx] = num_lut[rem * 2];
-      temp[idx + 1] = num_lut[rem * 2 + 1];
-    }
-    if (uval < 10) {
-      temp[--idx] = (char)('0' + uval);
-    } else {
-      idx -= 2;
-      temp[idx] = num_lut[uval * 2];
-      temp[idx + 1] = num_lut[uval * 2 + 1];
-    }
-
-    int len = 24 - idx;
-    std::memcpy(ptr, temp + idx, len);
-    ptr += len;
-    return *this;
-  }
-
-  inline Printer &operator<<(char c) {
-    put_char(c);
-    return *this;
-  }
-
-  inline Printer &operator<<(const char *s) {
-    while (*s)
-      put_char(*s++);
-    return *this;
-  }
-
-  inline Printer &operator<<(const std::string &s) {
-    for (char c : s)
-      put_char(c);
-    return *this;
-  }
-
-  template <typename T1, typename T2>
-  inline Printer &operator<<(const std::pair<T1, T2> &p) {
-    return *this << p.first << ' ' << p.second;
-  }
-
-  template <typename T> inline Printer &operator<<(const std::vector<T> &v) {
-    for (size_t i = 0; i < v.size(); i++) {
-      *this << v[i];
-      if (i + 1 < v.size())
-        put_char(' ');
-    }
-    return *this;
-  }
-
-  template <typename T> inline Printer &operator<<(const fvec<T> &v) {
-    for (size_t i = 0; i < v.size(); i++) {
-      *this << v[i];
-      if (i + 1 < v.size())
-        put_char(' ');
-    }
-    return *this;
-  }
-
-  template <typename T, size_t N>
-  inline Printer &operator<<(const std::array<T, N> &a) {
-    for (size_t i = 0; i < N; i++) {
-      *this << a[i];
-      if (i + 1 < N)
-        put_char(' ');
-    }
-    return *this;
-  }
-};
-
-inline Printer out;
-
-struct Scanner {
-  static constexpr int BUF_SIZE = 1 << 17;
-  char buf[BUF_SIZE];
-  char *ptr = buf;
-  char *end = buf;
-  bool eof_flag = false;
-
-  inline bool reload() {
-    out.flush();
-    int res = CALAFITE_READ(buf, BUF_SIZE);
-    if (res <= 0) {
-      eof_flag = true;
-      return false;
-    }
-    ptr = buf;
-    end = buf + res;
-    return true;
-  }
-
-  inline int get_char() {
-    if (CALAFITE_UNLIKELY(ptr == end)) {
-      if (eof_flag || !reload())
-        return EOF;
-    }
-    return static_cast<unsigned char>(*ptr++);
-  }
-
-  inline int skip_whitespace() {
-    int c;
-    while ((c = get_char()) != EOF && c <= ' ') {
-    }
-    return c;
-  }
-
-  explicit operator bool() const { return !eof_flag; }
-
-  template <typename T>
-  inline std::enable_if_t<std::is_integral_v<T>, Scanner &> operator>>(T &val) {
-    val = 0;
-    int c = skip_whitespace();
-    if (CALAFITE_UNLIKELY(c == EOF))
-      return *this;
-
-    bool neg = false;
-    if constexpr (std::is_signed_v<T>) {
-      if (c == '-') {
-        neg = true;
-        c = get_char();
-      }
-    }
-
-    for (; (unsigned char)(c - '0') < 10; c = get_char()) {
-      val = val * 10 + (c - '0');
-    }
-
-    if constexpr (std::is_signed_v<T>) {
-      if (neg)
-        val = -val;
-    }
-    return *this;
-  }
-
-  inline Scanner &operator>>(char &c) {
-    int res = skip_whitespace();
-    if (res != EOF)
-      c = static_cast<char>(res);
-    return *this;
-  }
-
-  inline Scanner &operator>>(std::string &s) {
-    s.clear();
-    int c = skip_whitespace();
-    if (CALAFITE_UNLIKELY(c == EOF))
-      return *this;
-    do {
-      s.push_back(static_cast<char>(c));
-      c = get_char();
-    } while (c != EOF && c > ' ');
-    return *this;
-  }
-
-  inline Scanner &operator>>(char *s) {
-    int c = skip_whitespace();
-    if (CALAFITE_UNLIKELY(c == EOF)) {
-      *s = '\0';
-      return *this;
-    }
-    do {
-      *s++ = static_cast<char>(c);
-      c = get_char();
-    } while (c != EOF && c > ' ');
-    *s = '\0';
-    return *this;
-  }
-
-  template <typename T1, typename T2>
-  inline Scanner &operator>>(std::pair<T1, T2> &p) {
-    return *this >> p.first >> p.second;
-  }
-
-  template <typename T> inline Scanner &operator>>(std::vector<T> &v) {
-    for (auto &x : v)
-      *this >> x;
-    return *this;
-  }
-
-  template <typename T> inline Scanner &operator>>(fvec<T> &v) {
-    for (auto &x : v)
-      *this >> x;
-    return *this;
-  }
-
-  template <typename T, size_t N>
-  inline Scanner &operator>>(std::array<T, N> &a) {
-    for (auto &x : a)
-      *this >> x;
-    return *this;
-  }
-};
-
-inline Scanner in;
-
-template <typename... Args> inline void read(Args &...args) {
-  (in >> ... >> args);
 }
-
-template <typename First, typename... Rest>
-inline void print(const First &first, const Rest &...rest) {
-  out << first;
-  ((out << ' ' << rest), ...);
-}
-inline void print() {}
-
-template <typename... Args> inline void println(const Args &...args) {
-  print(args...);
-  out << '\n';
-}
-
-} // namespace io
-} // namespace calafite

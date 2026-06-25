@@ -1,119 +1,493 @@
 #pragma once
 
+#include <cassert>
 #include <cmath>
 #include <numeric>
 
 namespace calafite {
-namespace ops {
+    namespace core {
+        namespace operations {
 
-namespace eps {
-inline constexpr double default_eps = 1e-9;
+            namespace epsilon {
 
-#define CALAFITE_MAKE_EPS_OP(name, expr)                                       \
-  struct _##name {                                                             \
-    double e;                                                                  \
-    constexpr _##name(double e = default_eps) : e(e) {}                        \
-    template <typename T, typename U>                                          \
-    constexpr bool operator()(const T &a, const U &b) const {                  \
-      return expr;                                                             \
-    }                                                                          \
-    template <typename U> constexpr auto operator()(const U &b) const {        \
-      return [b, e = e](const auto &a) { return _##name{e}(a, b); };           \
-    }                                                                          \
-    constexpr _##name with_eps(double new_e) const { return _##name{new_e}; }  \
-  };                                                                           \
-  inline constexpr _##name name{default_eps};
+                inline constexpr double defaultEpsilon = 1e-9;
 
-CALAFITE_MAKE_EPS_OP(eq, (std::abs(a - b) < e))
-CALAFITE_MAKE_EPS_OP(neq, (std::abs(a - b) >= e))
-CALAFITE_MAKE_EPS_OP(lt, (a < b - e))
-CALAFITE_MAKE_EPS_OP(gt, (a > b + e))
-CALAFITE_MAKE_EPS_OP(leq, (a < b + e))
-CALAFITE_MAKE_EPS_OP(geq, (a > b - e))
+                struct Equal {
+                    double epsilon;
+                    constexpr Equal(double epsilon = defaultEpsilon) : epsilon(epsilon) {}
 
-#undef CALAFITE_MAKE_EPS_OP
+                    template<typename LeftType, typename RightType>
+                    constexpr bool operator()(const LeftType& left, const RightType& right) const {
+                        return std::abs(left - right) < epsilon;
+                    }
 
-#define CALAFITE_MAKE_EPS_UNARY(name, expr)                                    \
-  struct _##name {                                                             \
-    double e;                                                                  \
-    constexpr _##name(double e = default_eps) : e(e) {}                        \
-    constexpr bool operator()(double a) const { return expr; }                 \
-    constexpr _##name with_eps(double new_e) const { return _##name{new_e}; }  \
-  };                                                                           \
-  inline constexpr _##name name{default_eps};
+                    template<typename RightType>
+                    constexpr auto operator()(const RightType& right) const {
+                        return [right, epsilon = epsilon](const auto& left) {
+                            return std::abs(left - right) < epsilon;
+                        };
+                    }
 
-CALAFITE_MAKE_EPS_UNARY(is_zero, (std::abs(a) < e))
-CALAFITE_MAKE_EPS_UNARY(is_pos, (a > e))
-CALAFITE_MAKE_EPS_UNARY(is_neg, (a < -e))
+                    constexpr Equal withEpsilon(double newEpsilon) const {
+                        return Equal{newEpsilon};
+                    }
+                };
+                inline constexpr Equal equal{defaultEpsilon};
 
-#undef CALAFITE_MAKE_EPS_UNARY
-} // namespace eps
+                struct NotEqual {
+                    double epsilon;
+                    constexpr NotEqual(double epsilon = defaultEpsilon) : epsilon(epsilon) {}
 
-#define CALAFITE_MAKE_OP(name, op)                                             \
-  struct _##name {                                                             \
-    template <typename T, typename U>                                          \
-    constexpr auto operator()(const T &a, const U &b) const {                  \
-      return a op b;                                                           \
-    }                                                                          \
-    template <typename U> constexpr auto operator()(const U &b) const {        \
-      return [b](const auto &a) { return a op b; };                            \
-    }                                                                          \
-  };                                                                           \
-  inline constexpr _##name name{};
+                    template<typename LeftType, typename RightType>
+                    constexpr bool operator()(const LeftType& left, const RightType& right) const {
+                        return std::abs(left - right) >= epsilon;
+                    }
 
-CALAFITE_MAKE_OP(add, +)
-CALAFITE_MAKE_OP(sub, -)
-CALAFITE_MAKE_OP(mul, *)
-CALAFITE_MAKE_OP(div, /)
-CALAFITE_MAKE_OP(mod, %)
+                    template<typename RightType>
+                    constexpr auto operator()(const RightType& right) const {
+                        return [right, epsilon = epsilon](const auto& left) {
+                            return std::abs(left - right) >= epsilon;
+                        };
+                    }
 
-CALAFITE_MAKE_OP(eq, ==)
-CALAFITE_MAKE_OP(neq, !=)
-CALAFITE_MAKE_OP(lt, <)
-CALAFITE_MAKE_OP(gt, >)
-CALAFITE_MAKE_OP(leq, <=)
-CALAFITE_MAKE_OP(geq, >=)
+                    constexpr NotEqual withEpsilon(double newEpsilon) const {
+                        return NotEqual{newEpsilon};
+                    }
+                };
+                inline constexpr NotEqual notEqual{defaultEpsilon};
 
-CALAFITE_MAKE_OP(band, &)
-CALAFITE_MAKE_OP(bor, |)
-CALAFITE_MAKE_OP(bxor, ^)
+                struct LessThan {
+                    double epsilon;
+                    constexpr LessThan(double epsilon = defaultEpsilon) : epsilon(epsilon) {}
 
-#undef CALAFITE_MAKE_OP
+                    template<typename LeftType, typename RightType>
+                    constexpr bool operator()(const LeftType& left, const RightType& right) const {
+                        return left < right - epsilon;
+                    }
 
-inline constexpr auto min = [](const auto &a, const auto &b) {
-  return a < b ? a : b;
-};
-inline constexpr auto max = [](const auto &a, const auto &b) {
-  return a > b ? a : b;
-};
+                    template<typename RightType>
+                    constexpr auto operator()(const RightType& right) const {
+                        return [right, epsilon = epsilon](const auto& left) {
+                            return left < right - epsilon;
+                        };
+                    }
 
-struct _gcd {
-  template <typename T, typename U>
-  constexpr auto operator()(const T &a, const U &b) const {
-    return std::gcd(a, b);
-  }
-  template <typename U> constexpr auto operator()(const U &b) const {
-    return [b](const auto &a) { return std::gcd(a, b); };
-  }
-};
-inline constexpr _gcd gcd{};
+                    constexpr LessThan withEpsilon(double newEpsilon) const {
+                        return LessThan{newEpsilon};
+                    }
+                };
+                inline constexpr LessThan lessThan{defaultEpsilon};
 
-struct _lcm {
-  template <typename T, typename U>
-  constexpr auto operator()(const T &a, const U &b) const {
-    return std::lcm(a, b);
-  }
-  template <typename U> constexpr auto operator()(const U &b) const {
-    return [b](const auto &a) { return std::lcm(a, b); };
-  }
-};
-inline constexpr _lcm lcm{};
+                struct GreaterThan {
+                    double epsilon;
+                    constexpr GreaterThan(double epsilon = defaultEpsilon) : epsilon(epsilon) {}
 
-inline constexpr auto is_even = [](const auto &a) { return a % 2 == 0; };
-inline constexpr auto is_odd = [](const auto &a) { return a % 2 != 0; };
-inline constexpr auto is_pos = [](const auto &a) { return a > 0; };
-inline constexpr auto is_neg = [](const auto &a) { return a < 0; };
-inline constexpr auto is_zero = [](const auto &a) { return a == 0; };
+                    template<typename LeftType, typename RightType>
+                    constexpr bool operator()(const LeftType& left, const RightType& right) const {
+                        return left > right + epsilon;
+                    }
 
-} // namespace ops
-} // namespace calafite
+                    template<typename RightType>
+                    constexpr auto operator()(const RightType& right) const {
+                        return [right, epsilon = epsilon](const auto& left) {
+                            return left > right + epsilon;
+                        };
+                    }
+
+                    constexpr GreaterThan withEpsilon(double newEpsilon) const {
+                        return GreaterThan{newEpsilon};
+                    }
+                };
+                inline constexpr GreaterThan greaterThan{defaultEpsilon};
+
+                struct LessThanOrEqual {
+                    double epsilon;
+                    constexpr LessThanOrEqual(double epsilon = defaultEpsilon) : epsilon(epsilon) {}
+
+                    template<typename LeftType, typename RightType>
+                    constexpr bool operator()(const LeftType& left, const RightType& right) const {
+                        return left < right + epsilon;
+                    }
+
+                    template<typename RightType>
+                    constexpr auto operator()(const RightType& right) const {
+                        return [right, epsilon = epsilon](const auto& left) {
+                            return left < right + epsilon;
+                        };
+                    }
+
+                    constexpr LessThanOrEqual withEpsilon(double newEpsilon) const {
+                        return LessThanOrEqual{newEpsilon};
+                    }
+                };
+                inline constexpr LessThanOrEqual lessThanOrEqual{defaultEpsilon};
+
+                struct GreaterThanOrEqual {
+                    double epsilon;
+                    constexpr GreaterThanOrEqual(double epsilon = defaultEpsilon) : epsilon(epsilon) {}
+
+                    template<typename LeftType, typename RightType>
+                    constexpr bool operator()(const LeftType& left, const RightType& right) const {
+                        return left > right - epsilon;
+                    }
+
+                    template<typename RightType>
+                    constexpr auto operator()(const RightType& right) const {
+                        return [right, epsilon = epsilon](const auto& left) {
+                            return left > right - epsilon;
+                        };
+                    }
+
+                    constexpr GreaterThanOrEqual withEpsilon(double newEpsilon) const {
+                        return GreaterThanOrEqual{newEpsilon};
+                    }
+                };
+                inline constexpr GreaterThanOrEqual greaterThanOrEqual{defaultEpsilon};
+
+                struct IsZero {
+                    double epsilon;
+                    constexpr IsZero(double epsilon = defaultEpsilon) : epsilon(epsilon) {}
+
+                    constexpr bool operator()(double value) const {
+                        return std::abs(value) < epsilon;
+                    }
+
+                    constexpr IsZero withEpsilon(double newEpsilon) const {
+                        return IsZero{newEpsilon};
+                    }
+                };
+                inline constexpr IsZero isZero{defaultEpsilon};
+
+                struct IsPositive {
+                    double epsilon;
+                    constexpr IsPositive(double epsilon = defaultEpsilon) : epsilon(epsilon) {}
+
+                    constexpr bool operator()(double value) const {
+                        return value > epsilon;
+                    }
+
+                    constexpr IsPositive withEpsilon(double newEpsilon) const {
+                        return IsPositive{newEpsilon};
+                    }
+                };
+                inline constexpr IsPositive isPositive{defaultEpsilon};
+
+                struct IsNegative {
+                    double epsilon;
+                    constexpr IsNegative(double epsilon = defaultEpsilon) : epsilon(epsilon) {}
+
+                    constexpr bool operator()(double value) const {
+                        return value < -epsilon;
+                    }
+
+                    constexpr IsNegative withEpsilon(double newEpsilon) const {
+                        return IsNegative{newEpsilon};
+                    }
+                };
+                inline constexpr IsNegative isNegative{defaultEpsilon};
+
+            }
+
+            struct Add {
+                template<typename LeftType, typename RightType>
+                constexpr auto operator()(const LeftType& left, const RightType& right) const {
+                    return left + right;
+                }
+
+                template<typename RightType>
+                constexpr auto operator()(const RightType& right) const {
+                    return [right](const auto& left) {
+                        return left + right;
+                    };
+                }
+            };
+            inline constexpr Add add{};
+
+            struct Subtract {
+                template<typename LeftType, typename RightType>
+                constexpr auto operator()(const LeftType& left, const RightType& right) const {
+                    return left - right;
+                }
+
+                template<typename RightType>
+                constexpr auto operator()(const RightType& right) const {
+                    return [right](const auto& left) {
+                        return left - right;
+                    };
+                }
+            };
+            inline constexpr Subtract subtract{};
+
+            struct Multiply {
+                template<typename LeftType, typename RightType>
+                constexpr auto operator()(const LeftType& left, const RightType& right) const {
+                    return left * right;
+                }
+
+                template<typename RightType>
+                constexpr auto operator()(const RightType& right) const {
+                    return [right](const auto& left) {
+                        return left * right;
+                    };
+                }
+            };
+            inline constexpr Multiply multiply{};
+
+            struct Divide {
+                template<typename LeftType, typename RightType>
+                constexpr auto operator()(const LeftType& left, const RightType& right) const {
+                    assert(right != 0);
+                    return left / right;
+                }
+
+                template<typename RightType>
+                constexpr auto operator()(const RightType& right) const {
+                    assert(right != 0);
+                    return [right](const auto& left) {
+                        return left / right;
+                    };
+                }
+            };
+            inline constexpr Divide divide{};
+
+            struct Modulo {
+                template<typename LeftType, typename RightType>
+                constexpr auto operator()(const LeftType& left, const RightType& right) const {
+                    assert(right != 0);
+                    return left % right;
+                }
+
+                template<typename RightType>
+                constexpr auto operator()(const RightType& right) const {
+                    assert(right != 0);
+                    return [right](const auto& left) {
+                        return left % right;
+                    };
+                }
+            };
+            inline constexpr Modulo modulo{};
+
+            struct Equal {
+                template<typename LeftType, typename RightType>
+                constexpr bool operator()(const LeftType& left, const RightType& right) const {
+                    return left == right;
+                }
+
+                template<typename RightType>
+                constexpr auto operator()(const RightType& right) const {
+                    return [right](const auto& left) {
+                        return left == right;
+                    };
+                }
+            };
+            inline constexpr Equal equal{};
+
+            struct NotEqual {
+                template<typename LeftType, typename RightType>
+                constexpr bool operator()(const LeftType& left, const RightType& right) const {
+                    return left != right;
+                }
+
+                template<typename RightType>
+                constexpr auto operator()(const RightType& right) const {
+                    return [right](const auto& left) {
+                        return left != right;
+                    };
+                }
+            };
+            inline constexpr NotEqual notEqual{};
+
+            struct LessThan {
+                template<typename LeftType, typename RightType>
+                constexpr bool operator()(const LeftType& left, const RightType& right) const {
+                    return left < right;
+                }
+
+                template<typename RightType>
+                constexpr auto operator()(const RightType& right) const {
+                    return [right](const auto& left) {
+                        return left < right;
+                    };
+                }
+            };
+            inline constexpr LessThan lessThan{};
+
+            struct GreaterThan {
+                template<typename LeftType, typename RightType>
+                constexpr bool operator()(const LeftType& left, const RightType& right) const {
+                    return left > right;
+                }
+
+                template<typename RightType>
+                constexpr auto operator()(const RightType& right) const {
+                    return [right](const auto& left) {
+                        return left > right;
+                    };
+                }
+            };
+            inline constexpr GreaterThan greaterThan{};
+
+            struct LessThanOrEqual {
+                template<typename LeftType, typename RightType>
+                constexpr bool operator()(const LeftType& left, const RightType& right) const {
+                    return left <= right;
+                }
+
+                template<typename RightType>
+                constexpr auto operator()(const RightType& right) const {
+                    return [right](const auto& left) {
+                        return left <= right;
+                    };
+                }
+            };
+            inline constexpr LessThanOrEqual lessThanOrEqual{};
+
+            struct GreaterThanOrEqual {
+                template<typename LeftType, typename RightType>
+                constexpr bool operator()(const LeftType& left, const RightType& right) const {
+                    return left >= right;
+                }
+
+                template<typename RightType>
+                constexpr auto operator()(const RightType& right) const {
+                    return [right](const auto& left) {
+                        return left >= right;
+                    };
+                }
+            };
+            inline constexpr GreaterThanOrEqual greaterThanOrEqual{};
+
+            struct BitwiseAnd {
+                template<typename LeftType, typename RightType>
+                constexpr auto operator()(const LeftType& left, const RightType& right) const {
+                    return left & right;
+                }
+
+                template<typename RightType>
+                constexpr auto operator()(const RightType& right) const {
+                    return [right](const auto& left) {
+                        return left & right;
+                    };
+                }
+            };
+            inline constexpr BitwiseAnd bitwiseAnd{};
+
+            struct BitwiseOr {
+                template<typename LeftType, typename RightType>
+                constexpr auto operator()(const LeftType& left, const RightType& right) const {
+                    return left | right;
+                }
+
+                template<typename RightType>
+                constexpr auto operator()(const RightType& right) const {
+                    return [right](const auto& left) {
+                        return left | right;
+                    };
+                }
+            };
+            inline constexpr BitwiseOr bitwiseOr{};
+
+            struct BitwiseXor {
+                template<typename LeftType, typename RightType>
+                constexpr auto operator()(const LeftType& left, const RightType& right) const {
+                    return left ^ right;
+                }
+
+                template<typename RightType>
+                constexpr auto operator()(const RightType& right) const {
+                    return [right](const auto& left) {
+                        return left ^ right;
+                    };
+                }
+            };
+            inline constexpr BitwiseXor bitwiseXor{};
+
+            struct Minimum {
+                template<typename LeftType, typename RightType>
+                constexpr auto operator()(const LeftType& left, const RightType& right) const {
+                    return left < right ? left : right;
+                }
+            };
+            inline constexpr Minimum minimum{};
+
+            struct Maximum {
+                template<typename LeftType, typename RightType>
+                constexpr auto operator()(const LeftType& left, const RightType& right) const {
+                    return left > right ? left : right;
+                }
+            };
+            inline constexpr Maximum maximum{};
+
+            struct GreatestCommonDivisor {
+                template<typename LeftType, typename RightType>
+                constexpr auto operator()(const LeftType& left, const RightType& right) const {
+                    return std::gcd(left, right);
+                }
+
+                template<typename RightType>
+                constexpr auto operator()(const RightType& right) const {
+                    return [right](const auto& left) {
+                        return std::gcd(left, right);
+                    };
+                }
+            };
+            inline constexpr GreatestCommonDivisor greatestCommonDivisor{};
+
+            struct LeastCommonMultiple {
+                template<typename LeftType, typename RightType>
+                constexpr auto operator()(const LeftType& left, const RightType& right) const {
+                    return std::lcm(left, right);
+                }
+
+                template<typename RightType>
+                constexpr auto operator()(const RightType& right) const {
+                    return [right](const auto& left) {
+                        return std::lcm(left, right);
+                    };
+                }
+            };
+            inline constexpr LeastCommonMultiple leastCommonMultiple{};
+
+            struct IsEven {
+                template<typename Type>
+                constexpr bool operator()(const Type& value) const {
+                    return value % 2 == 0;
+                }
+            };
+            inline constexpr IsEven isEven{};
+
+            struct IsOdd {
+                template<typename Type>
+                constexpr bool operator()(const Type& value) const {
+                    return value % 2 != 0;
+                }
+            };
+            inline constexpr IsOdd isOdd{};
+
+            struct IsPositive {
+                template<typename Type>
+                constexpr bool operator()(const Type& value) const {
+                    return value > 0;
+                }
+            };
+            inline constexpr IsPositive isPositive{};
+
+            struct IsNegative {
+                template<typename Type>
+                constexpr bool operator()(const Type& value) const {
+                    return value < 0;
+                }
+            };
+            inline constexpr IsNegative isNegative{};
+
+            struct IsZero {
+                template<typename Type>
+                constexpr bool operator()(const Type& value) const {
+                    return value == 0;
+                }
+            };
+            inline constexpr IsZero isZero{};
+
+        }
+    }
+}

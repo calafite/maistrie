@@ -1,42 +1,46 @@
 #pragma once
 
-#include "../core/fvec.hpp"
+#include "../core/fastVector.hpp"
 #include <algorithm>
+#include <cassert>
+#include <cstddef>
 
 namespace calafite {
+    namespace ds {
 
-template <typename T> struct Compressor {
-  fvec<T> vals;
+        template<typename Type> struct Compressor {
+            core::FastVector<Type> values;
 
-  Compressor() = default;
+            Compressor() = default;
 
-  explicit Compressor(const fvec<T> &initial_vals) : vals(initial_vals) {
-    build();
-  }
+            explicit Compressor(const core::FastVector<Type>& initialValues) : values(initialValues) { build(); }
 
-  inline void add(const T &x) { vals.push_back(x); }
+            inline void add(const Type& value) { values.pushBack(value); }
 
-  inline void build() {
-    vals.sort();
-    vals.unique();
-  }
+            inline void build() {
+                values.sort();
+                values.unique();
+            }
 
-  inline int get(const T &x) const {
-    return static_cast<int>(std::lower_bound(vals.begin(), vals.end(), x) -
-                            vals.begin());
-  }
+            inline size_t get(const Type& value) const {
+                return static_cast<size_t>(std::lower_bound(values.begin(), values.end(), value) - values.begin());
+            }
 
-  inline T operator[](int i) const { return vals[i]; }
+            inline Type operator[](size_t index) const {
+                assert(index < values.size());
+                return values[index];
+            }
 
-  inline int size() const { return static_cast<int>(vals.size()); }
+            inline size_t size() const { return values.size(); }
 
-  fvec<int> compress_array(const fvec<T> &arr) const {
-    fvec<int> res(arr.size());
-    for (size_t i = 0; i < arr.size(); i++) {
-      res[i] = get(arr[i]);
+            core::FastVector<size_t> compressArray(const core::FastVector<Type>& array) const {
+                core::FastVector<size_t> result(array.size());
+                for (size_t index = 0; index < array.size(); ++index) {
+                    result[index] = get(array[index]);
+                }
+                return result;
+            }
+        };
+
     }
-    return res;
-  }
-};
-
-} // namespace calafite
+}
