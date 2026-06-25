@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../core/fastVector.hpp"
-#include <algorithm>
 #include <cassert>
 #include <cstddef>
 

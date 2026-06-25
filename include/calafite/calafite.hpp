@@ -30,3 +30,9 @@
 //utilities
 #include "utils/fixPoint.hpp"
 #include "utils/utils.hpp"
+
+//search algorithms
+#include "search/graphBFS.hpp"
+#include "search/treeBFS.hpp"
+#include "search/graphDFS.hpp"
+#include "search/treeDFS.hpp"
