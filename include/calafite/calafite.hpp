@@ -62,13 +62,17 @@
     using namespace calafite;                                   \
     using ll   = long long;                                     \
     using ull  = unsigned long long;                            \
-    using vi   = core::FastVector<int>;                         \
-    using vll  = core::FastVector<ll>;                          \
+    using vi   = ::calafite::core::FastVector<int>;             \
+    using vll  = ::calafite::core::FastVector<ll>;              \
     using pii  = pair<int, int>;                                \
     using pll  = pair<ll, ll>;                                  \
-    using mii  = container::HashMap<int, int>;                  \
-    using mll  = container::HashMap<ll, ll>;                    \
     static constexpr int  INF   =  0x3f3f3f3f;                  \
     static constexpr int  NINF  = -0x3f3f3f3f;                  \
     static constexpr ll   LLINF =  0x3f3f3f3f3f3f3f3fLL;        \
-    static constexpr ll   LNINF = -0x3f3f3f3f3f3f3f3fLL;
+    static constexpr ll   LNINF = -0x3f3f3f3f3f3f3f3fLL;        \
+    using calafite::io::in;                                     \
+    using calafite::io::out;                                    \
+    using calafite::io::print;                                  \
+    using calafite::io::println;                                \
+    using calafite::io::read;                                   \
+    
