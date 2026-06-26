@@ -4,10 +4,12 @@
 #include "core/arena.hpp"
 #include "core/fastVector.hpp"
 #include "core/ops.hpp"
+#include "core/iterator.hpp"
 
 // container
 #include "container/hashMap.hpp"
 #include "container/priorityQueue.hpp"
+#include "container/circularBuffer.hpp"
 
 // dynamic programming
 #include "dp/knapsack.hpp"
