@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <cassert>
 #include <cstddef>
 #include <cstring>
@@ -7,13 +8,19 @@
 #include <type_traits>
 #include <utility>
 
-#include "arena.hpp" 
-
 #if defined(__has_include)
     #if __has_include(<version>)
         #include <version>
     #endif
 #endif
+
+namespace calafite {
+    namespace arena {
+        extern char* pointer;
+        extern char* end;
+        extern bool active;
+    }
+}
 
 #if defined(__GNUC__) || defined(__clang__)
 #define CALAFITE_UNLIKELY(x) __builtin_expect(!!(x), 0)
@@ -77,6 +84,49 @@ namespace calafite {
                     pointer = static_cast<Type*>(::operator new[](initialSize * sizeof(Type)));
                     sizeValue = initialSize;
                     capacityValue = initialSize;
+                }
+            }
+
+            FastVector(const Type* arrayPointer, size_t count) {
+                if (count > 0) {
+                    pointer = static_cast<Type*>(::operator new[](count * sizeof(Type)));
+                    sizeValue = count;
+                    capacityValue = count;
+                    if constexpr (std::is_trivially_copyable_v<Type>) {
+                        std::memcpy(pointer, arrayPointer, count * sizeof(Type));
+                    } else {
+                        for (size_t i = 0; i < count; ++i) {
+                            new (&pointer[i]) Type(arrayPointer[i]);
+                        }
+                    }
+                }
+            }
+
+            template <size_t N>
+            explicit FastVector(const Type (&arr)[N]) {
+                pointer = static_cast<Type*>(::operator new[](N * sizeof(Type)));
+                sizeValue = N;
+                capacityValue = N;
+                if constexpr (std::is_trivially_copyable_v<Type>) {
+                    std::memcpy(pointer, arr, N * sizeof(Type));
+                } else {
+                    for (size_t i = 0; i < N; ++i) {
+                        new (&pointer[i]) Type(arr[i]);
+                    }
+                }
+            }
+
+            template <size_t N>
+            explicit FastVector(const std::array<Type, N>& arr) {
+                pointer = static_cast<Type*>(::operator new[](N * sizeof(Type)));
+                sizeValue = N;
+                capacityValue = N;
+                if constexpr (std::is_trivially_copyable_v<Type>) {
+                    std::memcpy(pointer, arr.data(), N * sizeof(Type));
+                } else {
+                    for (size_t i = 0; i < N; ++i) {
+                        new (&pointer[i]) Type(arr[i]);
+                    }
                 }
             }
 
