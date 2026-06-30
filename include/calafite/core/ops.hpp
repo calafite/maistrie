@@ -2,18 +2,42 @@
 
 #include <cassert>
 #include <cmath>
-#include <numeric>
+#include <cstdint>
+#include <bit>
 
 namespace calafite {
     namespace core {
         namespace operations {
 
+            class FastModulo32 {
+            private:
+                uint32_t mod;
+                uint64_t m;
+
+            public:
+                constexpr explicit FastModulo32(uint32_t modulus) 
+                    : mod(modulus), m(modulus == 0 ? 0 : (static_cast<uint64_t>(-1) / modulus + 1)) {}
+
+                constexpr uint32_t operator()(uint64_t value) const {
+                #if defined(__SIZEOF_INT128__)
+                    uint64_t q = (static_cast<unsigned __int128>(value) * m) >> 64;
+                    uint32_t r = static_cast<uint32_t>(value - q * mod);
+                    return r >= mod ? r - mod : r;
+                #else
+                    return value % mod;
+                #endif
+                }
+            };
+
             namespace epsilon {
 
                 inline constexpr double defaultEpsilon = 1e-9;
 
-                struct Equal {
+                class Equal {
+                private:
                     double epsilon;
+
+                public:
                     constexpr Equal(double epsilon = defaultEpsilon) : epsilon(epsilon) {}
 
                     template<typename LeftType, typename RightType>
@@ -34,8 +58,11 @@ namespace calafite {
                 };
                 inline constexpr Equal equal{defaultEpsilon};
 
-                struct NotEqual {
+                class NotEqual {
+                private:
                     double epsilon;
+
+                public:
                     constexpr NotEqual(double epsilon = defaultEpsilon) : epsilon(epsilon) {}
 
                     template<typename LeftType, typename RightType>
@@ -56,8 +83,11 @@ namespace calafite {
                 };
                 inline constexpr NotEqual notEqual{defaultEpsilon};
 
-                struct LessThan {
+                class LessThan {
+                private:
                     double epsilon;
+
+                public:
                     constexpr LessThan(double epsilon = defaultEpsilon) : epsilon(epsilon) {}
 
                     template<typename LeftType, typename RightType>
@@ -78,8 +108,11 @@ namespace calafite {
                 };
                 inline constexpr LessThan lessThan{defaultEpsilon};
 
-                struct GreaterThan {
+                class GreaterThan {
+                private:
                     double epsilon;
+
+                public:
                     constexpr GreaterThan(double epsilon = defaultEpsilon) : epsilon(epsilon) {}
 
                     template<typename LeftType, typename RightType>
@@ -100,8 +133,11 @@ namespace calafite {
                 };
                 inline constexpr GreaterThan greaterThan{defaultEpsilon};
 
-                struct LessThanOrEqual {
+                class LessThanOrEqual {
+                private:
                     double epsilon;
+
+                public:
                     constexpr LessThanOrEqual(double epsilon = defaultEpsilon) : epsilon(epsilon) {}
 
                     template<typename LeftType, typename RightType>
@@ -122,8 +158,11 @@ namespace calafite {
                 };
                 inline constexpr LessThanOrEqual lessThanOrEqual{defaultEpsilon};
 
-                struct GreaterThanOrEqual {
+                class GreaterThanOrEqual {
+                private:
                     double epsilon;
+
+                public:
                     constexpr GreaterThanOrEqual(double epsilon = defaultEpsilon) : epsilon(epsilon) {}
 
                     template<typename LeftType, typename RightType>
@@ -144,8 +183,11 @@ namespace calafite {
                 };
                 inline constexpr GreaterThanOrEqual greaterThanOrEqual{defaultEpsilon};
 
-                struct IsZero {
+                class IsZero {
+                private:
                     double epsilon;
+
+                public:
                     constexpr IsZero(double epsilon = defaultEpsilon) : epsilon(epsilon) {}
 
                     constexpr bool operator()(double value) const {
@@ -158,8 +200,11 @@ namespace calafite {
                 };
                 inline constexpr IsZero isZero{defaultEpsilon};
 
-                struct IsPositive {
+                class IsPositive {
+                private:
                     double epsilon;
+
+                public:
                     constexpr IsPositive(double epsilon = defaultEpsilon) : epsilon(epsilon) {}
 
                     constexpr bool operator()(double value) const {
@@ -172,8 +217,11 @@ namespace calafite {
                 };
                 inline constexpr IsPositive isPositive{defaultEpsilon};
 
-                struct IsNegative {
+                class IsNegative {
+                private:
                     double epsilon;
+
+                public:
                     constexpr IsNegative(double epsilon = defaultEpsilon) : epsilon(epsilon) {}
 
                     constexpr bool operator()(double value) const {
@@ -188,7 +236,8 @@ namespace calafite {
 
             }
 
-            struct Add {
+            class Add {
+            public:
                 template<typename LeftType, typename RightType>
                 constexpr auto operator()(const LeftType& left, const RightType& right) const {
                     return left + right;
@@ -203,7 +252,8 @@ namespace calafite {
             };
             inline constexpr Add add{};
 
-            struct Subtract {
+            class Subtract {
+            public:
                 template<typename LeftType, typename RightType>
                 constexpr auto operator()(const LeftType& left, const RightType& right) const {
                     return left - right;
@@ -218,7 +268,8 @@ namespace calafite {
             };
             inline constexpr Subtract subtract{};
 
-            struct Multiply {
+            class Multiply {
+            public:
                 template<typename LeftType, typename RightType>
                 constexpr auto operator()(const LeftType& left, const RightType& right) const {
                     return left * right;
@@ -233,7 +284,8 @@ namespace calafite {
             };
             inline constexpr Multiply multiply{};
 
-            struct Divide {
+            class Divide {
+            public:
                 template<typename LeftType, typename RightType>
                 constexpr auto operator()(const LeftType& left, const RightType& right) const {
                     assert(right != 0);
@@ -250,7 +302,8 @@ namespace calafite {
             };
             inline constexpr Divide divide{};
 
-            struct Modulo {
+            class Modulo {
+            public:
                 template<typename LeftType, typename RightType>
                 constexpr auto operator()(const LeftType& left, const RightType& right) const {
                     assert(right != 0);
@@ -267,7 +320,8 @@ namespace calafite {
             };
             inline constexpr Modulo modulo{};
 
-            struct Equal {
+            class Equal {
+            public:
                 template<typename LeftType, typename RightType>
                 constexpr bool operator()(const LeftType& left, const RightType& right) const {
                     return left == right;
@@ -282,7 +336,8 @@ namespace calafite {
             };
             inline constexpr Equal equal{};
 
-            struct NotEqual {
+            class NotEqual {
+            public:
                 template<typename LeftType, typename RightType>
                 constexpr bool operator()(const LeftType& left, const RightType& right) const {
                     return left != right;
@@ -297,7 +352,8 @@ namespace calafite {
             };
             inline constexpr NotEqual notEqual{};
 
-            struct LessThan {
+            class LessThan {
+            public:
                 template<typename LeftType, typename RightType>
                 constexpr bool operator()(const LeftType& left, const RightType& right) const {
                     return left < right;
@@ -312,7 +368,8 @@ namespace calafite {
             };
             inline constexpr LessThan lessThan{};
 
-            struct GreaterThan {
+            class GreaterThan {
+            public:
                 template<typename LeftType, typename RightType>
                 constexpr bool operator()(const LeftType& left, const RightType& right) const {
                     return left > right;
@@ -327,7 +384,8 @@ namespace calafite {
             };
             inline constexpr GreaterThan greaterThan{};
 
-            struct LessThanOrEqual {
+            class LessThanOrEqual {
+            public:
                 template<typename LeftType, typename RightType>
                 constexpr bool operator()(const LeftType& left, const RightType& right) const {
                     return left <= right;
@@ -342,7 +400,8 @@ namespace calafite {
             };
             inline constexpr LessThanOrEqual lessThanOrEqual{};
 
-            struct GreaterThanOrEqual {
+            class GreaterThanOrEqual {
+            public:
                 template<typename LeftType, typename RightType>
                 constexpr bool operator()(const LeftType& left, const RightType& right) const {
                     return left >= right;
@@ -357,7 +416,8 @@ namespace calafite {
             };
             inline constexpr GreaterThanOrEqual greaterThanOrEqual{};
 
-            struct BitwiseAnd {
+            class BitwiseAnd {
+            public:
                 template<typename LeftType, typename RightType>
                 constexpr auto operator()(const LeftType& left, const RightType& right) const {
                     return left & right;
@@ -372,7 +432,8 @@ namespace calafite {
             };
             inline constexpr BitwiseAnd bitwiseAnd{};
 
-            struct BitwiseOr {
+            class BitwiseOr {
+            public:
                 template<typename LeftType, typename RightType>
                 constexpr auto operator()(const LeftType& left, const RightType& right) const {
                     return left | right;
@@ -387,7 +448,8 @@ namespace calafite {
             };
             inline constexpr BitwiseOr bitwiseOr{};
 
-            struct BitwiseXor {
+            class BitwiseXor {
+            public:
                 template<typename LeftType, typename RightType>
                 constexpr auto operator()(const LeftType& left, const RightType& right) const {
                     return left ^ right;
@@ -402,7 +464,8 @@ namespace calafite {
             };
             inline constexpr BitwiseXor bitwiseXor{};
 
-            struct Minimum {
+            class Minimum {
+            public:
                 template<typename LeftType, typename RightType>
                 constexpr auto operator()(const LeftType& left, const RightType& right) const {
                     return left < right ? left : right;
@@ -410,7 +473,8 @@ namespace calafite {
             };
             inline constexpr Minimum minimum{};
 
-            struct Maximum {
+            class Maximum {
+            public:
                 template<typename LeftType, typename RightType>
                 constexpr auto operator()(const LeftType& left, const RightType& right) const {
                     return left > right ? left : right;
@@ -418,53 +482,74 @@ namespace calafite {
             };
             inline constexpr Maximum maximum{};
 
-            struct GreatestCommonDivisor {
+            class GreatestCommonDivisor {
+            public:
                 template<typename LeftType, typename RightType>
-                constexpr auto operator()(const LeftType& left, const RightType& right) const {
-                    return std::gcd(left, right);
+                constexpr auto operator()(LeftType left, RightType right) const {
+                    using T = std::make_unsigned_t<std::common_type_t<LeftType, RightType>>;
+                    T u = left < 0 ? -left : left;
+                    T v = right < 0 ? -right : right;
+                    if (u == 0) return v;
+                    if (v == 0) return u;
+                    
+                    int shift = std::countr_zero(u | v);
+                    u >>= std::countr_zero(u);
+                    
+                    do {
+                        v >>= std::countr_zero(v);
+                        if (u > v) std::swap(u, v);
+                        v -= u;
+                    } while (v != 0);
+                    
+                    return u << shift;
                 }
 
                 template<typename RightType>
                 constexpr auto operator()(const RightType& right) const {
-                    return [right](const auto& left) {
-                        return std::gcd(left, right);
+                    return [right, this](const auto& left) {
+                        return (*this)(left, right);
                     };
                 }
             };
             inline constexpr GreatestCommonDivisor greatestCommonDivisor{};
 
-            struct LeastCommonMultiple {
+            class LeastCommonMultiple {
+            public:
                 template<typename LeftType, typename RightType>
                 constexpr auto operator()(const LeftType& left, const RightType& right) const {
-                    return std::lcm(left, right);
+                    if (left == 0 || right == 0) return 0;
+                    return (left / greatestCommonDivisor(left, right)) * right;
                 }
 
                 template<typename RightType>
                 constexpr auto operator()(const RightType& right) const {
-                    return [right](const auto& left) {
-                        return std::lcm(left, right);
+                    return [right, this](const auto& left) {
+                        return (*this)(left, right);
                     };
                 }
             };
             inline constexpr LeastCommonMultiple leastCommonMultiple{};
 
-            struct IsEven {
+            class IsEven {
+            public:
                 template<typename Type>
                 constexpr bool operator()(const Type& value) const {
-                    return value % 2 == 0;
+                    return (value & 1) == 0;
                 }
             };
             inline constexpr IsEven isEven{};
 
-            struct IsOdd {
+            class IsOdd {
+            public:
                 template<typename Type>
                 constexpr bool operator()(const Type& value) const {
-                    return value % 2 != 0;
+                    return (value & 1) != 0;
                 }
             };
             inline constexpr IsOdd isOdd{};
 
-            struct IsPositive {
+            class IsPositive {
+            public:
                 template<typename Type>
                 constexpr bool operator()(const Type& value) const {
                     return value > 0;
@@ -472,7 +557,8 @@ namespace calafite {
             };
             inline constexpr IsPositive isPositive{};
 
-            struct IsNegative {
+            class IsNegative {
+            public:
                 template<typename Type>
                 constexpr bool operator()(const Type& value) const {
                     return value < 0;
@@ -480,7 +566,8 @@ namespace calafite {
             };
             inline constexpr IsNegative isNegative{};
 
-            struct IsZero {
+            class IsZero {
+            public:
                 template<typename Type>
                 constexpr bool operator()(const Type& value) const {
                     return value == 0;

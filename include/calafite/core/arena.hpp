@@ -15,7 +15,7 @@ namespace calafite {
     namespace arena {
 
         class Chunk {
-          public:
+        public:
             Chunk* next;
             size_t size;
             char* data() { return reinterpret_cast<char*>(this + 1); }
@@ -93,6 +93,7 @@ namespace calafite {
         }
 
         class ScopedArena {
+        public:
             ScopedArena() { active = true; }
             ~ScopedArena() {
                 active = false;
