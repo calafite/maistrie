@@ -37,7 +37,7 @@ namespace calafite {
             using pointer = Type*;
             using const_pointer = const Type*;
 
-            Type* data = nullptr;
+            Type* dataValue = nullptr;
             size_t sizeValue = 0;
             size_t capacityValue = 0;
 
@@ -45,12 +45,12 @@ namespace calafite {
 
             explicit FastVector(size_t count) {
                 if (count > 0) {
-                    data = static_cast<Type*>(arena::allocate(count * sizeof(Type), alignof(Type)));
+                    dataValue = static_cast<Type*>(arena::allocate(count * sizeof(Type), alignof(Type)));
                     sizeValue = count;
                     capacityValue = count;
                     if constexpr (!std::is_trivially_default_constructible_v<Type>) {
                         for (size_t index = 0; index < count; ++index) {
-                            new (&data[index]) Type();
+                            new (&dataValue[index]) Type();
                         }
                     }
                 }
@@ -58,11 +58,11 @@ namespace calafite {
 
             FastVector(size_t count, const Type& value) {
                 if (count > 0) {
-                    data = static_cast<Type*>(arena::allocate(count * sizeof(Type), alignof(Type)));
+                    dataValue = static_cast<Type*>(arena::allocate(count * sizeof(Type), alignof(Type)));
                     sizeValue = count;
                     capacityValue = count;
                     for (size_t index = 0; index < count; ++index) {
-                        new (&data[index]) Type(value);
+                        new (&dataValue[index]) Type(value);
                     }
                 }
             }
@@ -70,33 +70,33 @@ namespace calafite {
             FastVector(std::initializer_list<Type> initializer) {
                 size_t count = initializer.size();
                 if (count > 0) {
-                    data = static_cast<Type*>(arena::allocate(count * sizeof(Type), alignof(Type)));
+                    dataValue = static_cast<Type*>(arena::allocate(count * sizeof(Type), alignof(Type)));
                     sizeValue = count;
                     capacityValue = count;
                     size_t index = 0;
                     for (const Type& value : initializer) {
-                        new (&data[index++]) Type(value);
+                        new (&dataValue[index++]) Type(value);
                     }
                 }
             }
 
             FastVector(const FastVector& other) {
                 if (other.sizeValue > 0) {
-                    data = static_cast<Type*>(arena::allocate(other.sizeValue * sizeof(Type), alignof(Type)));
+                    dataValue = static_cast<Type*>(arena::allocate(other.sizeValue * sizeof(Type), alignof(Type)));
                     sizeValue = other.sizeValue;
                     capacityValue = other.sizeValue;
                     if constexpr (std::is_trivially_copyable_v<Type>) {
-                        std::memcpy(data, other.data, sizeValue * sizeof(Type));
+                        std::memcpy(dataValue, other.dataValue, sizeValue * sizeof(Type));
                     } else {
                         for (size_t index = 0; index < sizeValue; ++index) {
-                            new (&data[index]) Type(other.data[index]);
+                            new (&dataValue[index]) Type(other.dataValue[index]);
                         }
                     }
                 }
             }
 
-            FastVector(FastVector&& other) noexcept : data(other.data), sizeValue(other.sizeValue), capacityValue(other.capacityValue) {
-                other.data = nullptr;
+            FastVector(FastVector&& other) noexcept : dataValue(other.dataValue), sizeValue(other.sizeValue), capacityValue(other.capacityValue) {
+                other.dataValue = nullptr;
                 other.sizeValue = 0;
                 other.capacityValue = 0;
             }
@@ -105,16 +105,16 @@ namespace calafite {
                 if (this == &other) return *this;
                 clear();
                 if (other.sizeValue > capacityValue) {
-                    data = static_cast<Type*>(arena::allocate(other.sizeValue * sizeof(Type), alignof(Type)));
+                    dataValue = static_cast<Type*>(arena::allocate(other.sizeValue * sizeof(Type), alignof(Type)));
                     capacityValue = other.sizeValue;
                 }
                 sizeValue = other.sizeValue;
                 if (sizeValue > 0) {
                     if constexpr (std::is_trivially_copyable_v<Type>) {
-                        std::memcpy(data, other.data, sizeValue * sizeof(Type));
+                        std::memcpy(dataValue, other.dataValue, sizeValue * sizeof(Type));
                     } else {
                         for (size_t index = 0; index < sizeValue; ++index) {
-                            new (&data[index]) Type(other.data[index]);
+                            new (&dataValue[index]) Type(other.dataValue[index]);
                         }
                     }
                 }
@@ -124,10 +124,10 @@ namespace calafite {
             FastVector& operator=(FastVector&& other) noexcept {
                 if (this == &other) return *this;
                 clear();
-                data = other.data;
+                dataValue = other.dataValue;
                 sizeValue = other.sizeValue;
                 capacityValue = other.capacityValue;
-                other.data = nullptr;
+                other.dataValue = nullptr;
                 other.sizeValue = 0;
                 other.capacityValue = 0;
                 return *this;
@@ -138,19 +138,19 @@ namespace calafite {
             inline void reserve(size_t capacity) {
                 if (capacity > capacityValue) {
                     Type* buffer = static_cast<Type*>(arena::allocate(capacity * sizeof(Type), alignof(Type)));
-                    if (data && sizeValue > 0) {
+                    if (dataValue && sizeValue > 0) {
                         if constexpr (std::is_trivially_copyable_v<Type>) {
-                            std::memcpy(buffer, data, sizeValue * sizeof(Type));
+                            std::memcpy(buffer, dataValue, sizeValue * sizeof(Type));
                         } else {
                             for (size_t index = 0; index < sizeValue; ++index) {
-                                new (&buffer[index]) Type(std::move(data[index]));
+                                new (&buffer[index]) Type(std::move(dataValue[index]));
                                 if constexpr (!std::is_trivially_destructible_v<Type>) {
-                                    data[index].~Type();
+                                    dataValue[index].~Type();
                                 }
                             }
                         }
                     }
-                    data = buffer;
+                    dataValue = buffer;
                     capacityValue = capacity;
                 }
             }
@@ -158,41 +158,41 @@ namespace calafite {
             inline void grow() {
                 size_t newCapacity = capacityValue == 0 ? 4 : capacityValue * 2;
                 Type* buffer = static_cast<Type*>(arena::allocate(newCapacity * sizeof(Type), alignof(Type)));
-                if (data) {
+                if (dataValue) {
                     if constexpr (std::is_trivially_copyable_v<Type>) {
-                        std::memcpy(buffer, data, sizeValue * sizeof(Type));
+                        std::memcpy(buffer, dataValue, sizeValue * sizeof(Type));
                     } else {
                         for (size_t index = 0; index < sizeValue; ++index) {
-                            new (&buffer[index]) Type(std::move(data[index]));
+                            new (&buffer[index]) Type(std::move(dataValue[index]));
                             if constexpr (!std::is_trivially_destructible_v<Type>) {
-                                data[index].~Type();
+                                dataValue[index].~Type();
                             }
                         }
                     }
                 }
-                data = buffer;
+                dataValue = buffer;
                 capacityValue = newCapacity;
             }
 
             inline void pushBack(const Type& value) {
                 if (CALAFITE_UNLIKELY(sizeValue == capacityValue)) grow();
-                new (&data[sizeValue++]) Type(value);
+                new (&dataValue[sizeValue++]) Type(value);
             }
 
             inline void pushBack(Type&& value) {
                 if (CALAFITE_UNLIKELY(sizeValue == capacityValue)) grow();
-                new (&data[sizeValue++]) Type(std::move(value));
+                new (&dataValue[sizeValue++]) Type(std::move(value));
             }
 
             template<typename... Args> inline void emplaceBack(Args&&... arguments) {
                 if (CALAFITE_UNLIKELY(sizeValue == capacityValue)) grow();
-                new (&data[sizeValue++]) Type(std::forward<Args>(arguments)...);
+                new (&dataValue[sizeValue++]) Type(std::forward<Args>(arguments)...);
             }
 
             inline void popBack() {
                 assert(sizeValue > 0);
                 if constexpr (!std::is_trivially_destructible_v<Type>) {
-                    data[sizeValue - 1].~Type();
+                    dataValue[sizeValue - 1].~Type();
                 }
                 --sizeValue;
             }
@@ -200,7 +200,7 @@ namespace calafite {
             inline void clear() {
                 if constexpr (!std::is_trivially_destructible_v<Type>) {
                     for (size_t index = 0; index < sizeValue; ++index) {
-                        data[index].~Type();
+                        dataValue[index].~Type();
                     }
                 }
                 sizeValue = 0;
@@ -210,30 +210,30 @@ namespace calafite {
                 if (count < sizeValue) {
                     if constexpr (!std::is_trivially_destructible_v<Type>) {
                         for (size_t index = count; index < sizeValue; ++index) {
-                            data[index].~Type();
+                            dataValue[index].~Type();
                         }
                     }
                 } else if (count > sizeValue) {
                     if (count > capacityValue) {
                         Type* buffer = static_cast<Type*>(arena::allocate(count * sizeof(Type), alignof(Type)));
-                        if (data && sizeValue > 0) {
+                        if (dataValue && sizeValue > 0) {
                             if constexpr (std::is_trivially_copyable_v<Type>) {
-                                std::memcpy(buffer, data, sizeValue * sizeof(Type));
+                                std::memcpy(buffer, dataValue, sizeValue * sizeof(Type));
                             } else {
                                 for (size_t index = 0; index < sizeValue; ++index) {
-                                    new (&buffer[index]) Type(std::move(data[index]));
+                                    new (&buffer[index]) Type(std::move(dataValue[index]));
                                     if constexpr (!std::is_trivially_destructible_v<Type>) {
-                                        data[index].~Type();
+                                        dataValue[index].~Type();
                                     }
                                 }
                             }
                         }
-                        data = buffer;
+                        dataValue = buffer;
                         capacityValue = count;
                     }
                     if constexpr (!std::is_trivially_default_constructible_v<Type>) {
                         for (size_t index = sizeValue; index < count; ++index) {
-                            new (&data[index]) Type();
+                            new (&dataValue[index]) Type();
                         }
                     }
                 }
@@ -244,49 +244,52 @@ namespace calafite {
                 Type copy = value;
                 clear();
                 if (count > capacityValue) {
-                    data = static_cast<Type*>(arena::allocate(count * sizeof(Type), alignof(Type)));
+                    dataValue = static_cast<Type*>(arena::allocate(count * sizeof(Type), alignof(Type)));
                     capacityValue = count;
                 }
                 sizeValue = count;
                 for (size_t index = 0; index < count; ++index) {
-                    new (&data[index]) Type(copy);
+                    new (&dataValue[index]) Type(copy);
                 }
             }
 
             inline Type& operator[](size_t index) {
                 assert(index < sizeValue);
-                return data[index];
+                return dataValue[index];
             }
             
             inline const Type& operator[](size_t index) const {
                 assert(index < sizeValue);
-                return data[index];
+                return dataValue[index];
             }
 
             inline Type& front() {
                 assert(sizeValue > 0);
-                return data[0];
+                return dataValue[0];
             }
             
             inline const Type& front() const {
                 assert(sizeValue > 0);
-                return data[0];
+                return dataValue[0];
             }
             
             inline Type& back() {
                 assert(sizeValue > 0);
-                return data[sizeValue - 1];
+                return dataValue[sizeValue - 1];
             }
             
             inline const Type& back() const {
                 assert(sizeValue > 0);
-                return data[sizeValue - 1];
+                return dataValue[sizeValue - 1];
             }
 
-            inline Type* begin() { return data; }
-            inline Type* end() { return data + sizeValue; }
-            inline const Type* begin() const { return data; }
-            inline const Type* end() const { return data + sizeValue; }
+            inline Type* begin() { return dataValue; }
+            inline Type* end() { return dataValue + sizeValue; }
+            inline const Type* begin() const { return dataValue; }
+            inline const Type* end() const { return dataValue + sizeValue; }
+
+            inline Type* data() noexcept { return dataValue; }
+            inline const Type* data() const noexcept { return dataValue; }
 
             inline size_t size() const { return sizeValue; }
             inline bool empty() const { return sizeValue == 0; }
@@ -295,14 +298,14 @@ namespace calafite {
 
             inline size_t find(const Type& value) const {
                 for (size_t index = 0; index < sizeValue; ++index) {
-                    if (data[index] == value) return index;
+                    if (dataValue[index] == value) return index;
                 }
                 return static_cast<size_t>(-1);
             }
 
             template<typename Predicate> inline size_t findIf(Predicate&& predicate) const {
                 for (size_t index = 0; index < sizeValue; ++index) {
-                    if (predicate(data[index])) return index;
+                    if (predicate(dataValue[index])) return index;
                 }
                 return static_cast<size_t>(-1);
             }
@@ -311,16 +314,16 @@ namespace calafite {
 
             inline void replace(const Type& oldValue, const Type& newValue) {
                 for (size_t index = 0; index < sizeValue; ++index) {
-                    if (data[index] == oldValue) data[index] = newValue;
+                    if (dataValue[index] == oldValue) dataValue[index] = newValue;
                 }
             }
 
             template<typename Function> inline auto map(Function&& function) const {
-                using ResultType = std::remove_cv_t<std::remove_reference_t<decltype(function(data[0]))>>;
+                using ResultType = std::remove_cv_t<std::remove_reference_t<decltype(function(dataValue[0]))>>;
                 FastVector<ResultType> result;
                 result.reserve(sizeValue);
                 for (size_t index = 0; index < sizeValue; ++index) {
-                    result.pushBack(function(data[index]));
+                    result.pushBack(function(dataValue[index]));
                 }
                 return result;
             }
@@ -328,7 +331,7 @@ namespace calafite {
             template<typename Predicate> inline FastVector<Type> filter(Predicate&& predicate) const {
                 FastVector<Type> result;
                 for (size_t index = 0; index < sizeValue; ++index) {
-                    if (predicate(data[index])) result.pushBack(data[index]);
+                    if (predicate(dataValue[index])) result.pushBack(dataValue[index]);
                 }
                 return result;
             }
@@ -336,7 +339,7 @@ namespace calafite {
             template<typename Accumulator, typename Function> inline Accumulator reduce(Accumulator initial, Function&& function) const {
                 Accumulator result = initial;
                 for (size_t index = 0; index < sizeValue; ++index) {
-                    result = function(result, data[index]);
+                    result = function(result, dataValue[index]);
                 }
                 return result;
             }
@@ -344,7 +347,7 @@ namespace calafite {
             inline size_t count(const Type& value) const {
                 size_t occurrence = 0;
                 for (size_t index = 0; index < sizeValue; ++index) {
-                    if (data[index] == value) ++occurrence;
+                    if (dataValue[index] == value) ++occurrence;
                 }
                 return occurrence;
             }
@@ -359,7 +362,7 @@ namespace calafite {
 
                 if constexpr (std::is_integral_v<Type> && (sizeof(Type) == 4 || sizeof(Type) == 8)) {
                     using UnsignedType = std::make_unsigned_t<Type>;
-                    UnsignedType* source = reinterpret_cast<UnsignedType*>(data);
+                    UnsignedType* source = reinterpret_cast<UnsignedType*>(dataValue);
 
                     UnsignedType* destination = static_cast<UnsignedType*>(std::malloc(sizeValue * sizeof(Type)));
                     if (!destination) {

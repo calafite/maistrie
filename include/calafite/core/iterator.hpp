@@ -1,5 +1,7 @@
 #pragma once
 
+#include <ranges>
+
 #if defined(__has_include)
     #if __has_include(<version>)
         #include <version>
