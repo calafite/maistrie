@@ -9,6 +9,7 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
+#include <cstdint>
 
 #if defined(_WIN32)
 #include <io.h>
@@ -119,10 +120,9 @@ namespace calafite {
                     temporary[index + 1] = numberLookupTable[val32 * 2 + 1];
                 }
 
-                size_t len = 32 - index;
-                std::memcpy(p, &temporary[index], len);
-                pointer = p + len;
-                
+                while (index - 32) {
+                    *p++ = temporary[index++];
+                }                
                 return *this;
             }
 
@@ -155,9 +155,10 @@ namespace calafite {
                         tmp[--index] = static_cast<char>('0' + u);
                     }
 
-                    size_t len = 12 - index;
-                    std::memcpy(p, &tmp[index], len);
-                    p += len;
+                    while(index < 12) {
+                        *p++ = tmp[index++];    
+                    }
+                    
                     *p++ = ' ';
                 }
                 

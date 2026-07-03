@@ -13,7 +13,7 @@
 
 namespace calafite {
     namespace core {
-        template<typename Type> struct FastVector;
+        template<typename Type> class FastVector;
     }
 
     namespace core {
