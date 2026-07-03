@@ -66,6 +66,7 @@ namespace calafite {
             }
 
             // Eager Operations
+
             template<template<typename...> typename Container = ::calafite::core::FastVector>
             constexpr auto collect() {
                 using RangeRef = std::ranges::range_reference_t<View>;
