@@ -1,8 +1,14 @@
 #pragma once
 
 #include <algorithm>
+#include <array>
 #include <cassert>
+#include <cstddef>
 #include <cstring>
+#include <initializer_list>
+#include <new>
+#include <type_traits>
+#include <utility>
 
 #if defined(__has_include)
 #if __has_include(<version>)
@@ -26,7 +32,6 @@ namespace calafite {
 
 namespace calafite {
     namespace core {
-
         template <typename Type> class FastVector {
           public:
             using iterator = Type*;
@@ -40,6 +45,11 @@ namespace calafite {
                     pointer = static_cast<Type*>(::operator new[](initialSize * sizeof(Type)));
                     sizeValue = initialSize;
                     capacityValue = initialSize;
+                    if constexpr (!std::is_trivial_v<Type>) {
+                        for (size_t i = 0; i < initialSize; ++i) {
+                            new (&pointer[i]) Type();
+                        }
+                    }
                 }
             }
 
@@ -99,17 +109,17 @@ namespace calafite {
                 }
             }
 
-            FastVector(std::initializer_list<Type> init) {
-                size_t count = init.size();
+            FastVector(std::initializer_list<Type> initializer) {
+                size_t count = initializer.size();
                 if (count > 0) {
                     pointer = static_cast<Type*>(::operator new[](count * sizeof(Type)));
                     sizeValue = count;
                     capacityValue = count;
                     if constexpr (std::is_trivially_copyable_v<Type>) {
-                        std::memcpy(pointer, init.begin(), count * sizeof(Type));
+                        std::memcpy(pointer, initializer.begin(), count * sizeof(Type));
                     } else {
                         size_t i = 0;
-                        for (const auto& item : init) {
+                        for (const auto& item : initializer) {
                             new (&pointer[i++]) Type(item);
                         }
                     }
@@ -184,25 +194,6 @@ namespace calafite {
                     other.sizeValue = 0;
                     other.capacityValue = 0;
                 }
-                return *this;
-            }
-
-            FastVector& operator=(std::initializer_list<Type> init) {
-                size_t count = init.size();
-                clear();
-                if (count > capacityValue)
-                    grow(count);
-                if (count > 0) {
-                    if constexpr (std::is_trivially_copyable_v<Type>) {
-                        std::memcpy(pointer, init.begin(), count * sizeof(Type));
-                    } else {
-                        size_t i = 0;
-                        for (const auto& item : init) {
-                            new (&pointer[i++]) Type(item);
-                        }
-                    }
-                }
-                sizeValue = count;
                 return *this;
             }
 
@@ -422,6 +413,5 @@ namespace calafite {
                 capacityValue = newCapacity;
             }
         };
-
     } // namespace core
 } // namespace calafite
