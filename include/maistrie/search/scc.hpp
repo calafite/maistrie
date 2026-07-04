@@ -5,18 +5,27 @@
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
+#include <type_traits>
 #include <utility>
 
 namespace calafite {
     namespace search {
+        template <typename EdgeType> constexpr size_t getEndpoint(const EdgeType& edge) {
+            if constexpr (std::is_integral_v<EdgeType>) {
+                return static_cast<size_t>(edge);
+            } else {
+                return static_cast<size_t>(edge.first);
+            }
+        }
+
         class StronglyConnectedComponents {
           public:
             size_t componentCount;
             core::FastVector<size_t> componentId;
             core::FastVector<core::FastVector<size_t>> components;
 
-            explicit StronglyConnectedComponents(
-                const core::FastVector<core::FastVector<size_t>>& adjacencyList) {
+            template <typename GraphType>
+            explicit StronglyConnectedComponents(const GraphType& adjacencyList) {
                 size_t nodeCount = adjacencyList.size();
                 componentId.assign(nodeCount, static_cast<size_t>(-1));
                 componentCount = 0;
@@ -39,15 +48,17 @@ namespace calafite {
                 nodeStack.clear();
             }
 
-            [[nodiscard]] core::FastVector<core::FastVector<size_t>> buildCondensationGraph(
-                const core::FastVector<core::FastVector<size_t>>& adjacencyList) const {
+            template <typename GraphType>
+            [[nodiscard]] core::FastVector<core::FastVector<size_t>>
+            buildCondensationGraph(const GraphType& adjacencyList) const {
 
                 core::FastVector<core::FastVector<size_t>> dag(componentCount);
                 size_t nodeCount = adjacencyList.size();
 
                 for (size_t u = 0; u < nodeCount; ++u) {
                     size_t uComponent = componentId[u];
-                    for (size_t v : adjacencyList[u]) {
+                    for (const auto& edge : adjacencyList[u]) {
+                        size_t v = getEndpoint(edge);
                         size_t vComponent = componentId[v];
                         if (uComponent != vComponent) {
                             dag[uComponent].pushBack(vComponent);
@@ -70,13 +81,15 @@ namespace calafite {
             core::FastVector<size_t> nodeStack;
             size_t timer;
 
-            void performTarjan(size_t current,
-                               const core::FastVector<core::FastVector<size_t>>& adjacencyList) {
+            template <typename GraphType>
+            void performTarjan(size_t current, const GraphType& adjacencyList) {
                 entryTimes[current] = lowLinks[current] = timer++;
                 nodeStack.pushBack(current);
                 onStack[current] = 1;
 
-                for (size_t neighbor : adjacencyList[current]) {
+                for (const auto& edge : adjacencyList[current]) {
+                    size_t neighbor = getEndpoint(edge);
+
                     if (entryTimes[neighbor] == 0) {
                         performTarjan(neighbor, adjacencyList);
                         lowLinks[current] = std::min(lowLinks[current], lowLinks[neighbor]);
