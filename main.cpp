@@ -1,5 +1,5 @@
 #include <bits/stdc++.h>
-#include <calafite/calafite.hpp>
+#include <maistrie/maistrie.hpp>
 
 CALAFITE_SETUP
 CALAFITE_MAKE_ARENA_GLOBAL

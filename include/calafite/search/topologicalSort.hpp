@@ -6,8 +6,8 @@
 
 namespace calafite {
     namespace search {
-        inline core::FastVector<size_t>
-        topologicalSort(const core::FastVector<core::FastVector<size_t>>& adjacencyList) {
+        template <typename GraphType>
+        inline core::FastVector<size_t> topologicalSort(const GraphType& adjacencyList) {
             size_t nodeCount = adjacencyList.size();
             core::FastVector<size_t> inDegree(nodeCount, 0);
 
@@ -37,7 +37,7 @@ namespace calafite {
             }
 
             if (order.size() != nodeCount) {
-                return {}; 
+                return {};
             }
 
             return order;
