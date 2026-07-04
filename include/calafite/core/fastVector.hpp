@@ -331,15 +331,19 @@ namespace calafite {
             inline size_t size() const {
                 return sizeValue;
             }
+
             inline size_t capacity() const {
                 return capacityValue;
             }
+
             inline bool empty() const {
                 return sizeValue == 0;
             }
+
             inline Type* data() {
                 return pointer;
             }
+
             inline const Type* data() const {
                 return pointer;
             }
@@ -347,12 +351,15 @@ namespace calafite {
             inline iterator begin() {
                 return iterator(pointer);
             }
+
             inline iterator end() {
                 return iterator(pointer + sizeValue);
             }
+
             inline const_iterator begin() const {
                 return const_iterator(pointer);
             }
+
             inline const_iterator end() const {
                 return const_iterator(pointer + sizeValue);
             }

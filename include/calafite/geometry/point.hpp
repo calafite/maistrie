@@ -7,17 +7,9 @@
 namespace calafite {
     namespace geometry {
         template <typename Type> class Point {
-            template <typename T>
-            friend inline io::Printer& operator<<(io::Printer& printer, Point<T> point);
-
-            template <typename T>
-            friend inline io::Scanner& operator>>(io::Scanner& scanner, Point<T>& point);
-
-          private:
             Type x;
             Type y;
 
-          public:
             constexpr Point() : x(Type(0)), y(Type(0)) {}
 
             constexpr Point(Type xValue, Type yValue) noexcept : x(xValue), y(yValue) {}
