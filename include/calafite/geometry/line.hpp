@@ -7,6 +7,7 @@
 namespace calafite {
     namespace geometry {
         template <typename Type> class Line {
+          public:
             Type a;
             Type b;
             Type c;

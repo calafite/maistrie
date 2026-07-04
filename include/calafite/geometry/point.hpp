@@ -7,6 +7,7 @@
 namespace calafite {
     namespace geometry {
         template <typename Type> class Point {
+          public:
             Type x;
             Type y;
 

@@ -12,6 +12,7 @@ namespace calafite {
 
         template <typename Type, size_t CSize = ChunkSize<Type>> class PointAoSoA {
             class alignas(64) Block {
+              public:
                 Type x[CSize];
                 Type y[CSize];
 
@@ -19,6 +20,7 @@ namespace calafite {
             };
 
             class Reference {
+              public:
                 Type& x;
                 Type& y;
 
@@ -52,6 +54,7 @@ namespace calafite {
             };
 
             class ConstReference {
+              public:
                 const Type& x;
                 const Type& y;
 
