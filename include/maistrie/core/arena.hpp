@@ -1,7 +1,5 @@
 #pragma once
 
-#include <cassert>
-#include <cstddef>
 #include <cstdint>
 #include <cstdlib>
 
@@ -117,7 +115,6 @@ namespace calafite {
 } // namespace calafite
 
 #if defined(_WIN32)
-#include <malloc.h>
 #define CALAFITE_ALIGNED_ALLOC(alignment, size) _aligned_malloc(size, alignment)
 #define CALAFITE_ALIGNED_FREE(pointer) _aligned_free(pointer)
 #else

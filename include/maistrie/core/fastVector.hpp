@@ -1,14 +1,8 @@
 #pragma once
 
 #include <algorithm>
-#include <array>
 #include <cassert>
-#include <cstddef>
 #include <cstring>
-#include <initializer_list>
-#include <new>
-#include <type_traits>
-#include <utility>
 
 #if defined(__has_include)
 #if __has_include(<version>)

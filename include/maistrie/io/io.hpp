@@ -31,7 +31,6 @@
 
 namespace calafite {
     namespace io {
-
         class Printer {
           public:
             static constexpr size_t BUFFER_SIZE = 1 << 17;
@@ -127,6 +126,8 @@ namespace calafite {
                 while (index - 32) {
                     *p++ = temporary[index++];
                 }
+
+                pointer = p;
                 return *this;
             }
 
