@@ -1,19 +1,19 @@
 #pragma once
 
+#include <algorithm>
 #include <array>
 #include <cassert>
 #include <cstddef>
 #include <cstring>
+#include <initializer_list>
 #include <new>
 #include <type_traits>
 #include <utility>
-#include <algorithm>
-#include <initializer_list>
 
 #if defined(__has_include)
-    #if __has_include(<version>)
-        #include <version>
-    #endif
+#if __has_include(<version>)
+#include <version>
+#endif
 #endif
 
 namespace calafite {
@@ -21,8 +21,8 @@ namespace calafite {
         extern char* pointer;
         extern char* end;
         extern bool active;
-    }
-}
+    } // namespace arena
+} // namespace calafite
 
 #if defined(__GNUC__) || defined(__clang__)
 #define CALAFITE_UNLIKELY(x) __builtin_expect(!!(x), 0)
@@ -33,9 +33,8 @@ namespace calafite {
 namespace calafite {
     namespace core {
 
-        template <typename Type>
-        class FastVector {
-        public:
+        template <typename Type> class FastVector {
+          public:
             using iterator = Type*;
             using const_iterator = const Type*;
             using value_type = Type;
@@ -80,8 +79,7 @@ namespace calafite {
                 }
             }
 
-            template <size_t N>
-            explicit FastVector(const Type (&arr)[N]) {
+            template <size_t N> explicit FastVector(const Type (&arr)[N]) {
                 pointer = static_cast<Type*>(::operator new[](N * sizeof(Type)));
                 sizeValue = N;
                 capacityValue = N;
@@ -94,8 +92,7 @@ namespace calafite {
                 }
             }
 
-            template <size_t N>
-            explicit FastVector(const std::array<Type, N>& arr) {
+            template <size_t N> explicit FastVector(const std::array<Type, N>& arr) {
                 pointer = static_cast<Type*>(::operator new[](N * sizeof(Type)));
                 sizeValue = N;
                 capacityValue = N;
@@ -136,7 +133,8 @@ namespace calafite {
                 }
             }
 
-            FastVector(const FastVector& other) : pointer(nullptr), sizeValue(other.sizeValue), capacityValue(other.sizeValue) {
+            FastVector(const FastVector& other)
+                : pointer(nullptr), sizeValue(other.sizeValue), capacityValue(other.sizeValue) {
                 if (capacityValue > 0) {
                     pointer = static_cast<Type*>(::operator new[](capacityValue * sizeof(Type)));
                     if constexpr (std::is_trivially_copyable_v<Type>) {
@@ -153,9 +151,12 @@ namespace calafite {
                 if (this != &other) {
                     clear();
                     if (other.sizeValue > capacityValue) {
-                        if (pointer) ::operator delete[](pointer);
+                        if (pointer)
+                            ::operator delete[](pointer);
                         capacityValue = other.sizeValue;
-                        pointer = capacityValue > 0 ? static_cast<Type*>(::operator new[](capacityValue * sizeof(Type))) : nullptr;
+                        pointer = capacityValue > 0
+                            ? static_cast<Type*>(::operator new[](capacityValue * sizeof(Type)))
+                            : nullptr;
                     }
                     sizeValue = other.sizeValue;
                     if (sizeValue > 0) {
@@ -172,7 +173,8 @@ namespace calafite {
             }
 
             FastVector(FastVector&& other) noexcept
-                : pointer(other.pointer), sizeValue(other.sizeValue), capacityValue(other.capacityValue) {
+                : pointer(other.pointer), sizeValue(other.sizeValue),
+                  capacityValue(other.capacityValue) {
                 other.pointer = nullptr;
                 other.sizeValue = 0;
                 other.capacityValue = 0;
@@ -189,12 +191,13 @@ namespace calafite {
                     other.capacityValue = 0;
                 }
                 return *this;
-            } 
+            }
 
             FastVector& operator=(std::initializer_list<Type> init) {
                 size_t count = init.size();
                 clear();
-                if (count > capacityValue) grow(count);
+                if (count > capacityValue)
+                    grow(count);
                 if (count > 0) {
                     if constexpr (std::is_trivially_copyable_v<Type>) {
                         std::memcpy(pointer, init.begin(), count * sizeof(Type));
@@ -210,18 +213,20 @@ namespace calafite {
             }
 
             inline void pushBack(const Type& value) {
-                if (CALAFITE_UNLIKELY(sizeValue == capacityValue)) grow();
+                if (CALAFITE_UNLIKELY(sizeValue == capacityValue))
+                    grow();
                 new (&pointer[sizeValue++]) Type(value);
             }
 
             inline void pushBack(Type&& value) {
-                if (CALAFITE_UNLIKELY(sizeValue == capacityValue)) grow();
+                if (CALAFITE_UNLIKELY(sizeValue == capacityValue))
+                    grow();
                 new (&pointer[sizeValue++]) Type(std::move(value));
             }
 
-            template <typename... Args>
-            inline Type& emplaceBack(Args&&... args) {
-                if (CALAFITE_UNLIKELY(sizeValue == capacityValue)) grow();
+            template <typename... Args> inline Type& emplaceBack(Args&&... args) {
+                if (CALAFITE_UNLIKELY(sizeValue == capacityValue))
+                    grow();
                 new (&pointer[sizeValue]) Type(std::forward<Args>(args)...);
                 return pointer[sizeValue++];
             }
@@ -235,11 +240,13 @@ namespace calafite {
             }
 
             inline void reserve(size_t newCapacity) {
-                if (newCapacity > capacityValue) grow(newCapacity);
+                if (newCapacity > capacityValue)
+                    grow(newCapacity);
             }
 
             inline void resize(size_t newSize) {
-                if (newSize > capacityValue) grow(newSize);
+                if (newSize > capacityValue)
+                    grow(newSize);
 
                 if (newSize > sizeValue) {
                     if constexpr (!std::is_trivial_v<Type>) {
@@ -260,7 +267,8 @@ namespace calafite {
             inline void assign(size_t count, const Type& value) {
                 Type copy = value;
                 clear();
-                if (count > capacityValue) grow(count);
+                if (count > capacityValue)
+                    grow(count);
                 if (count > 0) {
                     if constexpr (std::is_trivially_copyable_v<Type>) {
                         std::fill_n(pointer, count, copy);
@@ -320,24 +328,43 @@ namespace calafite {
                 return pointer[sizeValue - 1];
             }
 
-            inline size_t size() const { return sizeValue; }
-            inline size_t capacity() const { return capacityValue; }
-            inline bool empty() const { return sizeValue == 0; }
-            inline Type* data() { return pointer; }
-            inline const Type* data() const { return pointer; }
+            inline size_t size() const {
+                return sizeValue;
+            }
+            inline size_t capacity() const {
+                return capacityValue;
+            }
+            inline bool empty() const {
+                return sizeValue == 0;
+            }
+            inline Type* data() {
+                return pointer;
+            }
+            inline const Type* data() const {
+                return pointer;
+            }
 
-            inline iterator begin() { return iterator(pointer); }
-            inline iterator end() { return iterator(pointer + sizeValue); }
-            inline const_iterator begin() const { return const_iterator(pointer); }
-            inline const_iterator end() const { return const_iterator(pointer + sizeValue); }
+            inline iterator begin() {
+                return iterator(pointer);
+            }
+            inline iterator end() {
+                return iterator(pointer + sizeValue);
+            }
+            inline const_iterator begin() const {
+                return const_iterator(pointer);
+            }
+            inline const_iterator end() const {
+                return const_iterator(pointer + sizeValue);
+            }
 
-            template<typename Compare>
-            inline void sort(Compare comp) {
-                if (sizeValue > 1) std::sort(begin(), end(), comp);
+            template <typename Compare> inline void sort(Compare comp) {
+                if (sizeValue > 1)
+                    std::sort(begin(), end(), comp);
             }
 
             inline void sort() {
-                if (sizeValue > 1) std::sort(begin(), end());
+                if (sizeValue > 1)
+                    std::sort(begin(), end());
             }
 
             inline void unique() {
@@ -353,17 +380,19 @@ namespace calafite {
                 }
             }
 
-        private:
+          private:
             Type* pointer = nullptr;
             size_t sizeValue = 0;
             size_t capacityValue = 0;
 
             [[gnu::noinline]] void grow(size_t minimumCapacity = 0) {
                 size_t newCapacity = capacityValue == 0 ? 4 : capacityValue * 2;
-                if (newCapacity < minimumCapacity) newCapacity = minimumCapacity;
+                if (newCapacity < minimumCapacity)
+                    newCapacity = minimumCapacity;
 
                 if (calafite::arena::active && pointer) {
-                    char* allocationTail = reinterpret_cast<char*>(pointer) + (capacityValue * sizeof(Type));
+                    char* allocationTail =
+                        reinterpret_cast<char*>(pointer) + (capacityValue * sizeof(Type));
                     if (allocationTail == calafite::arena::pointer) {
                         size_t bytesNeeded = (newCapacity - capacityValue) * sizeof(Type);
                         if (calafite::arena::pointer + bytesNeeded <= calafite::arena::end) {
@@ -393,5 +422,5 @@ namespace calafite {
             }
         };
 
-    }
-}
+    } // namespace core
+} // namespace calafite

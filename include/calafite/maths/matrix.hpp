@@ -11,8 +11,7 @@
 namespace calafite {
     namespace mathematics {
 
-        template<typename Type>
-        struct Matrix {
+        template <typename Type> struct Matrix {
             size_t rowsValue, colsValue;
             core::FastVector<Type> data;
 
@@ -26,7 +25,8 @@ namespace calafite {
                 colsValue = rowsValue > 0 ? grid[0].size() : 0;
                 data.reserve(rowsValue * colsValue);
                 for (size_t r = 0; r < rowsValue; ++r) {
-                    assert(grid[r].size() == colsValue && "All rows must have the same number of columns.");
+                    assert(grid[r].size() == colsValue &&
+                           "All rows must have the same number of columns.");
                     for (size_t c = 0; c < colsValue; ++c) {
                         data.pushBack(grid[r][c]);
                     }
@@ -38,7 +38,8 @@ namespace calafite {
                 colsValue = rowsValue > 0 ? list.begin()->size() : 0;
                 data.reserve(rowsValue * colsValue);
                 for (const auto& row : list) {
-                    assert(row.size() == colsValue && "All rows must have the same number of columns.");
+                    assert(row.size() == colsValue &&
+                           "All rows must have the same number of columns.");
                     for (const auto& value : row) {
                         data.pushBack(value);
                     }
@@ -53,10 +54,20 @@ namespace calafite {
                 return result;
             }
 
-            inline size_t rows() const { return rowsValue; }
-            inline size_t cols() const { return colsValue; }
-            inline bool empty() const { return rowsValue == 0 || colsValue == 0; }
-            inline void clear() { rowsValue = 0; colsValue = 0; data.clear(); }
+            inline size_t rows() const {
+                return rowsValue;
+            }
+            inline size_t cols() const {
+                return colsValue;
+            }
+            inline bool empty() const {
+                return rowsValue == 0 || colsValue == 0;
+            }
+            inline void clear() {
+                rowsValue = 0;
+                colsValue = 0;
+                data.clear();
+            }
 
             inline Type* operator[](size_t row) {
                 assert(row < rowsValue);
@@ -69,30 +80,40 @@ namespace calafite {
             }
 
             bool operator==(const Matrix& other) const {
-                if (rowsValue != other.rowsValue || colsValue != other.colsValue) return false;
+                if (rowsValue != other.rowsValue || colsValue != other.colsValue)
+                    return false;
                 for (size_t i = 0; i < data.size(); ++i) {
-                    if (data[i] != other.data[i]) return false;
+                    if (data[i] != other.data[i])
+                        return false;
                 }
                 return true;
             }
 
-            bool operator!=(const Matrix& other) const { return !(*this == other); }
+            bool operator!=(const Matrix& other) const {
+                return !(*this == other);
+            }
 
             Matrix& operator+=(const Matrix& other) {
                 assert(rowsValue == other.rowsValue && colsValue == other.colsValue);
-                for (size_t i = 0; i < data.size(); ++i) data[i] = data[i] + other.data[i];
+                for (size_t i = 0; i < data.size(); ++i)
+                    data[i] = data[i] + other.data[i];
                 return *this;
             }
 
-            Matrix operator+(const Matrix& other) const { return Matrix(*this) += other; }
+            Matrix operator+(const Matrix& other) const {
+                return Matrix(*this) += other;
+            }
 
             Matrix& operator-=(const Matrix& other) {
                 assert(rowsValue == other.rowsValue && colsValue == other.colsValue);
-                for (size_t i = 0; i < data.size(); ++i) data[i] = data[i] - other.data[i];
+                for (size_t i = 0; i < data.size(); ++i)
+                    data[i] = data[i] - other.data[i];
                 return *this;
             }
 
-            Matrix operator-(const Matrix& other) const { return Matrix(*this) -= other; }
+            Matrix operator-(const Matrix& other) const {
+                return Matrix(*this) -= other;
+            }
 
             Matrix operator*(const Matrix& other) const {
                 assert(colsValue == other.rowsValue);
@@ -100,7 +121,8 @@ namespace calafite {
                 for (size_t i = 0; i < rowsValue; ++i) {
                     for (size_t k = 0; k < colsValue; ++k) {
                         Type temp = (*this)[i][k];
-                        if (temp == Type(0)) continue;
+                        if (temp == Type(0))
+                            continue;
                         for (size_t j = 0; j < other.colsValue; ++j) {
                             result[i][j] = result[i][j] + temp * other[k][j];
                         }
@@ -109,27 +131,36 @@ namespace calafite {
                 return result;
             }
 
-            Matrix& operator*=(const Matrix& other) { return *this = *this * other; }
+            Matrix& operator*=(const Matrix& other) {
+                return *this = *this * other;
+            }
 
             Matrix& operator*=(const Type& scalar) {
-                for (size_t i = 0; i < data.size(); ++i) data[i] = data[i] * scalar;
+                for (size_t i = 0; i < data.size(); ++i)
+                    data[i] = data[i] * scalar;
                 return *this;
             }
 
-            Matrix operator*(const Type& scalar) const { return Matrix(*this) *= scalar; }
+            Matrix operator*(const Type& scalar) const {
+                return Matrix(*this) *= scalar;
+            }
 
             Matrix& operator/=(const Type& scalar) {
-                for (size_t i = 0; i < data.size(); ++i) data[i] = data[i] / scalar;
+                for (size_t i = 0; i < data.size(); ++i)
+                    data[i] = data[i] / scalar;
                 return *this;
             }
-            Matrix operator/(const Type& scalar) const { return Matrix(*this) /= scalar; }
+            Matrix operator/(const Type& scalar) const {
+                return Matrix(*this) /= scalar;
+            }
 
             [[nodiscard]] Matrix power(long long exponent) const {
                 assert(rowsValue == colsValue);
                 Matrix result = identity(rowsValue);
                 Matrix base = *this;
                 while (exponent > 0) {
-                    if (exponent & 1) result *= base;
+                    if (exponent & 1)
+                        result *= base;
                     base *= base;
                     exponent >>= 1;
                 }
@@ -149,7 +180,7 @@ namespace calafite {
             [[nodiscard]] Type determinant() const {
                 return determinantImpl(std::is_integral<Type>{});
             }
-            
+
             [[nodiscard]] Matrix inverse(bool* possible = nullptr) const {
                 assert(rowsValue == colsValue);
                 size_t n = rowsValue;
@@ -164,19 +195,20 @@ namespace calafite {
                             break;
                         }
                     }
-                    
+
                     if (mat[pivot][i] == Type(0)) {
-                        if (possible) *possible = false;
-                        return res; 
+                        if (possible)
+                            *possible = false;
+                        return res;
                     }
-                    
+
                     if (pivot != i) {
                         for (size_t j = 0; j < n; ++j) {
                             std::swap(mat[i][j], mat[pivot][j]);
                             std::swap(res[i][j], res[pivot][j]);
                         }
                     }
-                    
+
                     Type inversePivot = Type(1) / mat[i][i];
                     for (size_t j = 0; j < n; ++j) {
                         mat[i][j] = mat[i][j] * inversePivot;
@@ -192,7 +224,8 @@ namespace calafite {
                         }
                     }
                 }
-                if (possible) *possible = true;
+                if (possible)
+                    *possible = true;
                 return res;
             }
 
@@ -210,13 +243,15 @@ namespace calafite {
                             break;
                         }
                     }
-                    if (mat[pivot][i] == Type(0)) return {};
-                    
+                    if (mat[pivot][i] == Type(0))
+                        return {};
+
                     if (pivot != i) {
-                        for (size_t j = i; j < n; ++j) std::swap(mat[i][j], mat[pivot][j]);
+                        for (size_t j = i; j < n; ++j)
+                            std::swap(mat[i][j], mat[pivot][j]);
                         std::swap(res[i], res[pivot]);
                     }
-                    
+
                     Type inversePivot = Type(1) / mat[i][i];
                     for (size_t j = i + 1; j < n; ++j) {
                         if (mat[j][i] != Type(0)) {
@@ -228,7 +263,7 @@ namespace calafite {
                         }
                     }
                 }
-                
+
                 for (size_t i = n; i-- > 0;) {
                     for (size_t j = i + 1; j < n; ++j) {
                         res[i] = res[i] - mat[i][j] * res[j];
@@ -238,11 +273,13 @@ namespace calafite {
                 return res;
             }
 
-            private:
+          private:
             [[nodiscard]] Type determinantImpl(std::true_type) const {
                 assert(rowsValue == colsValue && "Matrix must be square.");
-                if (rowsValue == 0) return Type(1);
-                if (rowsValue == 1) return data[0];
+                if (rowsValue == 0)
+                    return Type(1);
+                if (rowsValue == 1)
+                    return data[0];
 
                 Matrix workingMatrix = *this;
                 size_t matrixSize = rowsValue;
@@ -251,20 +288,20 @@ namespace calafite {
 
                 for (size_t pivotIndex = 0; pivotIndex < matrixSize - 1; ++pivotIndex) {
                     size_t pivotRow = pivotIndex;
-                    while (pivotRow < matrixSize && workingMatrix[pivotRow][pivotIndex] == Type(0)) {
+                    while (pivotRow < matrixSize &&
+                           workingMatrix[pivotRow][pivotIndex] == Type(0)) {
                         ++pivotRow;
                     }
 
                     if (pivotRow == matrixSize) {
-                        return Type(0); 
+                        return Type(0);
                     }
 
                     if (pivotRow != pivotIndex) {
-                        for (size_t columnIndex = pivotIndex; columnIndex < matrixSize; ++columnIndex) {
-                            std::swap(
-                                      workingMatrix[pivotIndex][columnIndex],
-                                      workingMatrix[pivotRow][columnIndex]
-                                );
+                        for (size_t columnIndex = pivotIndex; columnIndex < matrixSize;
+                             ++columnIndex) {
+                            std::swap(workingMatrix[pivotIndex][columnIndex],
+                                      workingMatrix[pivotRow][columnIndex]);
                         }
                         signValue = -signValue;
                     }
@@ -277,21 +314,20 @@ namespace calafite {
                         Type targetLeadingElement = rowTargetPointer[pivotIndex];
 
                         if (targetLeadingElement == Type(0)) {
-                            if (pivotElement == previousPivot) continue;
-                            for (size_t columnIndex = pivotIndex + 1; columnIndex < matrixSize; ++columnIndex) {
+                            if (pivotElement == previousPivot)
+                                continue;
+                            for (size_t columnIndex = pivotIndex + 1; columnIndex < matrixSize;
+                                 ++columnIndex) {
                                 rowTargetPointer[columnIndex] =
-                                    (rowTargetPointer[columnIndex]
-                                     * pivotElement)
-                                    / previousPivot;
+                                    (rowTargetPointer[columnIndex] * pivotElement) / previousPivot;
                             }
                         } else {
-                            for (size_t columnIndex = pivotIndex + 1; columnIndex < matrixSize; ++columnIndex) {
+                            for (size_t columnIndex = pivotIndex + 1; columnIndex < matrixSize;
+                                 ++columnIndex) {
                                 rowTargetPointer[columnIndex] =
-                                    (rowTargetPointer[columnIndex]
-                                     * pivotElement
-                                     - targetLeadingElement
-                                       * rowPivotPointer[columnIndex])
-                                    / previousPivot;
+                                    (rowTargetPointer[columnIndex] * pivotElement -
+                                     targetLeadingElement * rowPivotPointer[columnIndex]) /
+                                    previousPivot;
                             }
                         }
                     }
@@ -304,8 +340,10 @@ namespace calafite {
 
             [[nodiscard]] Type determinantImpl(std::false_type) const {
                 assert(rowsValue == colsValue && "Matrix must be square.");
-                if (rowsValue == 0) return Type(1);
-                if (rowsValue == 1) return data[0];
+                if (rowsValue == 0)
+                    return Type(1);
+                if (rowsValue == 1)
+                    return data[0];
 
                 Matrix workingMatrix = *this;
                 Type determinantValue = Type(1);
@@ -319,59 +357,61 @@ namespace calafite {
                             break;
                         }
                     }
-            
+
                     if (workingMatrix[pivotRow][pivotIndex] == Type(0)) {
-                        return Type(0); 
+                        return Type(0);
                     }
 
                     if (pivotRow != pivotIndex) {
-                        for (size_t columnIndex = pivotIndex; columnIndex < matrixSize; ++columnIndex) {
-                            std::swap(
-                                      workingMatrix[pivotIndex][columnIndex],
-                                      workingMatrix[pivotRow][columnIndex]
-                                  );
+                        for (size_t columnIndex = pivotIndex; columnIndex < matrixSize;
+                             ++columnIndex) {
+                            std::swap(workingMatrix[pivotIndex][columnIndex],
+                                      workingMatrix[pivotRow][columnIndex]);
                         }
                         determinantValue = Type(0) - determinantValue;
                     }
 
                     determinantValue = determinantValue * workingMatrix[pivotIndex][pivotIndex];
                     Type inversePivotValue = Type(1) / workingMatrix[pivotIndex][pivotIndex];
-            
+
                     for (size_t targetRow = pivotIndex + 1; targetRow < matrixSize; ++targetRow) {
                         if (workingMatrix[targetRow][pivotIndex] != Type(0)) {
-                            Type reductionFactor = workingMatrix[targetRow][pivotIndex] * inversePivotValue;
-                            for (size_t columnIndex = pivotIndex; columnIndex < matrixSize; ++columnIndex) {
+                            Type reductionFactor =
+                                workingMatrix[targetRow][pivotIndex] * inversePivotValue;
+                            for (size_t columnIndex = pivotIndex; columnIndex < matrixSize;
+                                 ++columnIndex) {
                                 workingMatrix[targetRow][columnIndex] =
-                                    workingMatrix[targetRow][columnIndex]
-                                    - reductionFactor
-                                    * workingMatrix[pivotIndex][columnIndex];
+                                    workingMatrix[targetRow][columnIndex] -
+                                    reductionFactor * workingMatrix[pivotIndex][columnIndex];
                             }
                         }
                     }
                 }
                 return determinantValue;
-            }                
+            }
         };
 
-        template<typename Type>
+        template <typename Type>
         inline io::Printer& operator<<(io::Printer& printer, const Matrix<Type>& matrix) {
             for (size_t r = 0; r < matrix.rows(); ++r) {
                 for (size_t c = 0; c < matrix.cols(); ++c) {
                     printer << matrix[r][c];
-                    if (c + 1 < matrix.cols()) printer << ' ';
+                    if (c + 1 < matrix.cols())
+                        printer << ' ';
                 }
-                if (r + 1 < matrix.rows()) printer << '\n';
+                if (r + 1 < matrix.rows())
+                    printer << '\n';
             }
             return printer;
         }
 
-        template<typename Type>
+        template <typename Type>
         inline io::Scanner& operator>>(io::Scanner& scanner, Matrix<Type>& matrix) {
             for (size_t i = 0; i < matrix.data.size(); ++i) {
                 scanner >> matrix.data[i];
             }
             return scanner;
         }
-        
-    }
-}
+
+    } // namespace mathematics
+} // namespace calafite

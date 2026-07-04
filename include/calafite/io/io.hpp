@@ -3,13 +3,13 @@
 #include "../core/fastVector.hpp"
 #include <array>
 #include <cassert>
+#include <cstdint>
 #include <cstdio>
 #include <cstring>
 #include <string>
 #include <type_traits>
 #include <utility>
 #include <vector>
-#include <cstdint>
 
 #if defined(_WIN32)
 #include <io.h>
@@ -23,25 +23,25 @@
 
 #if defined(__GNUC__) || defined(__clang__)
 #define CALAFITE_UNLIKELY(x) __builtin_expect(!!(x), 0)
-#define CALAFITE_LIKELY(x)   __builtin_expect(!!(x), 1)
+#define CALAFITE_LIKELY(x) __builtin_expect(!!(x), 1)
 #else
 #define CALAFITE_UNLIKELY(x) (x)
-#define CALAFITE_LIKELY(x)   (x)
+#define CALAFITE_LIKELY(x) (x)
 #endif
 
 namespace calafite {
     namespace io {
 
         class Printer {
-        public:
+          public:
             static constexpr size_t BUFFER_SIZE = 1 << 17;
 
-        private:
+          private:
             char buffer[BUFFER_SIZE];
             char* pointer = buffer;
             char numberLookupTable[200];
 
-        public:
+          public:
             Printer() {
                 for (size_t index = 0; index < 100; ++index) {
                     numberLookupTable[index * 2] = static_cast<char>('0' + index / 10);
@@ -49,7 +49,9 @@ namespace calafite {
                 }
             }
 
-            ~Printer() { flush(); }
+            ~Printer() {
+                flush();
+            }
 
             inline void flush() {
                 if (pointer != buffer) {
@@ -59,13 +61,15 @@ namespace calafite {
             }
 
             inline void putChar(char character) {
-                if (CALAFITE_UNLIKELY(pointer + 1 >= buffer + BUFFER_SIZE)) flush();
+                if (CALAFITE_UNLIKELY(pointer + 1 >= buffer + BUFFER_SIZE))
+                    flush();
                 *pointer++ = character;
             }
 
-            template<typename Type>
+            template <typename Type>
             inline std::enable_if_t<std::is_integral_v<Type>, Printer&> operator<<(Type value) {
-                if (CALAFITE_UNLIKELY(pointer + 32 >= buffer + BUFFER_SIZE)) flush();
+                if (CALAFITE_UNLIKELY(pointer + 32 >= buffer + BUFFER_SIZE))
+                    flush();
 
                 char* p = pointer;
                 using UnsignedType = std::make_unsigned_t<Type>;
@@ -101,7 +105,7 @@ namespace calafite {
                         temporary[--index] = static_cast<char>('0' + chunk);
                     }
                 }
-                
+
                 uint32_t val32 = static_cast<uint32_t>(unsignedValue);
 
                 while (val32 >= 100) {
@@ -111,7 +115,7 @@ namespace calafite {
                     temporary[index] = numberLookupTable[remainder * 2];
                     temporary[index + 1] = numberLookupTable[remainder * 2 + 1];
                 }
-                
+
                 if (val32 < 10) {
                     temporary[--index] = static_cast<char>('0' + val32);
                 } else {
@@ -122,27 +126,28 @@ namespace calafite {
 
                 while (index - 32) {
                     *p++ = temporary[index++];
-                }                
+                }
                 return *this;
             }
 
             inline void writeSeq(int start, int step, int count) {
-                char* p = pointer; 
-                
+                char* p = pointer;
+
                 for (int i = 0, v = start; i < count; ++i, v += step) {
                     if (CALAFITE_UNLIKELY(p + 11 >= buffer + BUFFER_SIZE)) {
-                        pointer = p; 
+                        pointer = p;
                         flush();
-                        p = pointer; 
+                        p = pointer;
                     }
-    
+
                     uint32_t u = static_cast<uint32_t>(v);
                     char tmp[12];
                     size_t index = 12;
-                    
+
                     while (u >= 100) {
                         index -= 2;
-                        uint32_t r = u % 100; u /= 100;
+                        uint32_t r = u % 100;
+                        u /= 100;
                         tmp[index] = numberLookupTable[r * 2];
                         tmp[index + 1] = numberLookupTable[r * 2 + 1];
                     }
@@ -155,13 +160,13 @@ namespace calafite {
                         tmp[--index] = static_cast<char>('0' + u);
                     }
 
-                    while(index < 12) {
-                        *p++ = tmp[index++];    
+                    while (index < 12) {
+                        *p++ = tmp[index++];
                     }
-                    
+
                     *p++ = ' ';
                 }
-                
+
                 pointer = p;
             }
 
@@ -199,34 +204,36 @@ namespace calafite {
                 return *this;
             }
 
-            template<typename Type1, typename Type2>
+            template <typename Type1, typename Type2>
             inline Printer& operator<<(const std::pair<Type1, Type2>& pair) {
                 return *this << pair.first << ' ' << pair.second;
             }
 
-            template<typename Type>
-            inline Printer& operator<<(const std::vector<Type>& vector) {
+            template <typename Type> inline Printer& operator<<(const std::vector<Type>& vector) {
                 for (size_t index = 0; index < vector.size(); ++index) {
                     *this << vector[index];
-                    if (index + 1 < vector.size()) putChar(' ');
+                    if (index + 1 < vector.size())
+                        putChar(' ');
                 }
                 return *this;
             }
 
-            template<typename Type>
+            template <typename Type>
             inline Printer& operator<<(const core::FastVector<Type>& vector) {
                 for (size_t index = 0; index < vector.size(); ++index) {
                     *this << vector[index];
-                    if (index + 1 < vector.size()) putChar(' ');
+                    if (index + 1 < vector.size())
+                        putChar(' ');
                 }
                 return *this;
             }
 
-            template<typename Type, size_t Size>
+            template <typename Type, size_t Size>
             inline Printer& operator<<(const std::array<Type, Size>& array) {
                 for (size_t index = 0; index < Size; ++index) {
                     *this << array[index];
-                    if (index + 1 < Size) putChar(' ');
+                    if (index + 1 < Size)
+                        putChar(' ');
                 }
                 return *this;
             }
@@ -235,16 +242,16 @@ namespace calafite {
         inline Printer out;
 
         class Scanner {
-        public:
+          public:
             static constexpr size_t BUFFER_SIZE = 1 << 17;
 
-        private:
+          private:
             char buffer[BUFFER_SIZE];
             char* pointer = buffer;
             char* end = buffer;
             bool endOfFileFlag = false;
 
-        public:
+          public:
             Scanner() = default;
 
             inline bool reload() {
@@ -261,7 +268,8 @@ namespace calafite {
 
             inline int getChar() {
                 if (CALAFITE_UNLIKELY(pointer == end)) {
-                    if (endOfFileFlag || !reload()) return EOF;
+                    if (endOfFileFlag || !reload())
+                        return EOF;
                 }
                 return static_cast<unsigned char>(*pointer++);
             }
@@ -269,20 +277,26 @@ namespace calafite {
             inline int skipWhitespace() {
                 while (true) {
                     char* p = pointer;
-                    while (p < end && *p <= ' ') ++p;
+                    while (p < end && *p <= ' ')
+                        ++p;
                     pointer = p;
-                    if (p < end) return static_cast<unsigned char>(*pointer++);
-                    if (!reload()) return EOF;
+                    if (p < end)
+                        return static_cast<unsigned char>(*pointer++);
+                    if (!reload())
+                        return EOF;
                 }
             }
 
-            explicit operator bool() const { return !endOfFileFlag; }
+            explicit operator bool() const {
+                return !endOfFileFlag;
+            }
 
-            template<typename Type>
+            template <typename Type>
             inline std::enable_if_t<std::is_integral_v<Type>, Scanner&> operator>>(Type& value) {
                 value = 0;
                 int character = skipWhitespace();
-                if (CALAFITE_UNLIKELY(character == EOF)) return *this;
+                if (CALAFITE_UNLIKELY(character == EOF))
+                    return *this;
 
                 bool negative = false;
                 if constexpr (std::is_signed_v<Type>) {
@@ -301,42 +315,48 @@ namespace calafite {
                     }
                     pointer = p;
                 } else {
-                    for (; static_cast<unsigned char>(character - '0') < 10; character = getChar()) {
+                    for (; static_cast<unsigned char>(character - '0') < 10;
+                         character = getChar()) {
                         value = value * 10 + (character - '0');
                     }
                 }
 
                 if constexpr (std::is_signed_v<Type>) {
-                    if (negative) value = -value;
+                    if (negative)
+                        value = -value;
                 }
                 return *this;
             }
 
             inline Scanner& operator>>(char& character) {
                 int result = skipWhitespace();
-                if (result != EOF) character = static_cast<char>(result);
+                if (result != EOF)
+                    character = static_cast<char>(result);
                 return *this;
             }
 
             inline Scanner& operator>>(std::string& string) {
                 string.clear();
                 int character = skipWhitespace();
-                if (CALAFITE_UNLIKELY(character == EOF)) return *this;
-                
+                if (CALAFITE_UNLIKELY(character == EOF))
+                    return *this;
+
                 string.push_back(static_cast<char>(character));
 
                 while (true) {
                     char* p = pointer;
                     char* start = p;
-                    while (p < end && *p > ' ') ++p;
-                    
+                    while (p < end && *p > ' ')
+                        ++p;
+
                     if (p > start) {
                         string.append(start, p - start);
                         pointer = p;
                     }
-                    
+
                     if (p == end) {
-                        if (!reload()) break;
+                        if (!reload())
+                            break;
                     } else {
                         break;
                     }
@@ -351,23 +371,25 @@ namespace calafite {
                     *string = '\0';
                     return *this;
                 }
-                
+
                 *string++ = static_cast<char>(character);
-                
+
                 while (true) {
                     char* p = pointer;
                     char* start = p;
-                    while (p < end && *p > ' ') ++p;
-                    
+                    while (p < end && *p > ' ')
+                        ++p;
+
                     size_t len = p - start;
                     if (len > 0) {
                         std::memcpy(string, start, len);
                         string += len;
                         pointer = p;
                     }
-                    
+
                     if (p == end) {
-                        if (!reload()) break;
+                        if (!reload())
+                            break;
                     } else {
                         break;
                     }
@@ -376,46 +398,47 @@ namespace calafite {
                 return *this;
             }
 
-            template<typename Type1, typename Type2>
+            template <typename Type1, typename Type2>
             inline Scanner& operator>>(std::pair<Type1, Type2>& pair) {
                 return *this >> pair.first >> pair.second;
             }
 
-            template<typename Type>
-            inline Scanner& operator>>(std::vector<Type>& vector) {
-                for (Type& element : vector) *this >> element;
+            template <typename Type> inline Scanner& operator>>(std::vector<Type>& vector) {
+                for (Type& element : vector)
+                    *this >> element;
                 return *this;
             }
 
-            template<typename Type>
-            inline Scanner& operator>>(core::FastVector<Type>& vector) {
-                for (Type& element : vector) *this >> element;
+            template <typename Type> inline Scanner& operator>>(core::FastVector<Type>& vector) {
+                for (Type& element : vector)
+                    *this >> element;
                 return *this;
             }
 
-            template<typename Type, size_t Size>
+            template <typename Type, size_t Size>
             inline Scanner& operator>>(std::array<Type, Size>& array) {
-                for (Type& element : array) *this >> element;
+                for (Type& element : array)
+                    *this >> element;
                 return *this;
             }
         };
 
         inline Scanner in;
 
-        template<typename... Args> inline void read(Args&... arguments) {
+        template <typename... Args> inline void read(Args&... arguments) {
             (in >> ... >> arguments);
         }
 
-        template<typename First, typename... Rest>
+        template <typename First, typename... Rest>
         inline void print(const First& first, const Rest&... rest) {
             out << first;
             ((out << ' ' << rest), ...);
         }
         inline void print() {}
 
-        template<typename... Args> inline void println(const Args&... arguments) {
+        template <typename... Args> inline void println(const Args&... arguments) {
             print(arguments...);
             out << '\n';
         }
-    }
-}
+    } // namespace io
+} // namespace calafite

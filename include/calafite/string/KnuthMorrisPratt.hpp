@@ -8,10 +8,12 @@
 namespace calafite {
     namespace string {
 
-        template<typename Container> core::FastVector<size_t> prefixFunction(const Container& string) {
+        template <typename Container>
+        core::FastVector<size_t> prefixFunction(const Container& string) {
             size_t sizeValue = string.size();
             core::FastVector<size_t> prefixTable(sizeValue, 0);
-            if (sizeValue == 0) return prefixTable;
+            if (sizeValue == 0)
+                return prefixTable;
 
             const auto* data = string.data();
             for (size_t index = 1; index < sizeValue; ++index) {
@@ -19,13 +21,14 @@ namespace calafite {
                 while (matchLength > 0 && data[index] != data[matchLength]) {
                     matchLength = prefixTable[matchLength - 1];
                 }
-                if (data[index] == data[matchLength]) ++matchLength;
+                if (data[index] == data[matchLength])
+                    ++matchLength;
                 prefixTable[index] = matchLength;
             }
             return prefixTable;
         }
 
-        template<typename Type> struct KnuthMorrisPratt {
+        template <typename Type> struct KnuthMorrisPratt {
             Type pattern;
             core::FastVector<size_t> prefixTable;
             size_t patternSize;
@@ -38,10 +41,12 @@ namespace calafite {
                 prefixTable = prefixFunction(this->pattern);
             }
 
-            template<typename Container> core::FastVector<size_t> search(const Container& text) const {
+            template <typename Container>
+            core::FastVector<size_t> search(const Container& text) const {
                 core::FastVector<size_t> result;
                 size_t textSize = text.size();
-                if (patternSize == 0 || textSize == 0 || patternSize > textSize) return result;
+                if (patternSize == 0 || textSize == 0 || patternSize > textSize)
+                    return result;
 
                 result.reserve(textSize / patternSize + 2);
 
@@ -64,9 +69,10 @@ namespace calafite {
                 return result;
             }
 
-            template<typename Container> size_t findFirst(const Container& text) const {
+            template <typename Container> size_t findFirst(const Container& text) const {
                 size_t textSize = text.size();
-                if (patternSize == 0 || textSize == 0 || patternSize > textSize) return static_cast<size_t>(-1);
+                if (patternSize == 0 || textSize == 0 || patternSize > textSize)
+                    return static_cast<size_t>(-1);
 
                 const auto* textData = text.data();
                 const auto* patternData = pattern.data();
@@ -86,16 +92,20 @@ namespace calafite {
                 return static_cast<size_t>(-1);
             }
 
-            void reset() { currentState = 0; }
+            void reset() {
+                currentState = 0;
+            }
 
-            template<typename CharacterType> bool feed(const CharacterType& character) {
-                if (patternSize == 0) return false;
+            template <typename CharacterType> bool feed(const CharacterType& character) {
+                if (patternSize == 0)
+                    return false;
                 const auto* patternData = pattern.data();
 
                 while (currentState > 0 && character != patternData[currentState]) {
                     currentState = prefixTable[currentState - 1];
                 }
-                if (character == patternData[currentState]) ++currentState;
+                if (character == patternData[currentState])
+                    ++currentState;
                 if (currentState == patternSize) {
                     currentState = prefixTable[currentState - 1];
                     return true;
@@ -104,5 +114,5 @@ namespace calafite {
             }
         };
 
-    }
-}
+    } // namespace string
+} // namespace calafite

@@ -9,11 +9,12 @@
 namespace calafite {
     namespace dp {
 
-        template<typename Container1, typename Container2>
+        template <typename Container1, typename Container2>
         size_t longestCommonSubsequence(const Container1& sequence1, const Container2& sequence2) {
             size_t n = sequence1.size();
             size_t m = sequence2.size();
-            if (n == 0 || m == 0) return 0;
+            if (n == 0 || m == 0)
+                return 0;
 
             core::FastVector<size_t> previousRow(m + 1, 0);
             core::FastVector<size_t> currentRow(m + 1, 0);
@@ -32,15 +33,18 @@ namespace calafite {
             return previousRow[m];
         }
 
-        template<typename Container1, typename Container2>
-        auto longestCommonSubsequencePath(const Container1& sequence1, const Container2& sequence2) {
+        template <typename Container1, typename Container2>
+        auto longestCommonSubsequencePath(const Container1& sequence1,
+                                          const Container2& sequence2) {
             using ValueType = std::remove_cv_t<std::remove_reference_t<decltype(sequence1[0])>>;
-            
+
             size_t n = sequence1.size();
             size_t m = sequence2.size();
-            if (n == 0 || m == 0) return core::FastVector<ValueType>();
+            if (n == 0 || m == 0)
+                return core::FastVector<ValueType>();
 
-            core::FastVector<core::FastVector<size_t>> dp(n + 1, core::FastVector<size_t>(m + 1, 0));
+            core::FastVector<core::FastVector<size_t>> dp(n + 1,
+                                                          core::FastVector<size_t>(m + 1, 0));
 
             for (size_t i = 1; i <= n; ++i) {
                 for (size_t j = 1; j <= m; ++j) {
@@ -73,5 +77,5 @@ namespace calafite {
             return lcs;
         }
 
-    }
-}
+    } // namespace dp
+} // namespace calafite

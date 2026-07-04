@@ -12,9 +12,9 @@
 #include <utility>
 
 #if defined(__has_include)
-    #if __has_include(<version>)
-        #include <version>
-    #endif
+#if __has_include(<version>)
+#include <version>
+#endif
 #endif
 
 #ifndef CALAFITE_UNLIKELY
@@ -29,18 +29,20 @@ namespace calafite {
     namespace container {
 
         constexpr size_t nextPowerOfTwo(size_t n) {
-            if (n == 0) return 1;
+            if (n == 0)
+                return 1;
             n--;
             n |= n >> 1;
             n |= n >> 2;
             n |= n >> 4;
             n |= n >> 8;
             n |= n >> 16;
-            if constexpr (sizeof(size_t) >= 8) n |= n >> 32;
+            if constexpr (sizeof(size_t) >= 8)
+                n |= n >> 32;
             return n + 1;
         }
 
-        template<typename Type> struct CircularBuffer {
+        template <typename Type> struct CircularBuffer {
             using value_type = Type;
             using size_type = size_t;
             using difference_type = ptrdiff_t;
@@ -55,8 +57,7 @@ namespace calafite {
             size_t capacityValue = 0;
             size_t maskValue = 0;
 
-            template<bool Const>
-            struct IteratorImpl {
+            template <bool Const> struct IteratorImpl {
                 using iterator_category = std::random_access_iterator_tag;
                 using value_type = Type;
                 using difference_type = ptrdiff_t;
@@ -68,32 +69,80 @@ namespace calafite {
                 size_t indexValue = 0;
 
                 IteratorImpl() = default;
-                IteratorImpl(Type* ptr, size_t mask, size_t idx) : bufferData(ptr), maskValue(mask), indexValue(idx) {}
+                IteratorImpl(Type* ptr, size_t mask, size_t idx)
+                    : bufferData(ptr), maskValue(mask), indexValue(idx) {}
 
-                inline reference operator*() const { return bufferData[indexValue & maskValue]; }
-                inline pointer operator->() const { return &bufferData[indexValue & maskValue]; }
+                inline reference operator*() const {
+                    return bufferData[indexValue & maskValue];
+                }
+                inline pointer operator->() const {
+                    return &bufferData[indexValue & maskValue];
+                }
 
-                inline IteratorImpl& operator++() { ++indexValue; return *this; }
-                inline IteratorImpl operator++(int) { IteratorImpl tmp = *this; ++indexValue; return tmp; }
-                inline IteratorImpl& operator--() { --indexValue; return *this; }
-                inline IteratorImpl operator--(int) { IteratorImpl tmp = *this; --indexValue; return tmp; }
+                inline IteratorImpl& operator++() {
+                    ++indexValue;
+                    return *this;
+                }
+                inline IteratorImpl operator++(int) {
+                    IteratorImpl tmp = *this;
+                    ++indexValue;
+                    return tmp;
+                }
+                inline IteratorImpl& operator--() {
+                    --indexValue;
+                    return *this;
+                }
+                inline IteratorImpl operator--(int) {
+                    IteratorImpl tmp = *this;
+                    --indexValue;
+                    return tmp;
+                }
 
-                inline IteratorImpl& operator+=(difference_type offset) { indexValue += offset; return *this; }
-                inline IteratorImpl operator+(difference_type offset) const { return IteratorImpl(bufferData, maskValue, indexValue + offset); }
-                friend inline IteratorImpl operator+(difference_type offset, const IteratorImpl& it) { return it + offset; }
+                inline IteratorImpl& operator+=(difference_type offset) {
+                    indexValue += offset;
+                    return *this;
+                }
+                inline IteratorImpl operator+(difference_type offset) const {
+                    return IteratorImpl(bufferData, maskValue, indexValue + offset);
+                }
+                friend inline IteratorImpl operator+(difference_type offset,
+                                                     const IteratorImpl& it) {
+                    return it + offset;
+                }
 
-                inline IteratorImpl& operator-=(difference_type offset) { indexValue -= offset; return *this; }
-                inline IteratorImpl operator-(difference_type offset) const { return IteratorImpl(bufferData, maskValue, indexValue - offset); }
-                inline difference_type operator-(const IteratorImpl& other) const { return indexValue - other.indexValue; }
+                inline IteratorImpl& operator-=(difference_type offset) {
+                    indexValue -= offset;
+                    return *this;
+                }
+                inline IteratorImpl operator-(difference_type offset) const {
+                    return IteratorImpl(bufferData, maskValue, indexValue - offset);
+                }
+                inline difference_type operator-(const IteratorImpl& other) const {
+                    return indexValue - other.indexValue;
+                }
 
-                inline reference operator[](difference_type offset) const { return bufferData[(indexValue + offset) & maskValue]; }
+                inline reference operator[](difference_type offset) const {
+                    return bufferData[(indexValue + offset) & maskValue];
+                }
 
-                inline bool operator==(const IteratorImpl& other) const { return indexValue == other.indexValue; }
-                inline bool operator!=(const IteratorImpl& other) const { return indexValue != other.indexValue; }
-                inline bool operator<(const IteratorImpl& other) const { return indexValue < other.indexValue; }
-                inline bool operator>(const IteratorImpl& other) const { return indexValue > other.indexValue; }
-                inline bool operator<=(const IteratorImpl& other) const { return indexValue <= other.indexValue; }
-                inline bool operator>=(const IteratorImpl& other) const { return indexValue >= other.indexValue; }
+                inline bool operator==(const IteratorImpl& other) const {
+                    return indexValue == other.indexValue;
+                }
+                inline bool operator!=(const IteratorImpl& other) const {
+                    return indexValue != other.indexValue;
+                }
+                inline bool operator<(const IteratorImpl& other) const {
+                    return indexValue < other.indexValue;
+                }
+                inline bool operator>(const IteratorImpl& other) const {
+                    return indexValue > other.indexValue;
+                }
+                inline bool operator<=(const IteratorImpl& other) const {
+                    return indexValue <= other.indexValue;
+                }
+                inline bool operator>=(const IteratorImpl& other) const {
+                    return indexValue >= other.indexValue;
+                }
             };
 
             using iterator = IteratorImpl<false>;
@@ -139,11 +188,15 @@ namespace calafite {
                     reserve(other.size());
                     tailValue = other.size();
                     if constexpr (std::is_trivially_copyable_v<Type>) {
-                        size_t firstPart = other.capacityValue - (other.headValue & other.maskValue);
-                        if (firstPart > tailValue) firstPart = tailValue;
-                        std::memcpy(data, other.data + (other.headValue & other.maskValue), firstPart * sizeof(Type));
+                        size_t firstPart =
+                            other.capacityValue - (other.headValue & other.maskValue);
+                        if (firstPart > tailValue)
+                            firstPart = tailValue;
+                        std::memcpy(data, other.data + (other.headValue & other.maskValue),
+                                    firstPart * sizeof(Type));
                         if (firstPart < tailValue) {
-                            std::memcpy(data + firstPart, other.data, (tailValue - firstPart) * sizeof(Type));
+                            std::memcpy(data + firstPart, other.data,
+                                        (tailValue - firstPart) * sizeof(Type));
                         }
                     } else {
                         for (size_t index = 0; index < tailValue; ++index) {
@@ -153,7 +206,9 @@ namespace calafite {
                 }
             }
 
-            CircularBuffer(CircularBuffer&& other) noexcept : data(other.data), headValue(other.headValue), tailValue(other.tailValue), capacityValue(other.capacityValue), maskValue(other.maskValue) {
+            CircularBuffer(CircularBuffer&& other) noexcept
+                : data(other.data), headValue(other.headValue), tailValue(other.tailValue),
+                  capacityValue(other.capacityValue), maskValue(other.maskValue) {
                 other.data = nullptr;
                 other.headValue = 0;
                 other.tailValue = 0;
@@ -162,11 +217,13 @@ namespace calafite {
             }
 
             CircularBuffer& operator=(const CircularBuffer& other) {
-                if (this == &other) return *this;
+                if (this == &other)
+                    return *this;
                 clear();
                 if (other.size() > capacityValue) {
                     size_t newCapacity = nextPowerOfTwo(other.size());
-                    data = static_cast<Type*>(arena::allocate(newCapacity * sizeof(Type), alignof(Type)));
+                    data = static_cast<Type*>(
+                        arena::allocate(newCapacity * sizeof(Type), alignof(Type)));
                     capacityValue = newCapacity;
                     maskValue = newCapacity - 1;
                 }
@@ -174,11 +231,15 @@ namespace calafite {
                 tailValue = other.size();
                 if (tailValue > 0) {
                     if constexpr (std::is_trivially_copyable_v<Type>) {
-                        size_t firstPart = other.capacityValue - (other.headValue & other.maskValue);
-                        if (firstPart > tailValue) firstPart = tailValue;
-                        std::memcpy(data, other.data + (other.headValue & other.maskValue), firstPart * sizeof(Type));
+                        size_t firstPart =
+                            other.capacityValue - (other.headValue & other.maskValue);
+                        if (firstPart > tailValue)
+                            firstPart = tailValue;
+                        std::memcpy(data, other.data + (other.headValue & other.maskValue),
+                                    firstPart * sizeof(Type));
                         if (firstPart < tailValue) {
-                            std::memcpy(data + firstPart, other.data, (tailValue - firstPart) * sizeof(Type));
+                            std::memcpy(data + firstPart, other.data,
+                                        (tailValue - firstPart) * sizeof(Type));
                         }
                     } else {
                         for (size_t index = 0; index < tailValue; ++index) {
@@ -190,7 +251,8 @@ namespace calafite {
             }
 
             CircularBuffer& operator=(CircularBuffer&& other) noexcept {
-                if (this == &other) return *this;
+                if (this == &other)
+                    return *this;
                 clear();
                 data = other.data;
                 headValue = other.headValue;
@@ -206,22 +268,28 @@ namespace calafite {
                 return *this;
             }
 
-            ~CircularBuffer() { clear(); }
+            ~CircularBuffer() {
+                clear();
+            }
 
             inline void reserve(size_t capacity) {
                 if (capacity > capacityValue) {
                     size_t newCapacity = nextPowerOfTwo(capacity);
                     size_t newMask = newCapacity - 1;
-                    Type* buffer = static_cast<Type*>(arena::allocate(newCapacity * sizeof(Type), alignof(Type)));
+                    Type* buffer = static_cast<Type*>(
+                        arena::allocate(newCapacity * sizeof(Type), alignof(Type)));
                     size_t currentSize = size();
-                    
+
                     if (data && currentSize > 0) {
                         if constexpr (std::is_trivially_copyable_v<Type>) {
                             size_t firstPart = capacityValue - (headValue & maskValue);
-                            if (firstPart > currentSize) firstPart = currentSize;
-                            std::memcpy(buffer, data + (headValue & maskValue), firstPart * sizeof(Type));
+                            if (firstPart > currentSize)
+                                firstPart = currentSize;
+                            std::memcpy(buffer, data + (headValue & maskValue),
+                                        firstPart * sizeof(Type));
                             if (firstPart < currentSize) {
-                                std::memcpy(buffer + firstPart, data, (currentSize - firstPart) * sizeof(Type));
+                                std::memcpy(buffer + firstPart, data,
+                                            (currentSize - firstPart) * sizeof(Type));
                             }
                         } else {
                             for (size_t index = 0; index < currentSize; ++index) {
@@ -241,40 +309,48 @@ namespace calafite {
                 }
             }
 
-            inline void grow() { reserve(capacityValue == 0 ? 4 : capacityValue * 2); }
+            inline void grow() {
+                reserve(capacityValue == 0 ? 4 : capacityValue * 2);
+            }
 
             inline void pushBack(const Type& value) {
-                if (CALAFITE_UNLIKELY(size() == capacityValue)) grow();
+                if (CALAFITE_UNLIKELY(size() == capacityValue))
+                    grow();
                 new (&data[tailValue & maskValue]) Type(value);
                 ++tailValue;
             }
 
             inline void pushBack(Type&& value) {
-                if (CALAFITE_UNLIKELY(size() == capacityValue)) grow();
+                if (CALAFITE_UNLIKELY(size() == capacityValue))
+                    grow();
                 new (&data[tailValue & maskValue]) Type(std::move(value));
                 ++tailValue;
             }
 
             inline void pushFront(const Type& value) {
-                if (CALAFITE_UNLIKELY(size() == capacityValue)) grow();
+                if (CALAFITE_UNLIKELY(size() == capacityValue))
+                    grow();
                 --headValue;
                 new (&data[headValue & maskValue]) Type(value);
             }
 
             inline void pushFront(Type&& value) {
-                if (CALAFITE_UNLIKELY(size() == capacityValue)) grow();
+                if (CALAFITE_UNLIKELY(size() == capacityValue))
+                    grow();
                 --headValue;
                 new (&data[headValue & maskValue]) Type(std::move(value));
             }
 
-            template<typename... Args> inline void emplaceBack(Args&&... arguments) {
-                if (CALAFITE_UNLIKELY(size() == capacityValue)) grow();
+            template <typename... Args> inline void emplaceBack(Args&&... arguments) {
+                if (CALAFITE_UNLIKELY(size() == capacityValue))
+                    grow();
                 new (&data[tailValue & maskValue]) Type(std::forward<Args>(arguments)...);
                 ++tailValue;
             }
 
-            template<typename... Args> inline void emplaceFront(Args&&... arguments) {
-                if (CALAFITE_UNLIKELY(size() == capacityValue)) grow();
+            template <typename... Args> inline void emplaceFront(Args&&... arguments) {
+                if (CALAFITE_UNLIKELY(size() == capacityValue))
+                    grow();
                 --headValue;
                 new (&data[headValue & maskValue]) Type(std::forward<Args>(arguments)...);
             }
@@ -335,19 +411,23 @@ namespace calafite {
                     new (&data[(headValue + index) & maskValue]) Type(copy);
                 }
             }
-            
+
             inline void linearize() {
-                if (empty() || (headValue & maskValue) == 0) return;
-                
+                if (empty() || (headValue & maskValue) == 0)
+                    return;
+
                 size_t currentSize = size();
-                Type* buffer = static_cast<Type*>(arena::allocate(capacityValue * sizeof(Type), alignof(Type)));
-                
+                Type* buffer = static_cast<Type*>(
+                    arena::allocate(capacityValue * sizeof(Type), alignof(Type)));
+
                 if constexpr (std::is_trivially_copyable_v<Type>) {
                     size_t firstPart = capacityValue - (headValue & maskValue);
-                    if (firstPart > currentSize) firstPart = currentSize;
+                    if (firstPart > currentSize)
+                        firstPart = currentSize;
                     std::memcpy(buffer, data + (headValue & maskValue), firstPart * sizeof(Type));
                     if (firstPart < currentSize) {
-                        std::memcpy(buffer + firstPart, data, (currentSize - firstPart) * sizeof(Type));
+                        std::memcpy(buffer + firstPart, data,
+                                    (currentSize - firstPart) * sizeof(Type));
                     }
                 } else {
                     for (size_t index = 0; index < currentSize; ++index) {
@@ -367,7 +447,7 @@ namespace calafite {
                 assert(index < size());
                 return data[(headValue + index) & maskValue];
             }
-            
+
             inline const Type& operator[](size_t index) const {
                 assert(index < size());
                 return data[(headValue + index) & maskValue];
@@ -377,59 +457,83 @@ namespace calafite {
                 assert(!empty());
                 return data[headValue & maskValue];
             }
-            
+
             inline const Type& front() const {
                 assert(!empty());
                 return data[headValue & maskValue];
             }
-            
+
             inline Type& back() {
                 assert(!empty());
                 return data[(tailValue - 1) & maskValue];
             }
-            
+
             inline const Type& back() const {
                 assert(!empty());
                 return data[(tailValue - 1) & maskValue];
             }
 
-            inline iterator begin() { return iterator(data, maskValue, headValue); }
-            inline iterator end() { return iterator(data, maskValue, tailValue); }
-            inline const_iterator begin() const { return const_iterator(data, maskValue, headValue); }
-            inline const_iterator end() const { return const_iterator(data, maskValue, tailValue); }
-            inline const_iterator cbegin() const { return const_iterator(data, maskValue, headValue); }
-            inline const_iterator cend() const { return const_iterator(data, maskValue, tailValue); }
+            inline iterator begin() {
+                return iterator(data, maskValue, headValue);
+            }
+            inline iterator end() {
+                return iterator(data, maskValue, tailValue);
+            }
+            inline const_iterator begin() const {
+                return const_iterator(data, maskValue, headValue);
+            }
+            inline const_iterator end() const {
+                return const_iterator(data, maskValue, tailValue);
+            }
+            inline const_iterator cbegin() const {
+                return const_iterator(data, maskValue, headValue);
+            }
+            inline const_iterator cend() const {
+                return const_iterator(data, maskValue, tailValue);
+            }
 
-            inline size_t size() const { return tailValue - headValue; }
-            inline bool empty() const { return headValue == tailValue; }
+            inline size_t size() const {
+                return tailValue - headValue;
+            }
+            inline bool empty() const {
+                return headValue == tailValue;
+            }
 
-            inline void reverse() { std::reverse(begin(), end()); }
+            inline void reverse() {
+                std::reverse(begin(), end());
+            }
 
             inline size_t find(const Type& value) const {
                 for (size_t index = 0; index < size(); ++index) {
-                    if (data[(headValue + index) & maskValue] == value) return index;
+                    if (data[(headValue + index) & maskValue] == value)
+                        return index;
                 }
                 return static_cast<size_t>(-1);
             }
 
-            template<typename Predicate> inline size_t findIf(Predicate&& predicate) const {
+            template <typename Predicate> inline size_t findIf(Predicate&& predicate) const {
                 for (size_t index = 0; index < size(); ++index) {
-                    if (predicate(data[(headValue + index) & maskValue])) return index;
+                    if (predicate(data[(headValue + index) & maskValue]))
+                        return index;
                 }
                 return static_cast<size_t>(-1);
             }
 
-            inline bool contains(const Type& value) const { return find(value) != static_cast<size_t>(-1); }
+            inline bool contains(const Type& value) const {
+                return find(value) != static_cast<size_t>(-1);
+            }
 
             inline void replace(const Type& oldValue, const Type& newValue) {
                 for (size_t index = 0; index < size(); ++index) {
                     size_t pos = (headValue + index) & maskValue;
-                    if (data[pos] == oldValue) data[pos] = newValue;
+                    if (data[pos] == oldValue)
+                        data[pos] = newValue;
                 }
             }
 
-            template<typename Function> inline auto map(Function&& function) const {
-                using ResultType = std::remove_cv_t<std::remove_reference_t<decltype(function(data[0]))>>;
+            template <typename Function> inline auto map(Function&& function) const {
+                using ResultType =
+                    std::remove_cv_t<std::remove_reference_t<decltype(function(data[0]))>>;
                 CircularBuffer<ResultType> result;
                 result.reserve(size());
                 for (size_t index = 0; index < size(); ++index) {
@@ -438,16 +542,19 @@ namespace calafite {
                 return result;
             }
 
-            template<typename Predicate> inline CircularBuffer<Type> filter(Predicate&& predicate) const {
+            template <typename Predicate>
+            inline CircularBuffer<Type> filter(Predicate&& predicate) const {
                 CircularBuffer<Type> result;
                 for (size_t index = 0; index < size(); ++index) {
                     size_t pos = (headValue + index) & maskValue;
-                    if (predicate(data[pos])) result.pushBack(data[pos]);
+                    if (predicate(data[pos]))
+                        result.pushBack(data[pos]);
                 }
                 return result;
             }
 
-            template<typename Accumulator, typename Function> inline Accumulator reduce(Accumulator initial, Function&& function) const {
+            template <typename Accumulator, typename Function>
+            inline Accumulator reduce(Accumulator initial, Function&& function) const {
                 Accumulator result = initial;
                 for (size_t index = 0; index < size(); ++index) {
                     result = function(result, data[(headValue + index) & maskValue]);
@@ -458,26 +565,31 @@ namespace calafite {
             inline size_t count(const Type& value) const {
                 size_t occurrence = 0;
                 for (size_t index = 0; index < size(); ++index) {
-                    if (data[(headValue + index) & maskValue] == value) ++occurrence;
+                    if (data[(headValue + index) & maskValue] == value)
+                        ++occurrence;
                 }
                 return occurrence;
             }
 
             inline void unique() {
-                if (empty()) return;
+                if (empty())
+                    return;
                 auto newEnd = std::unique(begin(), end());
                 tailValue = headValue + (newEnd - begin());
             }
 
             inline void sort() {
-                if (size() < 2) return;
-                linearize(); 
+                if (size() < 2)
+                    return;
+                linearize();
 
-                if constexpr (std::is_integral_v<Type> && (sizeof(Type) == 4 || sizeof(Type) == 8)) {
+                if constexpr (std::is_integral_v<Type> &&
+                              (sizeof(Type) == 4 || sizeof(Type) == 8)) {
                     using UnsignedType = std::make_unsigned_t<Type>;
                     UnsignedType* source = reinterpret_cast<UnsignedType*>(data);
 
-                    UnsignedType* destination = static_cast<UnsignedType*>(std::malloc(size() * sizeof(Type)));
+                    UnsignedType* destination =
+                        static_cast<UnsignedType*>(std::malloc(size() * sizeof(Type)));
                     if (!destination) {
                         std::sort(begin(), end());
                         return;
@@ -490,7 +602,8 @@ namespace calafite {
 
                         for (size_t index = 0; index < size(); ++index) {
                             uint8_t byte = (source[index] >> shift) & 0xFF;
-                            if (isLastPass) byte ^= 128;
+                            if (isLastPass)
+                                byte ^= 128;
                             occurrences[byte]++;
                         }
 
@@ -502,7 +615,8 @@ namespace calafite {
 
                         for (size_t index = 0; index < size(); ++index) {
                             uint8_t byte = (source[index] >> shift) & 0xFF;
-                            if (isLastPass) byte ^= 128;
+                            if (isLastPass)
+                                byte ^= 128;
                             destination[positions[byte]++] = source[index];
                         }
                         std::swap(source, destination);
@@ -513,11 +627,11 @@ namespace calafite {
                 }
             }
 
-            template<typename Compare> inline void sort(Compare comparison) {
+            template <typename Compare> inline void sort(Compare comparison) {
                 std::sort(begin(), end(), comparison);
             }
 
-            #if defined(__cpp_lib_ranges)
+#if defined(__cpp_lib_ranges)
             inline auto iterate() {
                 auto v = std::views::all(*this);
                 return ::calafite::core::IteratorPipeline<decltype(v)>(std::move(v));
@@ -527,7 +641,7 @@ namespace calafite {
                 auto v = std::views::all(*this);
                 return ::calafite::core::IteratorPipeline<decltype(v)>(std::move(v));
             }
-            #endif
+#endif
         };
-    }
-}
+    } // namespace container
+} // namespace calafite

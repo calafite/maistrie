@@ -3,10 +3,10 @@ Language: Cpp
 
 BasedOnStyle: LLVM
 
-Standard: Cpp17
+Standard: Latest
 
-IndentWidth: 2
-TabWidth: 2
+IndentWidth: 4
+TabWidth: 4
 UseTab: Never
 
 NamespaceIndentation: All

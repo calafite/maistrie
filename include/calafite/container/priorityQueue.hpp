@@ -10,8 +10,7 @@
 namespace calafite {
     namespace container {
 
-        template<typename Type, typename Compare = std::less<Type>>
-        struct PriorityQueue {
+        template <typename Type, typename Compare = std::less<Type>> struct PriorityQueue {
             core::FastVector<Type> data;
             Compare compare;
 
@@ -19,13 +18,13 @@ namespace calafite {
 
             explicit PriorityQueue(Compare comp) : compare(std::move(comp)) {}
 
-            PriorityQueue(std::initializer_list<Type> init, Compare comp = Compare()) 
+            PriorityQueue(std::initializer_list<Type> init, Compare comp = Compare())
                 : data(init), compare(std::move(comp)) {
                 std::make_heap(data.begin(), data.end(), compare);
             }
 
-            template<typename Container>
-            PriorityQueue(const Container& container, Compare comp = Compare()) 
+            template <typename Container>
+            PriorityQueue(const Container& container, Compare comp = Compare())
                 : compare(std::move(comp)) {
                 data.reserve(container.size());
                 for (const auto& item : container) {
@@ -34,8 +33,12 @@ namespace calafite {
                 std::make_heap(data.begin(), data.end(), compare);
             }
 
-            inline bool empty() const { return data.empty(); }
-            inline size_t size() const { return data.size(); }
+            inline bool empty() const {
+                return data.empty();
+            }
+            inline size_t size() const {
+                return data.size();
+            }
 
             inline void reserve(size_t capacity) {
                 data.reserve(capacity);
@@ -56,8 +59,7 @@ namespace calafite {
                 std::push_heap(data.begin(), data.end(), compare);
             }
 
-            template<typename... Args>
-            inline void emplace(Args&&... args) {
+            template <typename... Args> inline void emplace(Args&&... args) {
                 data.emplaceBack(std::forward<Args>(args)...);
                 std::push_heap(data.begin(), data.end(), compare);
             }
@@ -81,11 +83,9 @@ namespace calafite {
             }
         };
 
-        template<typename Type>
-        using MinHeap = PriorityQueue<Type, std::greater<Type>>;
+        template <typename Type> using MinHeap = PriorityQueue<Type, std::greater<Type>>;
 
-        template<typename Type>
-        using MaxHeap = PriorityQueue<Type, std::less<Type>>;
+        template <typename Type> using MaxHeap = PriorityQueue<Type, std::less<Type>>;
 
-    }
-}
+    } // namespace container
+} // namespace calafite

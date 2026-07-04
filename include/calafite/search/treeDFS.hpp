@@ -18,7 +18,8 @@ namespace calafite {
             core::FastVector<size_t> exitTimes;
             size_t timer;
 
-            TreeDepthFirstSearch(size_t root, const core::FastVector<core::FastVector<size_t>>& adjacencyList) {
+            TreeDepthFirstSearch(size_t root,
+                                 const core::FastVector<core::FastVector<size_t>>& adjacencyList) {
                 size_t nodeCount = adjacencyList.size();
                 parents.assign(nodeCount, unvisited);
                 depths.assign(nodeCount, 0);
@@ -33,11 +34,14 @@ namespace calafite {
             bool isAncestor(size_t first, size_t second) const {
                 assert(first < entryTimes.size());
                 assert(second < entryTimes.size());
-                return entryTimes[first] <= entryTimes[second] && entryTimes[second] < exitTimes[first];
+                return entryTimes[first] <= entryTimes[second] &&
+                    entryTimes[second] < exitTimes[first];
             }
 
-        private:
-            void performDepthFirstSearch(size_t current, size_t parent, const core::FastVector<core::FastVector<size_t>>& adjacencyList) {
+          private:
+            void performDepthFirstSearch(
+                size_t current, size_t parent,
+                const core::FastVector<core::FastVector<size_t>>& adjacencyList) {
                 parents[current] = parent;
                 entryTimes[current] = timer++;
 
@@ -48,7 +52,7 @@ namespace calafite {
                         subtreeSizes[current] += subtreeSizes[neighbor];
                     }
                 }
-                
+
                 exitTimes[current] = timer;
             }
         };
@@ -73,7 +77,8 @@ namespace calafite {
             }
         };
 
-        inline core::FastVector<size_t> topologicalSort(const core::FastVector<core::FastVector<size_t>>& adjacencyList) {
+        inline core::FastVector<size_t>
+        topologicalSort(const core::FastVector<core::FastVector<size_t>>& adjacencyList) {
             size_t nodeCount = adjacencyList.size();
             core::FastVector<size_t> order;
             order.reserve(nodeCount);
@@ -84,14 +89,16 @@ namespace calafite {
             TopologicalSorter sorter{adjacencyList, order, states, hasCycle};
 
             for (size_t index = 0; index < nodeCount; ++index) {
-                if (states[index] == 0 && !hasCycle) sorter.visit(index);
+                if (states[index] == 0 && !hasCycle)
+                    sorter.visit(index);
             }
 
-            if (hasCycle) return {};
+            if (hasCycle)
+                return {};
 
             order.reverse();
             return order;
         }
 
-    }
-}
+    } // namespace search
+} // namespace calafite

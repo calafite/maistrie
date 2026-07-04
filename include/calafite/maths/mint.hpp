@@ -9,22 +9,23 @@
 namespace calafite {
     namespace mathematics {
 
-        template<uint32_t Mod> class Modular {
+        template <uint32_t Mod> class Modular {
             static_assert(Mod > 0, "Modulus must be strictly positive");
-            
-        private:
+
+          private:
             uint32_t value;
 
-        public:
+          public:
             constexpr Modular() : value(0) {}
 
-            template<typename Type, typename = std::enable_if_t<std::is_integral_v<Type>>>
+            template <typename Type, typename = std::enable_if_t<std::is_integral_v<Type>>>
             constexpr Modular(Type initialValue) {
                 using UnsignedType = std::make_unsigned_t<Type>;
-                
+
                 if constexpr (std::is_signed_v<Type>) {
                     if (initialValue >= 0) {
-                        value = static_cast<uint32_t>(static_cast<UnsignedType>(initialValue) % Mod);
+                        value =
+                            static_cast<uint32_t>(static_cast<UnsignedType>(initialValue) % Mod);
                     } else {
                         long long rem = static_cast<long long>(initialValue) % Mod;
                         value = static_cast<uint32_t>(rem == 0 ? 0 : rem + Mod);
@@ -34,10 +35,16 @@ namespace calafite {
                 }
             }
 
-            constexpr uint32_t val() const noexcept { return value; }
+            constexpr uint32_t val() const noexcept {
+                return value;
+            }
 
-            constexpr Modular operator+() const { return *this; }
-            constexpr Modular operator-() const { return Modular() - *this; }
+            constexpr Modular operator+() const {
+                return *this;
+            }
+            constexpr Modular operator-() const {
+                return Modular() - *this;
+            }
 
             constexpr Modular& operator+=(const Modular& other) {
                 uint32_t res = value + other.value;
@@ -89,8 +96,10 @@ namespace calafite {
                     int32_t a = value, b = Mod, u = 1, v = 0;
                     while (b != 0) {
                         int32_t t = a / b;
-                        a -= t * b; std::swap(a, b);
-                        u -= t * v; std::swap(u, v);
+                        a -= t * b;
+                        std::swap(a, b);
+                        u -= t * v;
+                        std::swap(u, v);
                     }
                     assert(a == 1 && "Modular inverse does not exist (not coprime).");
                     return Modular(u);
@@ -98,8 +107,10 @@ namespace calafite {
                     int64_t a = value, b = Mod, u = 1, v = 0;
                     while (b != 0) {
                         int64_t t = a / b;
-                        a -= t * b; std::swap(a, b);
-                        u -= t * v; std::swap(u, v);
+                        a -= t * b;
+                        std::swap(a, b);
+                        u -= t * v;
+                        std::swap(u, v);
                     }
                     assert(a == 1 && "Modular inverse does not exist (not coprime).");
                     return Modular(u);
@@ -115,38 +126,51 @@ namespace calafite {
                 }
                 uint64_t exp = exponent;
                 while (exp > 0) {
-                    if (exp & 1) result *= base;
+                    if (exp & 1)
+                        result *= base;
                     base *= base;
                     exp >>= 1;
                 }
                 return result;
             }
 
-            friend constexpr Modular operator+(Modular left, const Modular& right) { return left += right; }
-            friend constexpr Modular operator-(Modular left, const Modular& right) { return left -= right; }
-            friend constexpr Modular operator*(Modular left, const Modular& right) { return left *= right; }
-            friend constexpr Modular operator/(Modular left, const Modular& right) { return left /= right; }
-            friend constexpr bool operator==(const Modular& left, const Modular& right) { return left.value == right.value; }
-            friend constexpr bool operator!=(const Modular& left, const Modular& right) { return left.value != right.value; }
+            friend constexpr Modular operator+(Modular left, const Modular& right) {
+                return left += right;
+            }
+            friend constexpr Modular operator-(Modular left, const Modular& right) {
+                return left -= right;
+            }
+            friend constexpr Modular operator*(Modular left, const Modular& right) {
+                return left *= right;
+            }
+            friend constexpr Modular operator/(Modular left, const Modular& right) {
+                return left /= right;
+            }
+            friend constexpr bool operator==(const Modular& left, const Modular& right) {
+                return left.value == right.value;
+            }
+            friend constexpr bool operator!=(const Modular& left, const Modular& right) {
+                return left.value != right.value;
+            }
 
-            template<uint32_t M>
+            template <uint32_t M>
             friend inline io::Printer& operator<<(io::Printer& printer, const Modular<M>& number);
 
-            template<uint32_t M>
+            template <uint32_t M>
             friend inline io::Scanner& operator>>(io::Scanner& scanner, Modular<M>& number);
         };
 
-        template<uint32_t Mod>
+        template <uint32_t Mod>
         inline io::Printer& operator<<(io::Printer& printer, const Modular<Mod>& number) {
             return printer << number.value;
         }
 
-        template<uint32_t Mod>
+        template <uint32_t Mod>
         inline io::Scanner& operator>>(io::Scanner& scanner, Modular<Mod>& number) {
             long long temporary;
             scanner >> temporary;
             number = Modular<Mod>(temporary);
             return scanner;
         }
-    }
-}
+    } // namespace mathematics
+} // namespace calafite

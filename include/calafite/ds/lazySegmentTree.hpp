@@ -9,7 +9,8 @@
 namespace calafite {
     namespace ds {
 
-        template<typename Type, typename LazyType, typename CombineNodeOp, typename ApplyLazyOp, typename ComposeLazyOp>
+        template <typename Type, typename LazyType, typename CombineNodeOp, typename ApplyLazyOp,
+                  typename ComposeLazyOp>
         struct LazySegmentTree {
             size_t sizeValue;
             core::FastVector<Type> tree;
@@ -22,50 +23,48 @@ namespace calafite {
             ApplyLazyOp applyLazy;
             ComposeLazyOp composeLazy;
 
-            LazySegmentTree(size_t count, Type neutralNode, LazyType neutralLazy, 
-                            CombineNodeOp combineNode, ApplyLazyOp applyLazy, ComposeLazyOp composeLazy)
-                : sizeValue(count),
-                  tree(count > 0 ? 4 * count : 0, neutralNode),
+            LazySegmentTree(size_t count, Type neutralNode, LazyType neutralLazy,
+                            CombineNodeOp combineNode, ApplyLazyOp applyLazy,
+                            ComposeLazyOp composeLazy)
+                : sizeValue(count), tree(count > 0 ? 4 * count : 0, neutralNode),
                   lazy(count > 0 ? 4 * count : 0, neutralLazy),
-                  hasLazy(count > 0 ? 4 * count : 0, 0),
-                  neutralNode(neutralNode),
-                  neutralLazy(neutralLazy),
-                  combineNode(std::move(combineNode)),
-                  applyLazy(std::move(applyLazy)),
-                  composeLazy(std::move(composeLazy)) {}
+                  hasLazy(count > 0 ? 4 * count : 0, 0), neutralNode(neutralNode),
+                  neutralLazy(neutralLazy), combineNode(std::move(combineNode)),
+                  applyLazy(std::move(applyLazy)), composeLazy(std::move(composeLazy)) {}
 
-            LazySegmentTree(const core::FastVector<Type>& values, Type neutralNode, LazyType neutralLazy, 
-                            CombineNodeOp combineNode, ApplyLazyOp applyLazy, ComposeLazyOp composeLazy)
+            LazySegmentTree(const core::FastVector<Type>& values, Type neutralNode,
+                            LazyType neutralLazy, CombineNodeOp combineNode, ApplyLazyOp applyLazy,
+                            ComposeLazyOp composeLazy)
                 : sizeValue(values.size()),
                   tree(values.size() > 0 ? 4 * values.size() : 0, neutralNode),
                   lazy(values.size() > 0 ? 4 * values.size() : 0, neutralLazy),
-                  hasLazy(values.size() > 0 ? 4 * values.size() : 0, 0),
-                  neutralNode(neutralNode),
-                  neutralLazy(neutralLazy),
-                  combineNode(std::move(combineNode)),
-                  applyLazy(std::move(applyLazy)),
-                  composeLazy(std::move(composeLazy)) {
+                  hasLazy(values.size() > 0 ? 4 * values.size() : 0, 0), neutralNode(neutralNode),
+                  neutralLazy(neutralLazy), combineNode(std::move(combineNode)),
+                  applyLazy(std::move(applyLazy)), composeLazy(std::move(composeLazy)) {
                 if (sizeValue > 0) {
                     buildInternal(1, 0, sizeValue - 1, values);
                 }
             }
 
             void update(size_t left, size_t right, const LazyType& value) {
-                if (sizeValue == 0) return;
+                if (sizeValue == 0)
+                    return;
                 assert(left <= right);
                 assert(right < sizeValue);
                 updateInternal(1, 0, sizeValue - 1, left, right, value);
             }
 
             Type query(size_t left, size_t right) {
-                if (sizeValue == 0) return neutralNode;
+                if (sizeValue == 0)
+                    return neutralNode;
                 assert(left <= right);
                 assert(right < sizeValue);
                 return queryInternal(1, 0, sizeValue - 1, left, right);
             }
 
-        private:
-            void buildInternal(size_t node, size_t left, size_t right, const core::FastVector<Type>& values) {
+          private:
+            void buildInternal(size_t node, size_t left, size_t right,
+                               const core::FastVector<Type>& values) {
                 if (left == right) {
                     tree[node] = values[left];
                     return;
@@ -95,7 +94,8 @@ namespace calafite {
                 }
             }
 
-            void updateInternal(size_t node, size_t left, size_t right, size_t queryLeft, size_t queryRight, const LazyType& value) {
+            void updateInternal(size_t node, size_t left, size_t right, size_t queryLeft,
+                                size_t queryRight, const LazyType& value) {
                 if (queryLeft <= left && right <= queryRight) {
                     applyNode(node, value);
                     return;
@@ -111,7 +111,8 @@ namespace calafite {
                 tree[node] = combineNode(tree[node << 1], tree[node << 1 | 1]);
             }
 
-            Type queryInternal(size_t node, size_t left, size_t right, size_t queryLeft, size_t queryRight) {
+            Type queryInternal(size_t node, size_t left, size_t right, size_t queryLeft,
+                               size_t queryRight) {
                 if (queryLeft <= left && right <= queryRight) {
                     return tree[node];
                 }
@@ -119,17 +120,18 @@ namespace calafite {
                 size_t mid = left + (right - left) / 2;
                 Type leftResult = neutralNode;
                 Type rightResult = neutralNode;
-                
+
                 if (queryLeft <= mid) {
                     leftResult = queryInternal(node << 1, left, mid, queryLeft, queryRight);
                 }
                 if (queryRight > mid) {
-                    rightResult = queryInternal(node << 1 | 1, mid + 1, right, queryLeft, queryRight);
+                    rightResult =
+                        queryInternal(node << 1 | 1, mid + 1, right, queryLeft, queryRight);
                 }
-                
+
                 return combineNode(leftResult, rightResult);
             }
         };
 
-    }
-}
+    } // namespace ds
+} // namespace calafite

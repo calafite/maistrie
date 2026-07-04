@@ -8,10 +8,11 @@
 namespace calafite {
     namespace string {
 
-        template<typename Container> core::FastVector<size_t> zFunction(const Container& string) {
+        template <typename Container> core::FastVector<size_t> zFunction(const Container& string) {
             size_t sizeValue = string.size();
             core::FastVector<size_t> zTable(sizeValue, 0);
-            if (sizeValue == 0) return zTable;
+            if (sizeValue == 0)
+                return zTable;
 
             const auto* data = string.data();
             size_t left = 0;
@@ -20,7 +21,8 @@ namespace calafite {
                 if (index <= right) {
                     zTable[index] = std::min(right - index + 1, zTable[index - left]);
                 }
-                while (index + zTable[index] < sizeValue && data[zTable[index]] == data[index + zTable[index]]) {
+                while (index + zTable[index] < sizeValue &&
+                       data[zTable[index]] == data[index + zTable[index]]) {
                     ++zTable[index];
                 }
                 if (index + zTable[index] > right + 1) {
@@ -31,7 +33,7 @@ namespace calafite {
             return zTable;
         }
 
-        template<typename Container> struct ZAlgorithm {
+        template <typename Container> struct ZAlgorithm {
             core::FastVector<size_t> zTable;
             size_t sizeValue;
 
@@ -47,15 +49,18 @@ namespace calafite {
                 return zTable[index];
             }
 
-            inline size_t size() const { return sizeValue; }
+            inline size_t size() const {
+                return sizeValue;
+            }
         };
 
-        template<typename Container1, typename Container2>
+        template <typename Container1, typename Container2>
         core::FastVector<size_t> zSearch(const Container1& text, const Container2& pattern) {
             core::FastVector<size_t> result;
             size_t textSize = text.size();
             size_t patternSize = pattern.size();
-            if (patternSize == 0 || textSize == 0 || patternSize > textSize) return result;
+            if (patternSize == 0 || textSize == 0 || patternSize > textSize)
+                return result;
 
             result.reserve(textSize / patternSize + 2);
 
@@ -74,7 +79,8 @@ namespace calafite {
                     matched = std::min(right - index + 1, patternZTable[index - left]);
                 }
 
-                while (index + matched < textSize && matched < patternSize && textData[index + matched] == patternData[matched]) {
+                while (index + matched < textSize && matched < patternSize &&
+                       textData[index + matched] == patternData[matched]) {
                     ++matched;
                 }
 
@@ -91,5 +97,5 @@ namespace calafite {
             return result;
         }
 
-    }
-}
+    } // namespace string
+} // namespace calafite

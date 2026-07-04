@@ -3,13 +3,13 @@
 // core
 #include "core/arena.hpp"
 #include "core/fastVector.hpp"
-#include "core/ops.hpp"
 #include "core/iterator.hpp"
+#include "core/ops.hpp"
 
 // container
+#include "container/circularBuffer.hpp"
 #include "container/hashMap.hpp"
 #include "container/priorityQueue.hpp"
-#include "container/circularBuffer.hpp"
 
 // dynamic programming
 #include "dp/knapsack.hpp"
@@ -18,25 +18,25 @@
 #include "dp/sos.hpp"
 
 // data structures
+#include "ds/cartesianTree.hpp"
 #include "ds/compressor.hpp"
 #include "ds/disjointSetUnion.hpp"
 #include "ds/fenwickTree.hpp"
 #include "ds/lazySegmentTree.hpp"
+#include "ds/monotonicStack.hpp"
 #include "ds/segmentTree.hpp"
 #include "ds/sparseTable.hpp"
 #include "ds/trie.hpp"
-#include "ds/monotonicStack.hpp"
-#include "ds/cartesianTree.hpp"
 
 // custom io
 #include "io/io.hpp"
 
 // mathematics
+#include "maths/fft.hpp"
 #include "maths/linearSieve.hpp"
 #include "maths/matrix.hpp"
 #include "maths/mint.hpp"
 #include "maths/sieve.hpp"
-#include "maths/fft.hpp"
 
 // search algorithms
 #include "search/dijkstra.hpp"
@@ -58,24 +58,23 @@
 #define _debug(x) cerr << #x << " = " << x << "\n"
 #define _upto(var, start, end) for (auto var = start; var < end; var++)
 #define _downto(var, start, end) for (auto var = start; var > end; var--)
-#define _foreach(element, collection) for (auto &element : collection)
+#define _foreach(element, collection) for (auto& element : collection)
 
-#define CALAFITE_SETUP                                          \
-    using namespace std;                                        \
-    using namespace calafite;                                   \
-    using ll   = long long;                                     \
-    using ull  = unsigned long long;                            \
-    using vi   = ::calafite::core::FastVector<int>;             \
-    using vll  = ::calafite::core::FastVector<ll>;              \
-    using pii  = pair<int, int>;                                \
-    using pll  = pair<ll, ll>;                                  \
-    static constexpr int  INF   =  0x3f3f3f3f;                  \
-    static constexpr int  NINF  = -0x3f3f3f3f;                  \
-    static constexpr ll   LLINF =  0x3f3f3f3f3f3f3f3fLL;        \
-    static constexpr ll   LNINF = -0x3f3f3f3f3f3f3f3fLL;        \
-    using calafite::io::in;                                     \
-    using calafite::io::out;                                    \
-    using calafite::io::print;                                  \
-    using calafite::io::println;                                \
-    using calafite::io::read;                                   \
-    
+#define CALAFITE_SETUP                                                                             \
+    using namespace std;                                                                           \
+    using namespace calafite;                                                                      \
+    using ll = long long;                                                                          \
+    using ull = unsigned long long;                                                                \
+    using vi = ::calafite::core::FastVector<int>;                                                  \
+    using vll = ::calafite::core::FastVector<ll>;                                                  \
+    using pii = pair<int, int>;                                                                    \
+    using pll = pair<ll, ll>;                                                                      \
+    static constexpr int INF = 0x3f3f3f3f;                                                         \
+    static constexpr int NINF = -0x3f3f3f3f;                                                       \
+    static constexpr ll LLINF = 0x3f3f3f3f3f3f3f3fLL;                                              \
+    static constexpr ll LNINF = -0x3f3f3f3f3f3f3f3fLL;                                             \
+    using calafite::io::in;                                                                        \
+    using calafite::io::out;                                                                       \
+    using calafite::io::print;                                                                     \
+    using calafite::io::println;                                                                   \
+    using calafite::io::read;

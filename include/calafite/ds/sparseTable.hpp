@@ -17,7 +17,7 @@ namespace calafite {
             return result;
         }
 
-        template<typename Type, typename Functor> struct SparseTable {
+        template <typename Type, typename Functor> struct SparseTable {
             size_t sizeValue;
             core::FastVector<core::FastVector<Type>> table;
             Functor combine;
@@ -28,10 +28,12 @@ namespace calafite {
                     size_t levels = calculateLog2(sizeValue) + 1;
                     table.assign(levels, core::FastVector<Type>(sizeValue));
                     table[0] = values;
-                    
+
                     for (size_t level = 1; level < levels; ++level) {
                         for (size_t index = 0; index + (size_t(1) << level) <= sizeValue; ++index) {
-                            table[level][index] = combine(table[level - 1][index], table[level - 1][index + (size_t(1) << (level - 1))]);
+                            table[level][index] =
+                                combine(table[level - 1][index],
+                                        table[level - 1][index + (size_t(1) << (level - 1))]);
                         }
                     }
                 }
@@ -45,5 +47,5 @@ namespace calafite {
             }
         };
 
-    }
-}
+    } // namespace ds
+} // namespace calafite

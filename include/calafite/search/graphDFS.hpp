@@ -14,11 +14,13 @@ namespace calafite {
             core::FastVector<size_t> parents;
             core::FastVector<size_t> entryTimes;
             core::FastVector<size_t> exitTimes;
-            core::FastVector<uint8_t> states; 
+            core::FastVector<uint8_t> states;
             size_t timer;
             bool hasCycle;
 
-            GraphDepthFirstSearch(size_t start, const core::FastVector<core::FastVector<size_t>>& adjacencyList, bool recordPaths = false) {
+            GraphDepthFirstSearch(size_t start,
+                                  const core::FastVector<core::FastVector<size_t>>& adjacencyList,
+                                  bool recordPaths = false) {
                 size_t nodeCount = adjacencyList.size();
                 assert(start < nodeCount);
 
@@ -34,7 +36,9 @@ namespace calafite {
                 performDepthFirstSearch(start, unvisited, adjacencyList, recordPaths);
             }
 
-            GraphDepthFirstSearch(const core::FastVector<size_t>& starts, const core::FastVector<core::FastVector<size_t>>& adjacencyList, bool recordPaths = false) {
+            GraphDepthFirstSearch(const core::FastVector<size_t>& starts,
+                                  const core::FastVector<core::FastVector<size_t>>& adjacencyList,
+                                  bool recordPaths = false) {
                 size_t nodeCount = adjacencyList.size();
 
                 states.assign(nodeCount, 0);
@@ -55,25 +59,32 @@ namespace calafite {
             }
 
             core::FastVector<size_t> getPath(size_t target) const {
-                assert(!parents.empty() && "Paths were not tracked. Initialize the GraphDepthFirstSearch struct with recordPaths = true.");
+                assert(!parents.empty() &&
+                       "Paths were not tracked. Initialize the GraphDepthFirstSearch struct with "
+                       "recordPaths = true.");
                 assert(target < states.size());
 
-                if (states[target] == 0) return {};
+                if (states[target] == 0)
+                    return {};
 
                 core::FastVector<size_t> path;
                 for (size_t current = target; current != unvisited; current = parents[current]) {
                     path.pushBack(current);
                 }
-                
+
                 path.reverse();
                 return path;
             }
 
-        private:
-            void performDepthFirstSearch(size_t current, size_t parent, const core::FastVector<core::FastVector<size_t>>& adjacencyList, bool recordPaths) {
+          private:
+            void
+            performDepthFirstSearch(size_t current, size_t parent,
+                                    const core::FastVector<core::FastVector<size_t>>& adjacencyList,
+                                    bool recordPaths) {
                 states[current] = 1;
                 entryTimes[current] = timer++;
-                if (recordPaths) parents[current] = parent;
+                if (recordPaths)
+                    parents[current] = parent;
 
                 for (size_t neighbor : adjacencyList[current]) {
                     if (states[neighbor] == 0) {
@@ -82,11 +93,11 @@ namespace calafite {
                         hasCycle = true;
                     }
                 }
-                
+
                 states[current] = 2;
                 exitTimes[current] = timer;
             }
         };
 
-    }
-}
+    } // namespace search
+} // namespace calafite

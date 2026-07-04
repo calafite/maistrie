@@ -8,23 +8,19 @@
 namespace calafite {
     namespace ds {
 
-        template<typename Type, typename Functor> struct SegmentTree {
+        template <typename Type, typename Functor> struct SegmentTree {
             size_t sizeValue;
             core::FastVector<Type> tree;
             Type neutral;
             Functor combine;
 
             SegmentTree(size_t count, Type neutral, Functor combine)
-            : sizeValue(count),
-            tree(2 * count, neutral),
-            neutral(neutral),
-            combine(std::move(combine)) {}
+                : sizeValue(count), tree(2 * count, neutral), neutral(neutral),
+                  combine(std::move(combine)) {}
 
             SegmentTree(const core::FastVector<Type>& values, Type neutral, Functor combine)
-            : sizeValue(values.size()),
-            tree(2 * values.size(), neutral),
-            neutral(neutral),
-            combine(std::move(combine)) {
+                : sizeValue(values.size()), tree(2 * values.size(), neutral), neutral(neutral),
+                  combine(std::move(combine)) {
                 if (sizeValue > 0) {
                     for (size_t index = 0; index < sizeValue; ++index) {
                         tree[sizeValue + index] = values[index];
@@ -49,13 +45,16 @@ namespace calafite {
                 assert(right < sizeValue);
                 Type leftResult = neutral;
                 Type rightResult = neutral;
-                for (left += sizeValue, right += sizeValue + 1; left < right; left >>= 1, right >>= 1) {
-                    if (left & 1) leftResult = combine(leftResult, tree[left++]);
-                    if (right & 1) rightResult = combine(tree[--right], rightResult);
+                for (left += sizeValue, right += sizeValue + 1; left < right;
+                     left >>= 1, right >>= 1) {
+                    if (left & 1)
+                        leftResult = combine(leftResult, tree[left++]);
+                    if (right & 1)
+                        rightResult = combine(tree[--right], rightResult);
                 }
                 return combine(leftResult, rightResult);
             }
         };
 
-    }
-}
+    } // namespace ds
+} // namespace calafite

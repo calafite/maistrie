@@ -11,18 +11,20 @@
 namespace calafite {
     namespace search {
 
-        template<typename WeightType>
-        struct Dijkstra {
+        template <typename WeightType> struct Dijkstra {
             static constexpr size_t unvisited = static_cast<size_t>(-1);
 
             core::FastVector<WeightType> distances;
             core::FastVector<size_t> parents;
             WeightType unreachable;
 
-            Dijkstra(size_t start, const core::FastVector<core::FastVector<std::pair<size_t, WeightType>>>& adjacencyList, 
-                     bool recordPaths = false, WeightType unreachableValue = std::numeric_limits<WeightType>::max())
+            Dijkstra(size_t start,
+                     const core::FastVector<core::FastVector<std::pair<size_t, WeightType>>>&
+                         adjacencyList,
+                     bool recordPaths = false,
+                     WeightType unreachableValue = std::numeric_limits<WeightType>::max())
                 : unreachable(unreachableValue) {
-                
+
                 size_t nodeCount = adjacencyList.size();
                 assert(start < nodeCount);
 
@@ -44,26 +46,31 @@ namespace calafite {
                     WeightType currentDist = top.first;
                     size_t current = top.second;
 
-                    if (currentDist > distances[current]) continue;
+                    if (currentDist > distances[current])
+                        continue;
 
                     for (const auto& edge : adjacencyList[current]) {
                         size_t neighbor = edge.first;
                         WeightType weight = edge.second;
-                        
+
                         WeightType newDist = currentDist + weight;
                         if (newDist < distances[neighbor]) {
                             distances[neighbor] = newDist;
-                            if (recordPaths) parents[neighbor] = current;
+                            if (recordPaths)
+                                parents[neighbor] = current;
                             queue.push({newDist, neighbor});
                         }
                     }
                 }
             }
 
-            Dijkstra(const core::FastVector<size_t>& starts, const core::FastVector<core::FastVector<std::pair<size_t, WeightType>>>& adjacencyList, 
-                     bool recordPaths = false, WeightType unreachableValue = std::numeric_limits<WeightType>::max())
+            Dijkstra(const core::FastVector<size_t>& starts,
+                     const core::FastVector<core::FastVector<std::pair<size_t, WeightType>>>&
+                         adjacencyList,
+                     bool recordPaths = false,
+                     WeightType unreachableValue = std::numeric_limits<WeightType>::max())
                 : unreachable(unreachableValue) {
-                
+
                 size_t nodeCount = adjacencyList.size();
 
                 distances.assign(nodeCount, unreachable);
@@ -89,16 +96,18 @@ namespace calafite {
                     WeightType currentDist = top.first;
                     size_t current = top.second;
 
-                    if (currentDist > distances[current]) continue;
+                    if (currentDist > distances[current])
+                        continue;
 
                     for (const auto& edge : adjacencyList[current]) {
                         size_t neighbor = edge.first;
                         WeightType weight = edge.second;
-                        
+
                         WeightType newDist = currentDist + weight;
                         if (newDist < distances[neighbor]) {
                             distances[neighbor] = newDist;
-                            if (recordPaths) parents[neighbor] = current;
+                            if (recordPaths)
+                                parents[neighbor] = current;
                             queue.push({newDist, neighbor});
                         }
                     }
@@ -106,20 +115,23 @@ namespace calafite {
             }
 
             core::FastVector<size_t> getPath(size_t target) const {
-                assert(!parents.empty() && "Paths were not tracked. Initialize the Dijkstra struct with recordPaths = true.");
+                assert(!parents.empty() &&
+                       "Paths were not tracked. Initialize the Dijkstra struct with recordPaths = "
+                       "true.");
                 assert(target < distances.size());
 
-                if (distances[target] == unreachable) return {};
+                if (distances[target] == unreachable)
+                    return {};
 
                 core::FastVector<size_t> path;
                 for (size_t current = target; current != unvisited; current = parents[current]) {
                     path.pushBack(current);
                 }
-                
+
                 path.reverse();
                 return path;
             }
         };
 
-    }
-}
+    } // namespace search
+} // namespace calafite

@@ -14,7 +14,8 @@ namespace calafite {
             core::FastVector<size_t> depths;
             core::FastVector<size_t> order;
 
-            TreeBreadthFirstSearch(size_t root, const core::FastVector<core::FastVector<size_t>>& adjacencyList) {
+            TreeBreadthFirstSearch(
+                size_t root, const core::FastVector<core::FastVector<size_t>>& adjacencyList) {
                 size_t nodeCount = adjacencyList.size();
                 assert(root < nodeCount);
 
@@ -47,11 +48,11 @@ namespace calafite {
                 for (size_t current = target; current != unvisited; current = parents[current]) {
                     path.pushBack(current);
                 }
-                
+
                 path.reverse();
                 return path;
             }
         };
 
-    }
-}
+    } // namespace search
+} // namespace calafite

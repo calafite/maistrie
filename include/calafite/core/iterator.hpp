@@ -3,37 +3,33 @@
 #include <ranges>
 
 #if defined(__has_include)
-    #if __has_include(<version>)
-        #include <version>
-    #endif
+#if __has_include(<version>)
+#include <version>
 #endif
-
+#endif
 
 #if defined(__cpp_lib_ranges)
 
 namespace calafite {
     namespace core {
-        template<typename Type> class FastVector;
+        template <typename Type> class FastVector;
     }
 
     namespace core {
 
-        template<std::ranges::view View>
-        struct IteratorPipeline {
+        template <std::ranges::view View> struct IteratorPipeline {
             View view;
 
             constexpr explicit IteratorPipeline(View v) : view(std::move(v)) {}
 
             // Lazy Operations
 
-            template<typename Function>
-            constexpr auto map(Function&& function) {
+            template <typename Function> constexpr auto map(Function&& function) {
                 auto next = view | std::views::transform(std::forward<Function>(function));
                 return IteratorPipeline<decltype(next)>(std::move(next));
             }
 
-            template<typename Predicate>
-            constexpr auto filter(Predicate&& predicate) {
+            template <typename Predicate> constexpr auto filter(Predicate&& predicate) {
                 auto next = view | std::views::filter(std::forward<Predicate>(predicate));
                 return IteratorPipeline<decltype(next)>(std::move(next));
             }
@@ -48,14 +44,12 @@ namespace calafite {
                 return IteratorPipeline<decltype(next)>(std::move(next));
             }
 
-            template<typename Predicate>
-            constexpr auto take_while(Predicate&& predicate) {
+            template <typename Predicate> constexpr auto take_while(Predicate&& predicate) {
                 auto next = view | std::views::take_while(std::forward<Predicate>(predicate));
                 return IteratorPipeline<decltype(next)>(std::move(next));
             }
 
-            template<typename Predicate>
-            constexpr auto drop_while(Predicate&& predicate) {
+            template <typename Predicate> constexpr auto drop_while(Predicate&& predicate) {
                 auto next = view | std::views::drop_while(std::forward<Predicate>(predicate));
                 return IteratorPipeline<decltype(next)>(std::move(next));
             }
@@ -67,11 +61,11 @@ namespace calafite {
 
             // Eager Operations
 
-            template<template<typename...> typename Container = ::calafite::core::FastVector>
+            template <template <typename...> typename Container = ::calafite::core::FastVector>
             constexpr auto collect() {
                 using RangeRef = std::ranges::range_reference_t<View>;
                 using RangeVal = std::remove_cvref_t<RangeRef>;
-                
+
                 Container<RangeVal> result;
 
                 if constexpr (requires { result.reserve(std::size_t{}); }) {
@@ -87,7 +81,7 @@ namespace calafite {
                 return result;
             }
 
-            template<typename Accumulator, typename Function>
+            template <typename Accumulator, typename Function>
             constexpr auto fold(Accumulator initial, Function&& function) {
                 Accumulator result = std::move(initial);
                 for (auto&& item : view) {
@@ -96,25 +90,24 @@ namespace calafite {
                 return result;
             }
 
-            template<typename Function>
-            constexpr void forEach(Function&& function) {
+            template <typename Function> constexpr void forEach(Function&& function) {
                 for (auto&& item : view) {
                     function(std::forward<decltype(item)>(item));
                 }
             }
 
-            template<typename Predicate>
-            constexpr bool any(Predicate&& predicate) {
+            template <typename Predicate> constexpr bool any(Predicate&& predicate) {
                 for (auto&& item : view) {
-                    if (predicate(item)) return true;
+                    if (predicate(item))
+                        return true;
                 }
                 return false;
             }
 
-            template<typename Predicate>
-            constexpr bool all(Predicate&& predicate) {
+            template <typename Predicate> constexpr bool all(Predicate&& predicate) {
                 for (auto&& item : view) {
-                    if (!predicate(item)) return false;
+                    if (!predicate(item))
+                        return false;
                 }
                 return true;
             }
@@ -132,7 +125,7 @@ namespace calafite {
             }
         };
 
-    }
-}
+    } // namespace core
+} // namespace calafite
 
-#endif 
+#endif
