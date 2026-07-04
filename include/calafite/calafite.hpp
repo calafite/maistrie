@@ -36,6 +36,7 @@
 #include "maths/matrix.hpp"
 #include "maths/mint.hpp"
 #include "maths/sieve.hpp"
+#include "maths/fft.hpp"
 
 // search algorithms
 #include "search/dijkstra.hpp"

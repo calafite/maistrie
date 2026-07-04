@@ -3,7 +3,6 @@
 
 namespace calafite {
     namespace utility {
-
         template<typename Functor> 
         struct FixedPoint {
             Functor functor;
@@ -19,6 +18,5 @@ namespace calafite {
 
         template<typename Functor>
         FixedPoint(Functor) -> FixedPoint<Functor>;
-
     }
 }
