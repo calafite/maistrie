@@ -47,6 +47,8 @@
 #include "search/dijkstra.hpp"
 #include "search/graphBFS.hpp"
 #include "search/graphDFS.hpp"
+#include "search/scc.hpp"
+#include "search/topologicalSort.hpp"
 #include "search/treeBFS.hpp"
 #include "search/treeDFS.hpp"
 

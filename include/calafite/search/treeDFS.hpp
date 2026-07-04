@@ -3,11 +3,9 @@
 #include "../core/fastVector.hpp"
 #include <cassert>
 #include <cstddef>
-#include <cstdint>
 
 namespace calafite {
     namespace search {
-
         struct TreeDepthFirstSearch {
             static constexpr size_t unvisited = static_cast<size_t>(-1);
 
@@ -18,8 +16,10 @@ namespace calafite {
             core::FastVector<size_t> exitTimes;
             size_t timer;
 
-            TreeDepthFirstSearch(size_t root,
-                                 const core::FastVector<core::FastVector<size_t>>& adjacencyList) {
+            TreeDepthFirstSearch(                                               //
+                size_t root,                                                    //
+                const core::FastVector<core::FastVector<size_t>>& adjacencyList //
+            ) {
                 size_t nodeCount = adjacencyList.size();
                 parents.assign(nodeCount, unvisited);
                 depths.assign(nodeCount, 0);
@@ -39,9 +39,11 @@ namespace calafite {
             }
 
           private:
-            void performDepthFirstSearch(
-                size_t current, size_t parent,
-                const core::FastVector<core::FastVector<size_t>>& adjacencyList) {
+            void performDepthFirstSearch(                                       //
+                size_t current,                                                 //
+                size_t parent,                                                  //
+                const core::FastVector<core::FastVector<size_t>>& adjacencyList //
+            ) {
                 parents[current] = parent;
                 entryTimes[current] = timer++;
 
@@ -56,49 +58,5 @@ namespace calafite {
                 exitTimes[current] = timer;
             }
         };
-
-        struct TopologicalSorter {
-            const core::FastVector<core::FastVector<size_t>>& adjacencyList;
-            core::FastVector<size_t>& order;
-            core::FastVector<uint8_t>& states;
-            bool& hasCycle;
-
-            void visit(size_t current) {
-                states[current] = 1;
-                for (size_t neighbor : adjacencyList[current]) {
-                    if (states[neighbor] == 0) {
-                        visit(neighbor);
-                    } else if (states[neighbor] == 1) {
-                        hasCycle = true;
-                    }
-                }
-                states[current] = 2;
-                order.pushBack(current);
-            }
-        };
-
-        inline core::FastVector<size_t>
-        topologicalSort(const core::FastVector<core::FastVector<size_t>>& adjacencyList) {
-            size_t nodeCount = adjacencyList.size();
-            core::FastVector<size_t> order;
-            order.reserve(nodeCount);
-
-            core::FastVector<uint8_t> states(nodeCount, 0);
-            bool hasCycle = false;
-
-            TopologicalSorter sorter{adjacencyList, order, states, hasCycle};
-
-            for (size_t index = 0; index < nodeCount; ++index) {
-                if (states[index] == 0 && !hasCycle)
-                    sorter.visit(index);
-            }
-
-            if (hasCycle)
-                return {};
-
-            order.reverse();
-            return order;
-        }
-
     } // namespace search
 } // namespace calafite
