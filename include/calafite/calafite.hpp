@@ -38,6 +38,11 @@
 #include "maths/mint.hpp"
 #include "maths/sieve.hpp"
 
+// geometry
+#include "geometry/aosoa.hpp"
+#include "geometry/line.hpp"
+#include "geometry/point.hpp"
+
 // search algorithms
 #include "search/dijkstra.hpp"
 #include "search/graphBFS.hpp"
