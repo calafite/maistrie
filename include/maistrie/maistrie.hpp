@@ -19,6 +19,7 @@
 
 // data structures
 #include "ds/cartesianTree.hpp"
+#include "ds/compressedSparseRow.hpp"
 #include "ds/compressor.hpp"
 #include "ds/disjointSetUnion.hpp"
 #include "ds/fenwickTree.hpp"
@@ -27,7 +28,6 @@
 #include "ds/segmentTree.hpp"
 #include "ds/sparseTable.hpp"
 #include "ds/trie.hpp"
-#include "ds/compressedSparseRow.hpp"
 
 // custom io
 #include "io/io.hpp"
@@ -48,7 +48,7 @@
 #include "search/dijkstra.hpp"
 #include "search/graphBFS.hpp"
 #include "search/graphDFS.hpp"
-#include "search/scc.hpp"
+#include "search/stronglyConnected.hpp"
 #include "search/topologicalSort.hpp"
 #include "search/treeBFS.hpp"
 #include "search/treeDFS.hpp"

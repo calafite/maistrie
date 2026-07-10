@@ -18,13 +18,13 @@ namespace calafite {
                       m(modulus == 0 ? 0 : (static_cast<uint64_t>(-1) / modulus + 1)) {}
 
                 constexpr uint32_t operator()(uint64_t value) const {
-                    #if defined(__SIZEOF_INT128__)
+#if defined(__SIZEOF_INT128__)
                     uint64_t q = (static_cast<unsigned __int128>(value) * m) >> 64;
                     uint32_t r = static_cast<uint32_t>(value - q * mod);
                     return r >= mod ? r - mod : r;
-                    #else
+#else
                     return value % mod;
-                    #endif
+#endif
                 }
             };
 
