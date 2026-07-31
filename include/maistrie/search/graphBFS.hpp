@@ -13,9 +13,11 @@ namespace calafite {
             core::FastVector<size_t> distances;
             core::FastVector<size_t> parents;
 
-            GraphBreadthFirstSearch(size_t start,
-                                    const core::FastVector<core::FastVector<size_t>>& adjacencyList,
-                                    bool recordPaths = false) {
+            GraphBreadthFirstSearch(
+                size_t start, //
+                const core::FastVector<core::FastVector<size_t>>& adjacencyList, //
+                bool recordPaths = false //
+            ) {
                 size_t nodeCount = adjacencyList.size();
                 assert(start < nodeCount);
 
@@ -43,9 +45,11 @@ namespace calafite {
                 }
             }
 
-            GraphBreadthFirstSearch(const core::FastVector<size_t>& starts,
-                                    const core::FastVector<core::FastVector<size_t>>& adjacencyList,
-                                    bool recordPaths = false) {
+            GraphBreadthFirstSearch(
+                const core::FastVector<size_t>& starts, //
+                const core::FastVector<core::FastVector<size_t>>& adjacencyList, //
+                bool recordPaths = false //
+            ) {
                 size_t nodeCount = adjacencyList.size();
                 distances.assign(nodeCount, unvisited);
                 if (recordPaths) {

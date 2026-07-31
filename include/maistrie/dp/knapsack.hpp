@@ -9,8 +9,11 @@ namespace calafite {
     namespace dp {
 
         template <typename WeightType, typename ValueType>
-        ValueType zeroOneKnapsack(size_t capacity, const core::FastVector<WeightType>& weights,
-                                  const core::FastVector<ValueType>& values) {
+        ValueType zeroOneKnapsack( //
+            size_t capacity, //
+            const core::FastVector<WeightType>& weights, //
+            const core::FastVector<ValueType>& values //
+        ) {
             assert(weights.size() == values.size());
             core::FastVector<ValueType> dp(capacity + 1, ValueType(0));
 
@@ -23,8 +26,11 @@ namespace calafite {
         }
 
         template <typename WeightType, typename ValueType>
-        ValueType unboundedKnapsack(size_t capacity, const core::FastVector<WeightType>& weights,
-                                    const core::FastVector<ValueType>& values) {
+        ValueType unboundedKnapsack( //
+            size_t capacity, //
+            const core::FastVector<WeightType>& weights, //
+            const core::FastVector<ValueType>& values //
+        ) {
             assert(weights.size() == values.size());
             core::FastVector<ValueType> dp(capacity + 1, ValueType(0));
 
@@ -39,9 +45,12 @@ namespace calafite {
         }
 
         template <typename WeightType, typename ValueType>
-        ValueType boundedKnapsack(size_t capacity, const core::FastVector<WeightType>& weights,
-                                  const core::FastVector<ValueType>& values,
-                                  const core::FastVector<size_t>& counts) {
+        ValueType boundedKnapsack( //
+            size_t capacity, //
+            const core::FastVector<WeightType>& weights, //
+            const core::FastVector<ValueType>& values, //
+            const core::FastVector<size_t>& counts //
+        ) {
             assert(weights.size() == values.size() && weights.size() == counts.size());
 
             core::FastVector<WeightType> splitWeights;

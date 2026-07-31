@@ -18,13 +18,13 @@ namespace calafite {
             core::FastVector<size_t> parents;
             WeightType unreachable;
 
-            Dijkstra(size_t start,
-                     const core::FastVector<core::FastVector<std::pair<size_t, WeightType>>>&
-                         adjacencyList,
-                     bool recordPaths = false,
-                     WeightType unreachableValue = std::numeric_limits<WeightType>::max())
+            Dijkstra(
+                size_t start, //
+                const core::FastVector<core::FastVector<std::pair<size_t, WeightType>>>& adjacencyList, //
+                bool recordPaths = false, //
+                WeightType unreachableValue = std::numeric_limits<WeightType>::max() //
+            ) //
                 : unreachable(unreachableValue) {
-
                 size_t nodeCount = adjacencyList.size();
                 assert(start < nodeCount);
 
@@ -64,11 +64,12 @@ namespace calafite {
                 }
             }
 
-            Dijkstra(const core::FastVector<size_t>& starts,
-                     const core::FastVector<core::FastVector<std::pair<size_t, WeightType>>>&
-                         adjacencyList,
-                     bool recordPaths = false,
-                     WeightType unreachableValue = std::numeric_limits<WeightType>::max())
+            Dijkstra(
+                const core::FastVector<size_t>& starts, //
+                const core::FastVector<core::FastVector<std::pair<size_t, WeightType>>>& adjacencyList, //
+                bool recordPaths = false, //
+                WeightType unreachableValue = std::numeric_limits<WeightType>::max() //
+            ) //
                 : unreachable(unreachableValue) {
 
                 size_t nodeCount = adjacencyList.size();

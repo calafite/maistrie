@@ -18,9 +18,11 @@ namespace calafite {
             size_t timer;
             bool hasCycle;
 
-            GraphDepthFirstSearch(size_t start,
-                                  const core::FastVector<core::FastVector<size_t>>& adjacencyList,
-                                  bool recordPaths = false) {
+            GraphDepthFirstSearch(
+                size_t start, //
+                const core::FastVector<core::FastVector<size_t>>& adjacencyList, //
+                bool recordPaths = false //
+            ) {
                 size_t nodeCount = adjacencyList.size();
                 assert(start < nodeCount);
 
@@ -78,9 +80,12 @@ namespace calafite {
 
           private:
             void
-            performDepthFirstSearch(size_t current, size_t parent,
-                                    const core::FastVector<core::FastVector<size_t>>& adjacencyList,
-                                    bool recordPaths) {
+            performDepthFirstSearch(
+                size_t current, //
+                size_t parent, //
+                const core::FastVector<core::FastVector<size_t>>& adjacencyList, //
+                bool recordPaths //
+            ) {
                 states[current] = 1;
                 entryTimes[current] = timer++;
                 if (recordPaths)

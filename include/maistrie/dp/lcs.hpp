@@ -34,8 +34,10 @@ namespace calafite {
         }
 
         template <typename Container1, typename Container2>
-        auto longestCommonSubsequencePath(const Container1& sequence1,
-                                          const Container2& sequence2) {
+        auto longestCommonSubsequencePath( //
+            const Container1& sequence1, //
+            const Container2& sequence2 //
+        ) {
             using ValueType = std::remove_cv_t<std::remove_reference_t<decltype(sequence1[0])>>;
 
             size_t n = sequence1.size();

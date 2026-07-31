@@ -28,8 +28,10 @@ namespace calafite {
         }
 
         template <typename Container, typename Compare = std::less<>>
-        core::FastVector<size_t> longestIncreasingSubsequenceIndices(const Container& sequence,
-                                                                     Compare comp = Compare()) {
+        core::FastVector<size_t> longestIncreasingSubsequenceIndices( //
+            const Container& sequence, //
+            Compare comp = Compare() //
+        ) {
             size_t n = sequence.size();
             if (n == 0)
                 return {};
