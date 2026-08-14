@@ -33,7 +33,6 @@ namespace maistrie {
     namespace io {
         class Printer {
           public:
-          public:
             static constexpr size_t BUFFER_SIZE = 1 << 17;
 
           private:
@@ -244,7 +243,6 @@ namespace maistrie {
         inline Printer out;
 
         class Scanner {
-          public:
           public:
             static constexpr size_t BUFFER_SIZE = 1 << 17;
 

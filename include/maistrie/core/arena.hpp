@@ -14,7 +14,6 @@ namespace maistrie {
 
         class Chunk {
           public:
-          public:
             Chunk* next;
             size_t size;
             char* data() {
@@ -103,7 +102,6 @@ namespace maistrie {
         }
 
         class ScopedArena {
-          public:
           public:
             ScopedArena() {
                 active = true;

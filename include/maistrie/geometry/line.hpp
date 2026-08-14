@@ -8,7 +8,6 @@ namespace maistrie {
     namespace geometry {
         template <typename Type> class Line {
           public:
-          public:
             Type a;
             Type b;
             Type c;

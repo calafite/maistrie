@@ -20,7 +20,6 @@ namespace maistrie {
 
         class StronglyConnectedComponents {
           public:
-          public:
             size_t componentCount;
             core::FastVector<size_t> componentId;
             core::FastVector<core::FastVector<size_t>> components;

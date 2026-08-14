@@ -8,7 +8,6 @@ namespace maistrie {
     namespace geometry {
         template <typename Type> class Point {
           public:
-          public:
             Type x;
             Type y;
 

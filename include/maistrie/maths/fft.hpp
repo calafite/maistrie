@@ -13,7 +13,6 @@ namespace maistrie {
     namespace mathematics {
 
         class Complex {
-          public:
           private:
             double real;
             double imaginary;

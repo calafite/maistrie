@@ -8,7 +8,6 @@ namespace maistrie {
         namespace operations {
 
             class FastModulo32 {
-              public:
               private:
                 uint32_t mod;
                 uint64_t m;
@@ -34,7 +33,6 @@ namespace maistrie {
                 inline constexpr double defaultEpsilon = 1e-9;
 
                 class Equal {
-                  public:
                   private:
                     double epsilon;
 
@@ -60,7 +58,6 @@ namespace maistrie {
                 inline constexpr Equal equal{defaultEpsilon};
 
                 class NotEqual {
-                  public:
                   private:
                     double epsilon;
 
@@ -86,7 +83,6 @@ namespace maistrie {
                 inline constexpr NotEqual notEqual{defaultEpsilon};
 
                 class LessThan {
-                  public:
                   private:
                     double epsilon;
 
@@ -112,7 +108,6 @@ namespace maistrie {
                 inline constexpr LessThan lessThan{defaultEpsilon};
 
                 class GreaterThan {
-                  public:
                   private:
                     double epsilon;
 
@@ -138,7 +133,6 @@ namespace maistrie {
                 inline constexpr GreaterThan greaterThan{defaultEpsilon};
 
                 class LessThanOrEqual {
-                  public:
                   private:
                     double epsilon;
 
@@ -164,7 +158,6 @@ namespace maistrie {
                 inline constexpr LessThanOrEqual lessThanOrEqual{defaultEpsilon};
 
                 class GreaterThanOrEqual {
-                  public:
                   private:
                     double epsilon;
 
@@ -191,7 +184,6 @@ namespace maistrie {
                 inline constexpr GreaterThanOrEqual greaterThanOrEqual{defaultEpsilon};
 
                 class IsZero {
-                  public:
                   private:
                     double epsilon;
 
@@ -209,7 +201,6 @@ namespace maistrie {
                 inline constexpr IsZero isZero{defaultEpsilon};
 
                 class IsPositive {
-                  public:
                   private:
                     double epsilon;
 
@@ -227,7 +218,6 @@ namespace maistrie {
                 inline constexpr IsPositive isPositive{defaultEpsilon};
 
                 class IsNegative {
-                  public:
                   private:
                     double epsilon;
 
@@ -248,7 +238,6 @@ namespace maistrie {
 
             class Add {
               public:
-              public:
                 template <typename LeftType, typename RightType>
                 constexpr auto operator()(const LeftType& left, const RightType& right) const {
                     return left + right;
@@ -262,7 +251,6 @@ namespace maistrie {
             inline constexpr Add add{};
 
             class Subtract {
-              public:
               public:
                 template <typename LeftType, typename RightType>
                 constexpr auto operator()(const LeftType& left, const RightType& right) const {
@@ -278,7 +266,6 @@ namespace maistrie {
 
             class Multiply {
               public:
-              public:
                 template <typename LeftType, typename RightType>
                 constexpr auto operator()(const LeftType& left, const RightType& right) const {
                     return left * right;
@@ -292,7 +279,6 @@ namespace maistrie {
             inline constexpr Multiply multiply{};
 
             class Divide {
-              public:
               public:
                 template <typename LeftType, typename RightType>
                 constexpr auto operator()(const LeftType& left, const RightType& right) const {
@@ -310,7 +296,6 @@ namespace maistrie {
 
             class Modulo {
               public:
-              public:
                 template <typename LeftType, typename RightType>
                 constexpr auto operator()(const LeftType& left, const RightType& right) const {
                     assert(right != 0);
@@ -327,7 +312,6 @@ namespace maistrie {
 
             class Equal {
               public:
-              public:
                 template <typename LeftType, typename RightType>
                 constexpr bool operator()(const LeftType& left, const RightType& right) const {
                     return left == right;
@@ -341,7 +325,6 @@ namespace maistrie {
             inline constexpr Equal equal{};
 
             class NotEqual {
-              public:
               public:
                 template <typename LeftType, typename RightType>
                 constexpr bool operator()(const LeftType& left, const RightType& right) const {
@@ -357,7 +340,6 @@ namespace maistrie {
 
             class LessThan {
               public:
-              public:
                 template <typename LeftType, typename RightType>
                 constexpr bool operator()(const LeftType& left, const RightType& right) const {
                     return left < right;
@@ -371,7 +353,6 @@ namespace maistrie {
             inline constexpr LessThan lessThan{};
 
             class GreaterThan {
-              public:
               public:
                 template <typename LeftType, typename RightType>
                 constexpr bool operator()(const LeftType& left, const RightType& right) const {
@@ -387,7 +368,6 @@ namespace maistrie {
 
             class LessThanOrEqual {
               public:
-              public:
                 template <typename LeftType, typename RightType>
                 constexpr bool operator()(const LeftType& left, const RightType& right) const {
                     return left <= right;
@@ -401,7 +381,6 @@ namespace maistrie {
             inline constexpr LessThanOrEqual lessThanOrEqual{};
 
             class GreaterThanOrEqual {
-              public:
               public:
                 template <typename LeftType, typename RightType>
                 constexpr bool operator()(const LeftType& left, const RightType& right) const {
@@ -417,7 +396,6 @@ namespace maistrie {
 
             class BitwiseAnd {
               public:
-              public:
                 template <typename LeftType, typename RightType>
                 constexpr auto operator()(const LeftType& left, const RightType& right) const {
                     return left & right;
@@ -431,7 +409,6 @@ namespace maistrie {
             inline constexpr BitwiseAnd bitwiseAnd{};
 
             class BitwiseOr {
-              public:
               public:
                 template <typename LeftType, typename RightType>
                 constexpr auto operator()(const LeftType& left, const RightType& right) const {
@@ -447,7 +424,6 @@ namespace maistrie {
 
             class BitwiseXor {
               public:
-              public:
                 template <typename LeftType, typename RightType>
                 constexpr auto operator()(const LeftType& left, const RightType& right) const {
                     return left ^ right;
@@ -462,7 +438,6 @@ namespace maistrie {
 
             class Minimum {
               public:
-              public:
                 template <typename LeftType, typename RightType>
                 constexpr auto operator()(const LeftType& left, const RightType& right) const {
                     return left < right ? left : right;
@@ -472,7 +447,6 @@ namespace maistrie {
 
             class Maximum {
               public:
-              public:
                 template <typename LeftType, typename RightType>
                 constexpr auto operator()(const LeftType& left, const RightType& right) const {
                     return left > right ? left : right;
@@ -481,7 +455,6 @@ namespace maistrie {
             inline constexpr Maximum maximum{};
 
             class GreatestCommonDivisor {
-              public:
               public:
                 template <typename LeftType, typename RightType>
                 constexpr auto operator()(LeftType left, RightType right) const {
@@ -515,7 +488,6 @@ namespace maistrie {
 
             class LeastCommonMultiple {
               public:
-              public:
                 template <typename LeftType, typename RightType>
                 constexpr auto operator()(const LeftType& left, const RightType& right) const {
                     if (left == 0 || right == 0)
@@ -532,7 +504,6 @@ namespace maistrie {
 
             class IsEven {
               public:
-              public:
                 template <typename Type> constexpr bool operator()(const Type& value) const {
                     return (value & 1) == 0;
                 }
@@ -540,7 +511,6 @@ namespace maistrie {
             inline constexpr IsEven isEven{};
 
             class IsOdd {
-              public:
               public:
                 template <typename Type> constexpr bool operator()(const Type& value) const {
                     return (value & 1) != 0;
@@ -550,7 +520,6 @@ namespace maistrie {
 
             class IsPositive {
               public:
-              public:
                 template <typename Type> constexpr bool operator()(const Type& value) const {
                     return value > 0;
                 }
@@ -559,7 +528,6 @@ namespace maistrie {
 
             class IsNegative {
               public:
-              public:
                 template <typename Type> constexpr bool operator()(const Type& value) const {
                     return value < 0;
                 }
@@ -567,7 +535,6 @@ namespace maistrie {
             inline constexpr IsNegative isNegative{};
 
             class IsZero {
-              public:
               public:
                 template <typename Type> constexpr bool operator()(const Type& value) const {
                     return value == 0;

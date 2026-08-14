@@ -14,7 +14,6 @@ namespace maistrie {
           public:
             class alignas(64) Block {
               public:
-              public:
                 Type x[CSize];
                 Type y[CSize];
 
@@ -22,7 +21,6 @@ namespace maistrie {
             };
 
             class Reference {
-              public:
               public:
                 Type& x;
                 Type& y;
@@ -57,7 +55,6 @@ namespace maistrie {
             };
 
             class ConstReference {
-              public:
               public:
                 const Type& x;
                 const Type& y;

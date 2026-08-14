@@ -34,7 +34,6 @@ namespace maistrie {
     namespace core {
         template <typename Type> class FastVector {
           public:
-          public:
             using iterator = Type*;
             using const_iterator = const Type*;
             using value_type = Type;

@@ -10,7 +10,6 @@ namespace maistrie {
     namespace ds {
         template <typename WeightType = void> class CSRGraph {
           public:
-          public:
             static constexpr bool isWeighted = !std::is_same_v<WeightType, void>;
             using EdgeType = std::conditional_t<isWeighted, std::pair<size_t, WeightType>, size_t>;
 
@@ -107,7 +106,6 @@ namespace maistrie {
             }
 
             class AdjacencyList {
-              public:
               public:
                 const EdgeType* beginPtr;
                 const EdgeType* endPtr;
