@@ -45,6 +45,7 @@
 #include "geometry/point.hpp"
 
 // search algorithms
+#include "search/edgeEndpoint.hpp"
 #include "search/dijkstra.hpp"
 #include "search/graphBFS.hpp"
 #include "search/graphDFS.hpp"

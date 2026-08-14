@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../core/fastVector.hpp"
+#include "edgeEndpoint.hpp"
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
@@ -8,7 +9,7 @@
 namespace maistrie {
     namespace search {
 
-        class GraphDepthFirstSearch {
+        template <typename GraphType> class GraphDepthFirstSearch {
           public:
             static constexpr size_t unvisited = static_cast<size_t>(-1);
 
@@ -19,10 +20,9 @@ namespace maistrie {
             size_t timer;
             bool hasCycle;
 
-            GraphDepthFirstSearch(
-                size_t start,                                                    //
-                const core::FastVector<core::FastVector<size_t>>& adjacencyList, //
-                bool recordPaths = false                                         //
+            GraphDepthFirstSearch(size_t start, //
+                                  const GraphType& adjacencyList,
+                                  bool recordPaths = false //
             ) {
                 size_t nodeCount = adjacencyList.size();
                 assert(start < nodeCount);
@@ -40,8 +40,7 @@ namespace maistrie {
             }
 
             GraphDepthFirstSearch(const core::FastVector<size_t>& starts,
-                                  const core::FastVector<core::FastVector<size_t>>& adjacencyList,
-                                  bool recordPaths = false) {
+                                  const GraphType& adjacencyList, bool recordPaths = false) {
                 size_t nodeCount = adjacencyList.size();
 
                 states.assign(nodeCount, 0);
@@ -80,18 +79,19 @@ namespace maistrie {
             }
 
           private:
-            void performDepthFirstSearch(
-                size_t current,                                                  //
-                size_t parent,                                                   //
-                const core::FastVector<core::FastVector<size_t>>& adjacencyList, //
-                bool recordPaths                                                 //
+            void performDepthFirstSearch( //
+                size_t current,           //
+                size_t parent,            //
+                const GraphType& adjacencyList,
+                bool recordPaths //
             ) {
                 states[current] = 1;
                 entryTimes[current] = timer++;
                 if (recordPaths)
                     parents[current] = parent;
 
-                for (size_t neighbor : adjacencyList[current]) {
+                for (const auto& edge : adjacencyList[current]) {
+                    size_t neighbor = getEndpoint(edge);
                     if (states[neighbor] == 0) {
                         performDepthFirstSearch(neighbor, current, adjacencyList, recordPaths);
                     } else if (states[neighbor] == 1) {

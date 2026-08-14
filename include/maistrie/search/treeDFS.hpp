@@ -1,12 +1,13 @@
 #pragma once
 
 #include "../core/fastVector.hpp"
+#include "edgeEndpoint.hpp"
 #include <cassert>
 #include <cstddef>
 
 namespace maistrie {
     namespace search {
-        class TreeDepthFirstSearch {
+        template <typename GraphType> class TreeDepthFirstSearch {
           public:
             static constexpr size_t unvisited = static_cast<size_t>(-1);
 
@@ -17,10 +18,7 @@ namespace maistrie {
             core::FastVector<size_t> exitTimes;
             size_t timer;
 
-            TreeDepthFirstSearch(                                               //
-                size_t root,                                                    //
-                const core::FastVector<core::FastVector<size_t>>& adjacencyList //
-            ) {
+            TreeDepthFirstSearch(size_t root, const GraphType& adjacencyList) {
                 size_t nodeCount = adjacencyList.size();
                 parents.assign(nodeCount, unvisited);
                 depths.assign(nodeCount, 0);
@@ -40,15 +38,16 @@ namespace maistrie {
             }
 
           private:
-            void performDepthFirstSearch(                                       //
-                size_t current,                                                 //
-                size_t parent,                                                  //
-                const core::FastVector<core::FastVector<size_t>>& adjacencyList //
+            void performDepthFirstSearch(      //
+                size_t current,                //
+                size_t parent,                 //
+                const GraphType& adjacencyList //
             ) {
                 parents[current] = parent;
                 entryTimes[current] = timer++;
 
-                for (size_t neighbor : adjacencyList[current]) {
+                for (const auto& edge : adjacencyList[current]) {
+                    size_t neighbor = getEndpoint(edge);
                     if (neighbor != parent) {
                         depths[neighbor] = depths[current] + 1;
                         performDepthFirstSearch(neighbor, current, adjacencyList);

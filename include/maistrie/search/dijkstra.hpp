@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../core/fastVector.hpp"
+#include "edgeEndpoint.hpp"
 #include <cassert>
 #include <cstddef>
 #include <limits>
@@ -11,7 +12,10 @@
 namespace maistrie {
     namespace search {
 
-        template <typename WeightType> class Dijkstra {
+        template <typename WeightType,
+                  typename GraphType =
+                      core::FastVector<core::FastVector<std::pair<size_t, WeightType>>>>
+        class Dijkstra {
           public:
             static constexpr size_t unvisited = static_cast<size_t>(-1);
 
@@ -19,9 +23,8 @@ namespace maistrie {
             core::FastVector<size_t> parents;
             WeightType unreachable;
 
-            Dijkstra(size_t start, //
-                     const core::FastVector<core::FastVector<std::pair<size_t, WeightType>>>&
-                         adjacencyList,                                                   //
+            Dijkstra(size_t start,                                                        //
+                     const GraphType& adjacencyList,                                      //
                      bool recordPaths = false,                                            //
                      WeightType unreachableValue = std::numeric_limits<WeightType>::max() //
                      )                                                                    //
@@ -51,7 +54,7 @@ namespace maistrie {
                         continue;
 
                     for (const auto& edge : adjacencyList[current]) {
-                        size_t neighbor = edge.first;
+                        size_t neighbor = getEndpoint(edge);
                         WeightType weight = edge.second;
 
                         WeightType newDist = currentDist + weight;
@@ -65,9 +68,8 @@ namespace maistrie {
                 }
             }
 
-            Dijkstra(const core::FastVector<size_t>& starts, //
-                     const core::FastVector<core::FastVector<std::pair<size_t, WeightType>>>&
-                         adjacencyList,                                                   //
+            Dijkstra(const core::FastVector<size_t>& starts,                              //
+                     const GraphType& adjacencyList,                                      //
                      bool recordPaths = false,                                            //
                      WeightType unreachableValue = std::numeric_limits<WeightType>::max() //
                      )                                                                    //
@@ -102,7 +104,7 @@ namespace maistrie {
                         continue;
 
                     for (const auto& edge : adjacencyList[current]) {
-                        size_t neighbor = edge.first;
+                        size_t neighbor = getEndpoint(edge);
                         WeightType weight = edge.second;
 
                         WeightType newDist = currentDist + weight;

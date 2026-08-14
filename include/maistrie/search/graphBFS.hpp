@@ -1,23 +1,23 @@
 #pragma once
 
 #include "../core/fastVector.hpp"
+#include "edgeEndpoint.hpp"
 #include <cassert>
 #include <cstddef>
 
 namespace maistrie {
     namespace search {
 
-        class GraphBreadthFirstSearch {
+        template <typename GraphType> class GraphBreadthFirstSearch {
           public:
             static constexpr size_t unvisited = static_cast<size_t>(-1);
 
             core::FastVector<size_t> distances;
             core::FastVector<size_t> parents;
 
-            GraphBreadthFirstSearch(
-                size_t start,                                                    //
-                const core::FastVector<core::FastVector<size_t>>& adjacencyList, //
-                bool recordPaths = false                                         //
+            GraphBreadthFirstSearch(size_t start, //
+                                    const GraphType& adjacencyList,
+                                    bool recordPaths = false //
             ) {
                 size_t nodeCount = adjacencyList.size();
                 assert(start < nodeCount);
@@ -35,7 +35,8 @@ namespace maistrie {
 
                 for (size_t head = 0; head < queue.size(); ++head) {
                     size_t current = queue[head];
-                    for (size_t neighbor : adjacencyList[current]) {
+                    for (const auto& edge : adjacencyList[current]) {
+                        size_t neighbor = getEndpoint(edge);
                         if (distances[neighbor] == unvisited) {
                             distances[neighbor] = distances[current] + 1;
                             if (recordPaths)
@@ -46,10 +47,9 @@ namespace maistrie {
                 }
             }
 
-            GraphBreadthFirstSearch(
-                const core::FastVector<size_t>& starts,                          //
-                const core::FastVector<core::FastVector<size_t>>& adjacencyList, //
-                bool recordPaths = false                                         //
+            GraphBreadthFirstSearch(const core::FastVector<size_t>& starts, //
+                                    const GraphType& adjacencyList,
+                                    bool recordPaths = false //
             ) {
                 size_t nodeCount = adjacencyList.size();
                 distances.assign(nodeCount, unvisited);
@@ -70,7 +70,8 @@ namespace maistrie {
 
                 for (size_t head = 0; head < queue.size(); ++head) {
                     size_t current = queue[head];
-                    for (size_t neighbor : adjacencyList[current]) {
+                    for (const auto& edge : adjacencyList[current]) {
+                        size_t neighbor = getEndpoint(edge);
                         if (distances[neighbor] == unvisited) {
                             distances[neighbor] = distances[current] + 1;
                             if (recordPaths)

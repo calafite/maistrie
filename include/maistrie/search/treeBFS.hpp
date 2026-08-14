@@ -1,13 +1,14 @@
 #pragma once
 
 #include "../core/fastVector.hpp"
+#include "edgeEndpoint.hpp"
 #include <cassert>
 #include <cstddef>
 
 namespace maistrie {
     namespace search {
 
-        class TreeBreadthFirstSearch {
+        template <typename GraphType> class TreeBreadthFirstSearch {
           public:
             static constexpr size_t unvisited = static_cast<size_t>(-1);
 
@@ -15,8 +16,7 @@ namespace maistrie {
             core::FastVector<size_t> depths;
             core::FastVector<size_t> order;
 
-            TreeBreadthFirstSearch(
-                size_t root, const core::FastVector<core::FastVector<size_t>>& adjacencyList) {
+            TreeBreadthFirstSearch(size_t root, const GraphType& adjacencyList) {
                 size_t nodeCount = adjacencyList.size();
                 assert(root < nodeCount);
 
@@ -28,7 +28,8 @@ namespace maistrie {
 
                 for (size_t head = 0; head < order.size(); ++head) {
                     size_t current = order[head];
-                    for (size_t neighbor : adjacencyList[current]) {
+                    for (const auto& edge : adjacencyList[current]) {
+                        size_t neighbor = getEndpoint(edge);
                         if (neighbor != parents[current]) {
                             parents[neighbor] = current;
                             depths[neighbor] = depths[current] + 1;

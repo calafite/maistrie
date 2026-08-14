@@ -1,23 +1,15 @@
 #pragma once
 
 #include "../core/fastVector.hpp"
+#include "edgeEndpoint.hpp"
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
-#include <type_traits>
 #include <utility>
 
 namespace maistrie {
     namespace search {
-        template <typename EdgeType> constexpr size_t getEndpoint(const EdgeType& edge) {
-            if constexpr (std::is_integral_v<EdgeType>) {
-                return static_cast<size_t>(edge);
-            } else {
-                return static_cast<size_t>(edge.first);
-            }
-        }
-
         class StronglyConnectedComponents {
           public:
             size_t componentCount;
