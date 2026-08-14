@@ -29,9 +29,14 @@ namespace maistrie {
             ComposeLazyOp composeLazy;
 
           public:
-            LazySegmentTree(size_t count, Type neutralNode, LazyType neutralLazy,
-                            CombineNodeOp combineNode, ApplyLazyOp applyLazy,
-                            ComposeLazyOp composeLazy)
+            LazySegmentTree(               //
+                size_t count,              //
+                Type neutralNode,          //
+                LazyType neutralLazy,      //
+                CombineNodeOp combineNode, //
+                ApplyLazyOp applyLazy,     //
+                ComposeLazyOp composeLazy  //
+                )
                 : sizeValue(count), tree(count > 0 ? 4 * count : 0, neutralNode),
                   lazy(count > 0 ? 4 * count : 0, neutralLazy),
                   hasLazy(count > 0 ? 4 * count : 0, 0), neutralNode(neutralNode),
@@ -119,8 +124,14 @@ namespace maistrie {
                 }
             }
 
-            void updateInternal(size_t node, size_t left, size_t right, size_t queryLeft,
-                                size_t queryRight, const LazyType& value) {
+            void updateInternal(      //
+                size_t node,          //
+                size_t left,          //
+                size_t right,         //
+                size_t queryLeft,     //
+                size_t queryRight,    //
+                const LazyType& value //
+            ) {
                 if (queryLeft <= left && right <= queryRight) {
                     applyNode(node, value);
                     return;
@@ -136,8 +147,13 @@ namespace maistrie {
                 tree[node] = combineNode(tree[node << 1], tree[node << 1 | 1]);
             }
 
-            Type queryInternal(size_t node, size_t left, size_t right, size_t queryLeft,
-                               size_t queryRight) {
+            Type queryInternal(   //
+                size_t node,      //
+                size_t left,      //
+                size_t right,     //
+                size_t queryLeft, //
+                size_t queryRight //
+            ) {
                 if (queryLeft <= left && right <= queryRight) {
                     return tree[node];
                 }

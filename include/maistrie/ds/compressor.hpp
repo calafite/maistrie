@@ -43,8 +43,13 @@ namespace maistrie {
             }
 
             inline size_t get(const Type& value) const {
-                return static_cast<size_t>(std::lower_bound(values.begin(), values.end(), value) -
-                                           values.begin());
+                return static_cast<size_t>( //
+                    std::lower_bound(       //
+                        values.begin(),     //
+                        values.end(), value //
+                        ) -
+                    values.begin() //
+                );
             }
 
             inline Type operator[](size_t index) const {
