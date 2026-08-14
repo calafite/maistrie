@@ -5,17 +5,20 @@
 #include <cassert>
 #include <cmath>
 
-namespace calafite {
+namespace maistrie {
     namespace mathematics {
 
-        template <typename Type = int> struct Sieve {
+        template <typename Type = int> class Sieve {
+          public:
             static_assert(std::is_integral_v<Type> && std::is_signed_v<Type> && sizeof(Type) >= 4,
                           "Type must be a signed integer of at least 32 bits");
 
+          private:
             Type limit;
             core::FastVector<bool> isPrime;
             core::FastVector<int> primes;
 
+          public:
             Sieve(Type limit) : limit(limit), isPrime((limit >> 1) + 1, true) {
                 if (isPrime.size() > 0)
                     isPrime[0] = false;
@@ -60,4 +63,4 @@ namespace calafite {
         };
 
     } // namespace mathematics
-} // namespace calafite
+} // namespace maistrie

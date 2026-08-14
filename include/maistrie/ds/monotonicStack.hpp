@@ -6,19 +6,23 @@
 #include <functional>
 #include <utility>
 
-namespace calafite {
+namespace maistrie {
     namespace ds {
 
-        template <typename Type, typename Compare = std::less<Type>> struct MonotonicStack {
-            struct Element {
+        template <typename Type, typename Compare = std::less<Type>> class MonotonicStack {
+          public:
+            class Element {
+              public:
                 Type value;
                 size_t count;
             };
 
+          private:
             core::FastVector<Element> stack;
             Compare compare;
             Type currentSum;
 
+          public:
             MonotonicStack(Compare comp = Compare())
                 : compare(std::move(comp)), currentSum(Type(0)) {}
 
@@ -67,4 +71,4 @@ namespace calafite {
         };
 
     } // namespace ds
-} // namespace calafite
+} // namespace maistrie

@@ -10,16 +10,19 @@
 
 #if defined(__cpp_lib_ranges)
 
-namespace calafite {
+namespace maistrie {
     namespace core {
         template <typename Type> class FastVector;
     }
 
     namespace core {
 
-        template <std::ranges::view View> struct IteratorPipeline {
+        template <std::ranges::view View> class IteratorPipeline {
+
+          private:
             View view;
 
+          public:
             constexpr explicit IteratorPipeline(View v) : view(std::move(v)) {}
 
             // Lazy Operations
@@ -44,12 +47,12 @@ namespace calafite {
                 return IteratorPipeline<decltype(next)>(std::move(next));
             }
 
-            template <typename Predicate> constexpr auto take_while(Predicate&& predicate) {
+            template <typename Predicate> constexpr auto takeWhile(Predicate&& predicate) {
                 auto next = view | std::views::take_while(std::forward<Predicate>(predicate));
                 return IteratorPipeline<decltype(next)>(std::move(next));
             }
 
-            template <typename Predicate> constexpr auto drop_while(Predicate&& predicate) {
+            template <typename Predicate> constexpr auto dropWhile(Predicate&& predicate) {
                 auto next = view | std::views::drop_while(std::forward<Predicate>(predicate));
                 return IteratorPipeline<decltype(next)>(std::move(next));
             }
@@ -61,7 +64,7 @@ namespace calafite {
 
             // Eager Operations
 
-            template <template <typename...> typename Container = ::calafite::core::FastVector>
+            template <template <typename...> typename Container = ::maistrie::core::FastVector>
             constexpr auto collect() {
                 using RangeRef = std::ranges::range_reference_t<View>;
                 using RangeVal = std::remove_cvref_t<RangeRef>;
@@ -126,6 +129,6 @@ namespace calafite {
         };
 
     } // namespace core
-} // namespace calafite
+} // namespace maistrie
 
 #endif

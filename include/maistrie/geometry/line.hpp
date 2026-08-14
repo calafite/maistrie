@@ -4,9 +4,10 @@
 #include "point.hpp"
 #include <cmath>
 
-namespace calafite {
+namespace maistrie {
     namespace geometry {
         template <typename Type> class Line {
+          public:
           public:
             Type a;
             Type b;
@@ -88,4 +89,4 @@ namespace calafite {
             return scanner >> line.a >> line.b >> line.c;
         }
     } // namespace geometry
-} // namespace calafite
+} // namespace maistrie

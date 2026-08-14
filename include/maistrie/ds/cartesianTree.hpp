@@ -6,12 +6,14 @@
 #include <functional>
 #include <utility>
 
-namespace calafite {
+namespace maistrie {
     namespace ds {
 
-        template <typename Type, typename Compare = std::less<Type>> struct CartesianTree {
+        template <typename Type, typename Compare = std::less<Type>> class CartesianTree {
+          public:
             static constexpr size_t nullNode = static_cast<size_t>(-1);
 
+          private:
             size_t sizeValue;
             core::FastVector<size_t> leftChild;
             core::FastVector<size_t> rightChild;
@@ -19,6 +21,7 @@ namespace calafite {
             size_t root;
             Compare compare;
 
+          public:
             CartesianTree() : sizeValue(0), root(nullNode) {}
 
             CartesianTree(const core::FastVector<Type>& values, Compare comp = Compare())
@@ -58,4 +61,4 @@ namespace calafite {
         };
 
     } // namespace ds
-} // namespace calafite
+} // namespace maistrie

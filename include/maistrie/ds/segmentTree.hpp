@@ -5,15 +5,18 @@
 #include <cstddef>
 #include <utility>
 
-namespace calafite {
+namespace maistrie {
     namespace ds {
 
-        template <typename Type, typename Functor> struct SegmentTree {
+        template <typename Type, typename Functor> class SegmentTree {
+
+          private:
             size_t sizeValue;
             core::FastVector<Type> tree;
             Type neutral;
             Functor combine;
 
+          public:
             SegmentTree(size_t count, Type neutral, Functor combine)
                 : sizeValue(count), tree(2 * count, neutral), neutral(neutral),
                   combine(std::move(combine)) {}
@@ -57,4 +60,4 @@ namespace calafite {
         };
 
     } // namespace ds
-} // namespace calafite
+} // namespace maistrie

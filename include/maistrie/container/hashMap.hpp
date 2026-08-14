@@ -7,15 +7,20 @@
 #include <functional>
 #include <utility>
 
-namespace calafite {
+namespace maistrie {
     namespace container {
 
-        template <typename Type> struct IsPair : std::false_type {};
+        template <typename Type> class IsPair : public std::false_type {
+          public:
+        };
 
         template <typename Type1, typename Type2>
-        struct IsPair<std::pair<Type1, Type2>> : std::true_type {};
+        class IsPair<std::pair<Type1, Type2>> : public std::true_type {
+          public:
+        };
 
-        template <typename Type> struct CustomHash {
+        template <typename Type> class CustomHash {
+          public:
             static uint64_t splitMix64(uint64_t value) {
                 value += 0x9e3779b97f4a7c15;
                 value = (value ^ (value >> 30)) * 0xbf58476d1ce4e5b9;
@@ -39,18 +44,22 @@ namespace calafite {
         };
 
         template <typename KeyType, typename ValueType, typename HashFunction = CustomHash<KeyType>>
-        struct HashMap {
-            struct Entry {
+        class HashMap {
+          public:
+            class Entry {
+              public:
                 KeyType key;
                 ValueType value;
                 bool occupied = false;
             };
 
+          private:
             size_t capacity;
             core::FastVector<Entry> table;
             size_t size;
             HashFunction hasher;
 
+          public:
             HashMap(size_t initialCapacity = 16) : capacity(1), size(0) {
                 while (capacity < initialCapacity)
                     capacity <<= 1;
@@ -129,4 +138,4 @@ namespace calafite {
         };
 
     } // namespace container
-} // namespace calafite
+} // namespace maistrie

@@ -4,9 +4,10 @@
 #include <cassert>
 #include <cstddef>
 
-namespace calafite {
+namespace maistrie {
     namespace search {
-        struct TreeDepthFirstSearch {
+        class TreeDepthFirstSearch {
+          public:
             static constexpr size_t unvisited = static_cast<size_t>(-1);
 
             core::FastVector<size_t> parents;
@@ -59,4 +60,4 @@ namespace calafite {
             }
         };
     } // namespace search
-} // namespace calafite
+} // namespace maistrie

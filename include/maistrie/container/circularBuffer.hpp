@@ -17,15 +17,15 @@
 #endif
 #endif
 
-#ifndef CALAFITE_UNLIKELY
+#ifndef MAISTRIE_UNLIKELY
 #if defined(__GNUC__) || defined(__clang__)
-#define CALAFITE_UNLIKELY(x) __builtin_expect(!!(x), 0)
+#define MAISTRIE_UNLIKELY(x) __builtin_expect(!!(x), 0)
 #else
-#define CALAFITE_UNLIKELY(x) (x)
+#define MAISTRIE_UNLIKELY(x) (x)
 #endif
 #endif
 
-namespace calafite {
+namespace maistrie {
     namespace container {
 
         constexpr size_t nextPowerOfTwo(size_t n) {
@@ -42,7 +42,8 @@ namespace calafite {
             return n + 1;
         }
 
-        template <typename Type> struct CircularBuffer {
+        template <typename Type> class CircularBuffer {
+          public:
             using value_type = Type;
             using size_type = size_t;
             using difference_type = ptrdiff_t;
@@ -51,13 +52,16 @@ namespace calafite {
             using pointer = Type*;
             using const_pointer = const Type*;
 
+          private:
             Type* data = nullptr;
             size_t headValue = 0;
             size_t tailValue = 0;
             size_t capacityValue = 0;
             size_t maskValue = 0;
 
-            template <bool Const> struct IteratorImpl {
+          public:
+            template <bool Const> class IteratorImpl {
+              public:
                 using iterator_category = std::random_access_iterator_tag;
                 using value_type = Type;
                 using difference_type = ptrdiff_t;
@@ -314,42 +318,42 @@ namespace calafite {
             }
 
             inline void pushBack(const Type& value) {
-                if (CALAFITE_UNLIKELY(size() == capacityValue))
+                if (MAISTRIE_UNLIKELY(size() == capacityValue))
                     grow();
                 new (&data[tailValue & maskValue]) Type(value);
                 ++tailValue;
             }
 
             inline void pushBack(Type&& value) {
-                if (CALAFITE_UNLIKELY(size() == capacityValue))
+                if (MAISTRIE_UNLIKELY(size() == capacityValue))
                     grow();
                 new (&data[tailValue & maskValue]) Type(std::move(value));
                 ++tailValue;
             }
 
             inline void pushFront(const Type& value) {
-                if (CALAFITE_UNLIKELY(size() == capacityValue))
+                if (MAISTRIE_UNLIKELY(size() == capacityValue))
                     grow();
                 --headValue;
                 new (&data[headValue & maskValue]) Type(value);
             }
 
             inline void pushFront(Type&& value) {
-                if (CALAFITE_UNLIKELY(size() == capacityValue))
+                if (MAISTRIE_UNLIKELY(size() == capacityValue))
                     grow();
                 --headValue;
                 new (&data[headValue & maskValue]) Type(std::move(value));
             }
 
             template <typename... Args> inline void emplaceBack(Args&&... arguments) {
-                if (CALAFITE_UNLIKELY(size() == capacityValue))
+                if (MAISTRIE_UNLIKELY(size() == capacityValue))
                     grow();
                 new (&data[tailValue & maskValue]) Type(std::forward<Args>(arguments)...);
                 ++tailValue;
             }
 
             template <typename... Args> inline void emplaceFront(Args&&... arguments) {
-                if (CALAFITE_UNLIKELY(size() == capacityValue))
+                if (MAISTRIE_UNLIKELY(size() == capacityValue))
                     grow();
                 --headValue;
                 new (&data[headValue & maskValue]) Type(std::forward<Args>(arguments)...);
@@ -634,14 +638,14 @@ namespace calafite {
 #if defined(__cpp_lib_ranges)
             inline auto iterate() {
                 auto v = std::views::all(*this);
-                return ::calafite::core::IteratorPipeline<decltype(v)>(std::move(v));
+                return ::maistrie::core::IteratorPipeline<decltype(v)>(std::move(v));
             }
 
             inline auto iterate() const {
                 auto v = std::views::all(*this);
-                return ::calafite::core::IteratorPipeline<decltype(v)>(std::move(v));
+                return ::maistrie::core::IteratorPipeline<decltype(v)>(std::move(v));
             }
 #endif
         };
     } // namespace container
-} // namespace calafite
+} // namespace maistrie

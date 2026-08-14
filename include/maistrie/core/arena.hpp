@@ -4,15 +4,16 @@
 #include <cstdlib>
 
 #if defined(__GNUC__) || defined(__clang__)
-#define CALAFITE_UNLIKELY(x) __builtin_expect(!!(x), 0)
+#define MAISTRIE_UNLIKELY(x) __builtin_expect(!!(x), 0)
 #else
-#define CALAFITE_UNLIKELY(x) (x)
+#define MAISTRIE_UNLIKELY(x) (x)
 #endif
 
-namespace calafite {
+namespace maistrie {
     namespace arena {
 
         class Chunk {
+          public:
           public:
             Chunk* next;
             size_t size;
@@ -74,7 +75,7 @@ namespace calafite {
             uintptr_t address = reinterpret_cast<uintptr_t>(pointer);
             uintptr_t aligned = (address + alignment - 1) & ~(alignment - 1);
 
-            if (CALAFITE_UNLIKELY(aligned + size > reinterpret_cast<uintptr_t>(end))) {
+            if (MAISTRIE_UNLIKELY(aligned + size > reinterpret_cast<uintptr_t>(end))) {
                 return allocate_slow_path(size, alignment);
             }
 
@@ -92,7 +93,7 @@ namespace calafite {
 
         inline bool contains(void* target) noexcept {
             uintptr_t addr = reinterpret_cast<uintptr_t>(target);
-            if (CALAFITE_UNLIKELY(addr >= min_address && addr < max_address)) {
+            if (MAISTRIE_UNLIKELY(addr >= min_address && addr < max_address)) {
                 for (Chunk* chunk = head; chunk; chunk = chunk->next) {
                     if (target >= chunk->data() && target < chunk->data() + chunk->size)
                         return true;
@@ -103,6 +104,7 @@ namespace calafite {
 
         class ScopedArena {
           public:
+          public:
             ScopedArena() {
                 active = true;
             }
@@ -112,68 +114,68 @@ namespace calafite {
             }
         };
     } // namespace arena
-} // namespace calafite
+} // namespace maistrie
 
 #if defined(_WIN32)
-#define CALAFITE_ALIGNED_ALLOC(alignment, size) _aligned_malloc(size, alignment)
-#define CALAFITE_ALIGNED_FREE(pointer) _aligned_free(pointer)
+#define MAISTRIE_ALIGNED_ALLOC(alignment, size) _aligned_malloc(size, alignment)
+#define MAISTRIE_ALIGNED_FREE(pointer) _aligned_free(pointer)
 #else
-#define CALAFITE_ALIGNED_ALLOC(alignment, size) std::aligned_alloc(alignment, size)
-#define CALAFITE_ALIGNED_FREE(pointer) std::free(pointer)
+#define MAISTRIE_ALIGNED_ALLOC(alignment, size) std::aligned_alloc(alignment, size)
+#define MAISTRIE_ALIGNED_FREE(pointer) std::free(pointer)
 #endif
 
-#define CALAFITE_ROUND_UP(size, alignment) (((size) + (alignment) - 1) & ~((alignment) - 1))
+#define MAISTRIE_ROUND_UP(size, alignment) (((size) + (alignment) - 1) & ~((alignment) - 1))
 
-#define CALAFITE_MAKE_ARENA_GLOBAL                                                                 \
+#define MAISTRIE_MAKE_ARENA_GLOBAL                                                                 \
     void* operator new(size_t size) {                                                              \
-        if (calafite::arena::active)                                                               \
-            return calafite::arena::allocate(size);                                                \
+        if (maistrie::arena::active)                                                               \
+            return maistrie::arena::allocate(size);                                                \
         return std::malloc(size);                                                                  \
     }                                                                                              \
     void* operator new[](size_t size) {                                                            \
-        if (calafite::arena::active)                                                               \
-            return calafite::arena::allocate(size);                                                \
+        if (maistrie::arena::active)                                                               \
+            return maistrie::arena::allocate(size);                                                \
         return std::malloc(size);                                                                  \
     }                                                                                              \
     void* operator new(size_t size, std::align_val_t alignmentValue) {                             \
         size_t alignment = static_cast<size_t>(alignmentValue);                                    \
-        if (calafite::arena::active)                                                               \
-            return calafite::arena::allocate(size, alignment);                                     \
-        return CALAFITE_ALIGNED_ALLOC(alignment, CALAFITE_ROUND_UP(size, alignment));              \
+        if (maistrie::arena::active)                                                               \
+            return maistrie::arena::allocate(size, alignment);                                     \
+        return MAISTRIE_ALIGNED_ALLOC(alignment, MAISTRIE_ROUND_UP(size, alignment));              \
     }                                                                                              \
     void* operator new[](size_t size, std::align_val_t alignmentValue) {                           \
         size_t alignment = static_cast<size_t>(alignmentValue);                                    \
-        if (calafite::arena::active)                                                               \
-            return calafite::arena::allocate(size, alignment);                                     \
-        return CALAFITE_ALIGNED_ALLOC(alignment, CALAFITE_ROUND_UP(size, alignment));              \
+        if (maistrie::arena::active)                                                               \
+            return maistrie::arena::allocate(size, alignment);                                     \
+        return MAISTRIE_ALIGNED_ALLOC(alignment, MAISTRIE_ROUND_UP(size, alignment));              \
     }                                                                                              \
     void operator delete(void* pointer) noexcept {                                                 \
-        if (!pointer || calafite::arena::active || calafite::arena::contains(pointer))             \
+        if (!pointer || maistrie::arena::active || maistrie::arena::contains(pointer))             \
             return;                                                                                \
         std::free(pointer);                                                                        \
     }                                                                                              \
     void operator delete[](void* pointer) noexcept {                                               \
-        if (!pointer || calafite::arena::active || calafite::arena::contains(pointer))             \
+        if (!pointer || maistrie::arena::active || maistrie::arena::contains(pointer))             \
             return;                                                                                \
         std::free(pointer);                                                                        \
     }                                                                                              \
     void operator delete(void* pointer, size_t) noexcept {                                         \
-        if (!pointer || calafite::arena::active || calafite::arena::contains(pointer))             \
+        if (!pointer || maistrie::arena::active || maistrie::arena::contains(pointer))             \
             return;                                                                                \
         std::free(pointer);                                                                        \
     }                                                                                              \
     void operator delete[](void* pointer, size_t) noexcept {                                       \
-        if (!pointer || calafite::arena::active || calafite::arena::contains(pointer))             \
+        if (!pointer || maistrie::arena::active || maistrie::arena::contains(pointer))             \
             return;                                                                                \
         std::free(pointer);                                                                        \
     }                                                                                              \
     void operator delete(void* pointer, std::align_val_t) noexcept {                               \
-        if (!pointer || calafite::arena::active || calafite::arena::contains(pointer))             \
+        if (!pointer || maistrie::arena::active || maistrie::arena::contains(pointer))             \
             return;                                                                                \
-        CALAFITE_ALIGNED_FREE(pointer);                                                            \
+        MAISTRIE_ALIGNED_FREE(pointer);                                                            \
     }                                                                                              \
     void operator delete[](void* pointer, std::align_val_t) noexcept {                             \
-        if (!pointer || calafite::arena::active || calafite::arena::contains(pointer))             \
+        if (!pointer || maistrie::arena::active || maistrie::arena::contains(pointer))             \
             return;                                                                                \
-        CALAFITE_ALIGNED_FREE(pointer);                                                            \
+        MAISTRIE_ALIGNED_FREE(pointer);                                                            \
     }

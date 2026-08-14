@@ -4,11 +4,13 @@
 #include <cassert>
 #include <cstddef>
 
-namespace calafite {
+namespace maistrie {
     namespace ds {
 
-        template <size_t AlphabetSize = 26, int Offset = 'a'> struct Trie {
-            struct Node {
+        template <size_t AlphabetSize = 26, int Offset = 'a'> class Trie {
+          public:
+            class Node {
+              public:
                 int next[AlphabetSize];
                 int words = 0;
                 int prefixes = 0;
@@ -20,8 +22,10 @@ namespace calafite {
                 }
             };
 
+          private:
             core::FastVector<Node> nodes;
 
+          public:
             Trie() {
                 nodes.emplaceBack();
             }
@@ -104,4 +108,4 @@ namespace calafite {
         };
 
     } // namespace ds
-} // namespace calafite
+} // namespace maistrie

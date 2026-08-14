@@ -6,10 +6,11 @@
 #include <type_traits>
 #include <utility>
 
-namespace calafite {
+namespace maistrie {
     namespace mathematics {
 
         template <uint32_t Mod> class Modular {
+          public:
             static_assert(Mod > 0, "Modulus must be strictly positive");
 
           private:
@@ -173,4 +174,4 @@ namespace calafite {
             return scanner;
         }
     } // namespace mathematics
-} // namespace calafite
+} // namespace maistrie

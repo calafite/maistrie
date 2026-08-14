@@ -4,13 +4,16 @@
 #include <cassert>
 #include <cstddef>
 
-namespace calafite {
+namespace maistrie {
     namespace ds {
 
-        template <typename Type> struct FenwickTree {
+        template <typename Type> class FenwickTree {
+
+          private:
             size_t sizeValue;
             core::FastVector<Type> tree;
 
+          public:
             FenwickTree(size_t count) : sizeValue(count), tree(count + 1, Type(0)) {}
 
             FenwickTree(const core::FastVector<Type>& values)
@@ -75,4 +78,4 @@ namespace calafite {
         };
 
     } // namespace ds
-} // namespace calafite
+} // namespace maistrie

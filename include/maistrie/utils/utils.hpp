@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <cstddef>
 
-namespace calafite {
+namespace maistrie {
     namespace utility {
 
         template <typename Type>
@@ -20,4 +20,4 @@ namespace calafite {
         }
 
     } // namespace utility
-} // namespace calafite
+} // namespace maistrie

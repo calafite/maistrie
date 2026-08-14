@@ -4,19 +4,20 @@
 #include <cassert>
 #include <cstddef>
 
-namespace calafite {
+namespace maistrie {
     namespace search {
 
-        struct GraphBreadthFirstSearch {
+        class GraphBreadthFirstSearch {
+          public:
             static constexpr size_t unvisited = static_cast<size_t>(-1);
 
             core::FastVector<size_t> distances;
             core::FastVector<size_t> parents;
 
             GraphBreadthFirstSearch(
-                size_t start, //
+                size_t start,                                                    //
                 const core::FastVector<core::FastVector<size_t>>& adjacencyList, //
-                bool recordPaths = false //
+                bool recordPaths = false                                         //
             ) {
                 size_t nodeCount = adjacencyList.size();
                 assert(start < nodeCount);
@@ -46,9 +47,9 @@ namespace calafite {
             }
 
             GraphBreadthFirstSearch(
-                const core::FastVector<size_t>& starts, //
+                const core::FastVector<size_t>& starts,                          //
                 const core::FastVector<core::FastVector<size_t>>& adjacencyList, //
-                bool recordPaths = false //
+                bool recordPaths = false                                         //
             ) {
                 size_t nodeCount = adjacencyList.size();
                 distances.assign(nodeCount, unvisited);
@@ -82,7 +83,7 @@ namespace calafite {
 
             core::FastVector<size_t> getPath(size_t target) const {
                 assert(!parents.empty() &&
-                       "Paths were not tracked. Initialize the GraphBreadthFirstSearch struct with "
+                       "Paths were not tracked. Initialize the GraphBreadthFirstSearch class with "
                        "recordPaths = true.");
                 assert(target < distances.size());
 
@@ -100,4 +101,4 @@ namespace calafite {
         };
 
     } // namespace search
-} // namespace calafite
+} // namespace maistrie

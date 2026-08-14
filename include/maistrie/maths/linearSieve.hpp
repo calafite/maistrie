@@ -5,18 +5,21 @@
 #include <cassert>
 #include <cmath>
 
-namespace calafite {
+namespace maistrie {
     namespace mathematics {
 
-        template <typename Type> struct LinearSieve {
+        template <typename Type> class LinearSieve {
+          public:
             static_assert(
                 std::is_integral_v<Type> && std::is_signed_v<Type> && sizeof(Type) >= 4,
                 "Type must be a signed integer of at least 32 bits (int, long, long long)");
 
+          private:
             Type limit;
             core::FastVector<Type> primes;
             core::FastVector<Type> smallestPrimeFactor;
 
+          public:
             LinearSieve(Type limit) : limit(limit), smallestPrimeFactor((limit >> 1) + 1, 0) {
                 if (limit >= 2) {
                     primes.reserve(
@@ -88,4 +91,4 @@ namespace calafite {
         };
 
     } // namespace mathematics
-} // namespace calafite
+} // namespace maistrie

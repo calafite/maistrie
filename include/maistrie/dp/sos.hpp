@@ -4,7 +4,7 @@
 #include <cassert>
 #include <cstddef>
 
-namespace calafite {
+namespace maistrie {
     namespace dp {
 
         template <typename Type> void sumOverSubsets(core::FastVector<Type>& dp, size_t bits) {
@@ -42,4 +42,4 @@ namespace calafite {
         }
 
     } // namespace dp
-} // namespace calafite
+} // namespace maistrie

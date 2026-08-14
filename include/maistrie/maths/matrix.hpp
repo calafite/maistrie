@@ -8,13 +8,19 @@
 #include <type_traits>
 #include <utility>
 
-namespace calafite {
+namespace maistrie {
     namespace mathematics {
 
-        template <typename Type> struct Matrix {
+        template <typename Type> class Matrix {
+          public:
+            template <typename T>
+            friend io::Scanner& operator>>(io::Scanner& scanner, Matrix<T>& matrix);
+
+          private:
             size_t rowsValue, colsValue;
             core::FastVector<Type> data;
 
+          public:
             Matrix() : rowsValue(0), colsValue(0) {}
 
             Matrix(size_t rows, size_t cols, const Type& initialValue = Type(0))
@@ -414,4 +420,4 @@ namespace calafite {
         }
 
     } // namespace mathematics
-} // namespace calafite
+} // namespace maistrie

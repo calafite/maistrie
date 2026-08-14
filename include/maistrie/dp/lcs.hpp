@@ -6,7 +6,7 @@
 #include <cstddef>
 #include <type_traits>
 
-namespace calafite {
+namespace maistrie {
     namespace dp {
 
         template <typename Container1, typename Container2>
@@ -35,8 +35,8 @@ namespace calafite {
 
         template <typename Container1, typename Container2>
         auto longestCommonSubsequencePath( //
-            const Container1& sequence1, //
-            const Container2& sequence2 //
+            const Container1& sequence1,   //
+            const Container2& sequence2    //
         ) {
             using ValueType = std::remove_cv_t<std::remove_reference_t<decltype(sequence1[0])>>;
 
@@ -80,4 +80,4 @@ namespace calafite {
         }
 
     } // namespace dp
-} // namespace calafite
+} // namespace maistrie

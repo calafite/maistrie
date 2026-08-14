@@ -3,11 +3,12 @@
 #include <cmath>
 #include <cstdint>
 
-namespace calafite {
+namespace maistrie {
     namespace core {
         namespace operations {
 
             class FastModulo32 {
+              public:
               private:
                 uint32_t mod;
                 uint64_t m;
@@ -18,13 +19,13 @@ namespace calafite {
                       m(modulus == 0 ? 0 : (static_cast<uint64_t>(-1) / modulus + 1)) {}
 
                 constexpr uint32_t operator()(uint64_t value) const {
-                    #if defined(__SIZEOF_INT128__)
+#if defined(__SIZEOF_INT128__)
                     uint64_t q = (static_cast<unsigned __int128>(value) * m) >> 64;
                     uint32_t r = static_cast<uint32_t>(value - q * mod);
                     return r >= mod ? r - mod : r;
-                    #else
+#else
                     return value % mod;
-                    #endif
+#endif
                 }
             };
 
@@ -33,6 +34,7 @@ namespace calafite {
                 inline constexpr double defaultEpsilon = 1e-9;
 
                 class Equal {
+                  public:
                   private:
                     double epsilon;
 
@@ -58,6 +60,7 @@ namespace calafite {
                 inline constexpr Equal equal{defaultEpsilon};
 
                 class NotEqual {
+                  public:
                   private:
                     double epsilon;
 
@@ -83,6 +86,7 @@ namespace calafite {
                 inline constexpr NotEqual notEqual{defaultEpsilon};
 
                 class LessThan {
+                  public:
                   private:
                     double epsilon;
 
@@ -108,6 +112,7 @@ namespace calafite {
                 inline constexpr LessThan lessThan{defaultEpsilon};
 
                 class GreaterThan {
+                  public:
                   private:
                     double epsilon;
 
@@ -133,6 +138,7 @@ namespace calafite {
                 inline constexpr GreaterThan greaterThan{defaultEpsilon};
 
                 class LessThanOrEqual {
+                  public:
                   private:
                     double epsilon;
 
@@ -158,6 +164,7 @@ namespace calafite {
                 inline constexpr LessThanOrEqual lessThanOrEqual{defaultEpsilon};
 
                 class GreaterThanOrEqual {
+                  public:
                   private:
                     double epsilon;
 
@@ -184,6 +191,7 @@ namespace calafite {
                 inline constexpr GreaterThanOrEqual greaterThanOrEqual{defaultEpsilon};
 
                 class IsZero {
+                  public:
                   private:
                     double epsilon;
 
@@ -201,6 +209,7 @@ namespace calafite {
                 inline constexpr IsZero isZero{defaultEpsilon};
 
                 class IsPositive {
+                  public:
                   private:
                     double epsilon;
 
@@ -218,6 +227,7 @@ namespace calafite {
                 inline constexpr IsPositive isPositive{defaultEpsilon};
 
                 class IsNegative {
+                  public:
                   private:
                     double epsilon;
 
@@ -238,6 +248,7 @@ namespace calafite {
 
             class Add {
               public:
+              public:
                 template <typename LeftType, typename RightType>
                 constexpr auto operator()(const LeftType& left, const RightType& right) const {
                     return left + right;
@@ -251,6 +262,7 @@ namespace calafite {
             inline constexpr Add add{};
 
             class Subtract {
+              public:
               public:
                 template <typename LeftType, typename RightType>
                 constexpr auto operator()(const LeftType& left, const RightType& right) const {
@@ -266,6 +278,7 @@ namespace calafite {
 
             class Multiply {
               public:
+              public:
                 template <typename LeftType, typename RightType>
                 constexpr auto operator()(const LeftType& left, const RightType& right) const {
                     return left * right;
@@ -279,6 +292,7 @@ namespace calafite {
             inline constexpr Multiply multiply{};
 
             class Divide {
+              public:
               public:
                 template <typename LeftType, typename RightType>
                 constexpr auto operator()(const LeftType& left, const RightType& right) const {
@@ -296,6 +310,7 @@ namespace calafite {
 
             class Modulo {
               public:
+              public:
                 template <typename LeftType, typename RightType>
                 constexpr auto operator()(const LeftType& left, const RightType& right) const {
                     assert(right != 0);
@@ -312,6 +327,7 @@ namespace calafite {
 
             class Equal {
               public:
+              public:
                 template <typename LeftType, typename RightType>
                 constexpr bool operator()(const LeftType& left, const RightType& right) const {
                     return left == right;
@@ -325,6 +341,7 @@ namespace calafite {
             inline constexpr Equal equal{};
 
             class NotEqual {
+              public:
               public:
                 template <typename LeftType, typename RightType>
                 constexpr bool operator()(const LeftType& left, const RightType& right) const {
@@ -340,6 +357,7 @@ namespace calafite {
 
             class LessThan {
               public:
+              public:
                 template <typename LeftType, typename RightType>
                 constexpr bool operator()(const LeftType& left, const RightType& right) const {
                     return left < right;
@@ -353,6 +371,7 @@ namespace calafite {
             inline constexpr LessThan lessThan{};
 
             class GreaterThan {
+              public:
               public:
                 template <typename LeftType, typename RightType>
                 constexpr bool operator()(const LeftType& left, const RightType& right) const {
@@ -368,6 +387,7 @@ namespace calafite {
 
             class LessThanOrEqual {
               public:
+              public:
                 template <typename LeftType, typename RightType>
                 constexpr bool operator()(const LeftType& left, const RightType& right) const {
                     return left <= right;
@@ -381,6 +401,7 @@ namespace calafite {
             inline constexpr LessThanOrEqual lessThanOrEqual{};
 
             class GreaterThanOrEqual {
+              public:
               public:
                 template <typename LeftType, typename RightType>
                 constexpr bool operator()(const LeftType& left, const RightType& right) const {
@@ -396,6 +417,7 @@ namespace calafite {
 
             class BitwiseAnd {
               public:
+              public:
                 template <typename LeftType, typename RightType>
                 constexpr auto operator()(const LeftType& left, const RightType& right) const {
                     return left & right;
@@ -409,6 +431,7 @@ namespace calafite {
             inline constexpr BitwiseAnd bitwiseAnd{};
 
             class BitwiseOr {
+              public:
               public:
                 template <typename LeftType, typename RightType>
                 constexpr auto operator()(const LeftType& left, const RightType& right) const {
@@ -424,6 +447,7 @@ namespace calafite {
 
             class BitwiseXor {
               public:
+              public:
                 template <typename LeftType, typename RightType>
                 constexpr auto operator()(const LeftType& left, const RightType& right) const {
                     return left ^ right;
@@ -438,6 +462,7 @@ namespace calafite {
 
             class Minimum {
               public:
+              public:
                 template <typename LeftType, typename RightType>
                 constexpr auto operator()(const LeftType& left, const RightType& right) const {
                     return left < right ? left : right;
@@ -446,6 +471,7 @@ namespace calafite {
             inline constexpr Minimum minimum{};
 
             class Maximum {
+              public:
               public:
                 template <typename LeftType, typename RightType>
                 constexpr auto operator()(const LeftType& left, const RightType& right) const {
@@ -456,10 +482,11 @@ namespace calafite {
 
             class GreatestCommonDivisor {
               public:
+              public:
                 template <typename LeftType, typename RightType>
                 constexpr auto operator()(LeftType left, RightType right) const {
                     using T = std::make_unsigned_t<std::common_type_t<LeftType, RightType>>;
-                    T u = left < 0 ? -left : left;
+                    T u = left < 0 ? 0 - static_cast<T>(left) : static_cast<T>(left);
                     T v = right < 0 ? -right : right;
                     if (u == 0)
                         return v;
@@ -488,6 +515,7 @@ namespace calafite {
 
             class LeastCommonMultiple {
               public:
+              public:
                 template <typename LeftType, typename RightType>
                 constexpr auto operator()(const LeftType& left, const RightType& right) const {
                     if (left == 0 || right == 0)
@@ -504,6 +532,7 @@ namespace calafite {
 
             class IsEven {
               public:
+              public:
                 template <typename Type> constexpr bool operator()(const Type& value) const {
                     return (value & 1) == 0;
                 }
@@ -511,6 +540,7 @@ namespace calafite {
             inline constexpr IsEven isEven{};
 
             class IsOdd {
+              public:
               public:
                 template <typename Type> constexpr bool operator()(const Type& value) const {
                     return (value & 1) != 0;
@@ -520,6 +550,7 @@ namespace calafite {
 
             class IsPositive {
               public:
+              public:
                 template <typename Type> constexpr bool operator()(const Type& value) const {
                     return value > 0;
                 }
@@ -527,6 +558,7 @@ namespace calafite {
             inline constexpr IsPositive isPositive{};
 
             class IsNegative {
+              public:
               public:
                 template <typename Type> constexpr bool operator()(const Type& value) const {
                     return value < 0;
@@ -536,6 +568,7 @@ namespace calafite {
 
             class IsZero {
               public:
+              public:
                 template <typename Type> constexpr bool operator()(const Type& value) const {
                     return value == 0;
                 }
@@ -544,4 +577,4 @@ namespace calafite {
 
         } // namespace operations
     } // namespace core
-} // namespace calafite
+} // namespace maistrie

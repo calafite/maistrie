@@ -5,10 +5,11 @@
 #include <cstddef>
 #include <cstdint>
 
-namespace calafite {
+namespace maistrie {
     namespace search {
 
-        struct GraphDepthFirstSearch {
+        class GraphDepthFirstSearch {
+          public:
             static constexpr size_t unvisited = static_cast<size_t>(-1);
 
             core::FastVector<size_t> parents;
@@ -19,9 +20,9 @@ namespace calafite {
             bool hasCycle;
 
             GraphDepthFirstSearch(
-                size_t start, //
+                size_t start,                                                    //
                 const core::FastVector<core::FastVector<size_t>>& adjacencyList, //
-                bool recordPaths = false //
+                bool recordPaths = false                                         //
             ) {
                 size_t nodeCount = adjacencyList.size();
                 assert(start < nodeCount);
@@ -62,7 +63,7 @@ namespace calafite {
 
             core::FastVector<size_t> getPath(size_t target) const {
                 assert(!parents.empty() &&
-                       "Paths were not tracked. Initialize the GraphDepthFirstSearch struct with "
+                       "Paths were not tracked. Initialize the GraphDepthFirstSearch class with "
                        "recordPaths = true.");
                 assert(target < states.size());
 
@@ -79,12 +80,11 @@ namespace calafite {
             }
 
           private:
-            void
-            performDepthFirstSearch(
-                size_t current, //
-                size_t parent, //
+            void performDepthFirstSearch(
+                size_t current,                                                  //
+                size_t parent,                                                   //
                 const core::FastVector<core::FastVector<size_t>>& adjacencyList, //
-                bool recordPaths //
+                bool recordPaths                                                 //
             ) {
                 states[current] = 1;
                 entryTimes[current] = timer++;
@@ -105,4 +105,4 @@ namespace calafite {
         };
 
     } // namespace search
-} // namespace calafite
+} // namespace maistrie

@@ -4,7 +4,7 @@
 #include <cassert>
 #include <cstddef>
 
-namespace calafite {
+namespace maistrie {
     namespace search {
         template <typename GraphType>
         inline core::FastVector<size_t> topologicalSort(const GraphType& adjacencyList) {
@@ -43,4 +43,4 @@ namespace calafite {
             return order;
         }
     } // namespace search
-} // namespace calafite
+} // namespace maistrie

@@ -5,7 +5,7 @@
 #include <cassert>
 #include <cstddef>
 
-namespace calafite {
+namespace maistrie {
     namespace string {
 
         template <typename Container> core::FastVector<size_t> zFunction(const Container& string) {
@@ -33,10 +33,13 @@ namespace calafite {
             return zTable;
         }
 
-        template <typename Container> struct ZAlgorithm {
+        template <typename Container> class ZAlgorithm {
+
+          private:
             core::FastVector<size_t> zTable;
             size_t sizeValue;
 
+          public:
             ZAlgorithm() : sizeValue(0) {}
 
             explicit ZAlgorithm(const Container& string) {
@@ -98,4 +101,4 @@ namespace calafite {
         }
 
     } // namespace string
-} // namespace calafite
+} // namespace maistrie

@@ -1,42 +1,37 @@
----
-Language: Cpp
+-- -Language : Cpp
 
-BasedOnStyle: LLVM
+                   BasedOnStyle : LLVM
 
-Standard: Latest
+                                      Standard : Latest
 
-IndentWidth: 4
-TabWidth: 4
-UseTab: Never
+                                                     IndentWidth : 4 TabWidth : 4 UseTab
+    : Never
 
-NamespaceIndentation: All
+          NamespaceIndentation : All
 
-BreakBeforeBraces: Attach
+                                     BreakBeforeBraces : Attach
 
-AllowShortIfStatementsOnASingleLine: false
-AllowShortLoopsOnASingleLine: false
-AllowShortBlocksOnASingleLine: Empty
-AllowShortFunctionsOnASingleLine: Empty
+                                                             AllowShortIfStatementsOnASingleLine
+    : false AllowShortLoopsOnASingleLine : false AllowShortBlocksOnASingleLine
+    : Empty AllowShortFunctionsOnASingleLine : Empty
 
-PointerAlignment: Left
-ReferenceAlignment: Left
+                                                   PointerAlignment : Left ReferenceAlignment
+    : Left
 
-SpaceBeforeParens: ControlStatements
+          SpaceBeforeParens : ControlStatements
 
-SpacesInAngles: Never
+                                  SpacesInAngles : Never
 
-AlignConsecutiveAssignments: false
-AlignConsecutiveDeclarations: false
-AlignOperands: false
+                                                       AlignConsecutiveAssignments
+    : false AlignConsecutiveDeclarations : false AlignOperands : false
 
-BinPackArguments: true
-BinPackParameters: true
+                                                                 BinPackArguments
+    : true BinPackParameters : true
 
-SortIncludes: true
+                               SortIncludes : true
 
-ColumnLimit: 100
+                                              ColumnLimit : 100
 
-Cpp11BracedListStyle: true
+                                              Cpp11BracedListStyle : true
 
-FixNamespaceComments: true
-...
+                                                                     FixNamespaceComments : true...

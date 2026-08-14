@@ -7,13 +7,16 @@
 #include <initializer_list>
 #include <utility>
 
-namespace calafite {
+namespace maistrie {
     namespace container {
 
-        template <typename Type, typename Compare = std::less<Type>> struct PriorityQueue {
+        template <typename Type, typename Compare = std::less<Type>> class PriorityQueue {
+
+          private:
             core::FastVector<Type> data;
             Compare compare;
 
+          public:
             PriorityQueue() = default;
 
             explicit PriorityQueue(Compare comp) : compare(std::move(comp)) {}
@@ -88,4 +91,4 @@ namespace calafite {
         template <typename Type> using MaxHeap = PriorityQueue<Type, std::less<Type>>;
 
     } // namespace container
-} // namespace calafite
+} // namespace maistrie

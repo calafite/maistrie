@@ -6,12 +6,14 @@
 #include <cstdint>
 #include <utility>
 
-namespace calafite {
+namespace maistrie {
     namespace ds {
 
         template <typename Type, typename LazyType, typename CombineNodeOp, typename ApplyLazyOp,
                   typename ComposeLazyOp>
-        struct LazySegmentTree {
+        class LazySegmentTree {
+
+          private:
             size_t sizeValue;
             core::FastVector<Type> tree;
             core::FastVector<LazyType> lazy;
@@ -23,6 +25,7 @@ namespace calafite {
             ApplyLazyOp applyLazy;
             ComposeLazyOp composeLazy;
 
+          public:
             LazySegmentTree(size_t count, Type neutralNode, LazyType neutralLazy,
                             CombineNodeOp combineNode, ApplyLazyOp applyLazy,
                             ComposeLazyOp composeLazy)
@@ -134,4 +137,4 @@ namespace calafite {
         };
 
     } // namespace ds
-} // namespace calafite
+} // namespace maistrie

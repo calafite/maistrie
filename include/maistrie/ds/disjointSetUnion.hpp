@@ -5,14 +5,17 @@
 #include <cassert>
 #include <cstddef>
 
-namespace calafite {
+namespace maistrie {
     namespace ds {
 
-        struct DisjointSetUnion {
+        class DisjointSetUnion {
+
+          private:
             size_t componentCount;
             core::FastVector<size_t> parents;
             core::FastVector<size_t> sizes;
 
+          public:
             explicit DisjointSetUnion(size_t count)
                 : componentCount(count), parents(count), sizes(count, 1) {
                 for (size_t index = 0; index < count; ++index) {
@@ -52,4 +55,4 @@ namespace calafite {
         };
 
     } // namespace ds
-} // namespace calafite
+} // namespace maistrie

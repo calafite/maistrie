@@ -68,21 +68,21 @@
 #define _downto(var, start, end) for (auto var = start; var > end; var--)
 #define _foreach(element, collection) for (auto& element : collection)
 
-#define CALAFITE_SETUP                                                                             \
+#define MAISTRIE_SETUP                                                                             \
     using namespace std;                                                                           \
-    using namespace calafite;                                                                      \
+    using namespace maistrie;                                                                      \
     using ll = long long;                                                                          \
     using ull = unsigned long long;                                                                \
-    using vi = ::calafite::core::FastVector<int>;                                                  \
-    using vll = ::calafite::core::FastVector<ll>;                                                  \
+    using vi = ::maistrie::core::FastVector<int>;                                                  \
+    using vll = ::maistrie::core::FastVector<ll>;                                                  \
     using pii = pair<int, int>;                                                                    \
     using pll = pair<ll, ll>;                                                                      \
     static constexpr int INF = 0x3f3f3f3f;                                                         \
     static constexpr int NINF = -0x3f3f3f3f;                                                       \
     static constexpr ll LLINF = 0x3f3f3f3f3f3f3f3fLL;                                              \
     static constexpr ll LNINF = -0x3f3f3f3f3f3f3f3fLL;                                             \
-    using calafite::io::in;                                                                        \
-    using calafite::io::out;                                                                       \
-    using calafite::io::print;                                                                     \
-    using calafite::io::println;                                                                   \
-    using calafite::io::read;
+    using maistrie::io::in;                                                                        \
+    using maistrie::io::out;                                                                       \
+    using maistrie::io::print;                                                                     \
+    using maistrie::io::println;                                                                   \
+    using maistrie::io::read;

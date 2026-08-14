@@ -16,23 +16,24 @@
 #endif
 #endif
 
-namespace calafite {
+namespace maistrie {
     namespace arena {
         extern char* pointer;
         extern char* end;
         extern bool active;
     } // namespace arena
-} // namespace calafite
+} // namespace maistrie
 
 #if defined(__GNUC__) || defined(__clang__)
-#define CALAFITE_UNLIKELY(x) __builtin_expect(!!(x), 0)
+#define MAISTRIE_UNLIKELY(x) __builtin_expect(!!(x), 0)
 #else
-#define CALAFITE_UNLIKELY(x) (x)
+#define MAISTRIE_UNLIKELY(x) (x)
 #endif
 
-namespace calafite {
+namespace maistrie {
     namespace core {
         template <typename Type> class FastVector {
+          public:
           public:
             using iterator = Type*;
             using const_iterator = const Type*;
@@ -198,19 +199,19 @@ namespace calafite {
             }
 
             inline void pushBack(const Type& value) {
-                if (CALAFITE_UNLIKELY(sizeValue == capacityValue))
+                if (MAISTRIE_UNLIKELY(sizeValue == capacityValue))
                     grow();
                 new (&pointer[sizeValue++]) Type(value);
             }
 
             inline void pushBack(Type&& value) {
-                if (CALAFITE_UNLIKELY(sizeValue == capacityValue))
+                if (MAISTRIE_UNLIKELY(sizeValue == capacityValue))
                     grow();
                 new (&pointer[sizeValue++]) Type(std::move(value));
             }
 
             template <typename... Args> inline Type& emplaceBack(Args&&... args) {
-                if (CALAFITE_UNLIKELY(sizeValue == capacityValue))
+                if (MAISTRIE_UNLIKELY(sizeValue == capacityValue))
                     grow();
                 new (&pointer[sizeValue]) Type(std::forward<Args>(args)...);
                 return pointer[sizeValue++];
@@ -382,13 +383,13 @@ namespace calafite {
                 if (newCapacity < minimumCapacity)
                     newCapacity = minimumCapacity;
 
-                if (calafite::arena::active && pointer) {
+                if (maistrie::arena::active && pointer) {
                     char* allocationTail =
                         reinterpret_cast<char*>(pointer) + (capacityValue * sizeof(Type));
-                    if (allocationTail == calafite::arena::pointer) {
+                    if (allocationTail == maistrie::arena::pointer) {
                         size_t bytesNeeded = (newCapacity - capacityValue) * sizeof(Type);
-                        if (calafite::arena::pointer + bytesNeeded <= calafite::arena::end) {
-                            calafite::arena::pointer += bytesNeeded;
+                        if (maistrie::arena::pointer + bytesNeeded <= maistrie::arena::end) {
+                            maistrie::arena::pointer += bytesNeeded;
                             capacityValue = newCapacity;
                             return;
                         }
@@ -414,4 +415,4 @@ namespace calafite {
             }
         };
     } // namespace core
-} // namespace calafite
+} // namespace maistrie

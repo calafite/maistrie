@@ -5,13 +5,15 @@
 #include <cassert>
 #include <cstddef>
 
-namespace calafite {
+namespace maistrie {
     namespace geometry {
         template <typename Type>
         constexpr size_t ChunkSize = (64 / sizeof(Type) > 0 ? 64 / sizeof(Type) : 1);
 
         template <typename Type, size_t CSize = ChunkSize<Type>> class PointAoSoA {
+          public:
             class alignas(64) Block {
+              public:
               public:
                 Type x[CSize];
                 Type y[CSize];
@@ -20,6 +22,7 @@ namespace calafite {
             };
 
             class Reference {
+              public:
               public:
                 Type& x;
                 Type& y;
@@ -54,6 +57,7 @@ namespace calafite {
             };
 
             class ConstReference {
+              public:
               public:
                 const Type& x;
                 const Type& y;
@@ -151,4 +155,4 @@ namespace calafite {
         };
 
     } // namespace geometry
-} // namespace calafite
+} // namespace maistrie

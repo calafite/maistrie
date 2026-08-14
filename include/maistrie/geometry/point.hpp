@@ -4,9 +4,10 @@
 
 #include <cmath>
 
-namespace calafite {
+namespace maistrie {
     namespace geometry {
         template <typename Type> class Point {
+          public:
           public:
             Type x;
             Type y;
@@ -114,4 +115,4 @@ namespace calafite {
         }
 
     } // namespace geometry
-} // namespace calafite
+} // namespace maistrie

@@ -5,7 +5,7 @@
 #include <cstddef>
 #include <utility>
 
-namespace calafite {
+namespace maistrie {
     namespace string {
 
         template <typename Container>
@@ -28,12 +28,15 @@ namespace calafite {
             return prefixTable;
         }
 
-        template <typename Type> struct KnuthMorrisPratt {
+        template <typename Type> class KnuthMorrisPratt {
+
+          private:
             Type pattern;
             core::FastVector<size_t> prefixTable;
             size_t patternSize;
             size_t currentState = 0;
 
+          public:
             KnuthMorrisPratt() : patternSize(0) {}
 
             explicit KnuthMorrisPratt(Type pattern)
@@ -115,4 +118,4 @@ namespace calafite {
         };
 
     } // namespace string
-} // namespace calafite
+} // namespace maistrie

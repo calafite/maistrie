@@ -6,7 +6,7 @@
 #include <cstddef>
 #include <utility>
 
-namespace calafite {
+namespace maistrie {
     namespace ds {
 
         inline constexpr size_t calculateLog2(size_t value) {
@@ -17,11 +17,14 @@ namespace calafite {
             return result;
         }
 
-        template <typename Type, typename Functor> struct SparseTable {
+        template <typename Type, typename Functor> class SparseTable {
+
+          private:
             size_t sizeValue;
             core::FastVector<core::FastVector<Type>> table;
             Functor combine;
 
+          public:
             SparseTable(const core::FastVector<Type>& values, Functor combine)
                 : sizeValue(values.size()), combine(std::move(combine)) {
                 if (sizeValue > 0) {
@@ -48,4 +51,4 @@ namespace calafite {
         };
 
     } // namespace ds
-} // namespace calafite
+} // namespace maistrie

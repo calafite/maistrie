@@ -6,7 +6,7 @@
 #include <cstddef>
 #include <functional>
 
-namespace calafite {
+namespace maistrie {
     namespace dp {
 
         template <typename Container, typename Compare = std::less<>>
@@ -29,8 +29,8 @@ namespace calafite {
 
         template <typename Container, typename Compare = std::less<>>
         core::FastVector<size_t> longestIncreasingSubsequenceIndices( //
-            const Container& sequence, //
-            Compare comp = Compare() //
+            const Container& sequence,                                //
+            Compare comp = Compare()                                  //
         ) {
             size_t n = sequence.size();
             if (n == 0)
@@ -70,4 +70,4 @@ namespace calafite {
         }
 
     } // namespace dp
-} // namespace calafite
+} // namespace maistrie

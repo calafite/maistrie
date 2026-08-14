@@ -13,25 +13,26 @@
 
 #if defined(_WIN32)
 #include <io.h>
-#define CALAFITE_READ(buffer, size) _read(0, buffer, static_cast<unsigned int>(size))
-#define CALAFITE_WRITE(buffer, size) _write(1, buffer, static_cast<unsigned int>(size))
+#define MAISTRIE_READ(buffer, size) _read(0, buffer, static_cast<unsigned int>(size))
+#define MAISTRIE_WRITE(buffer, size) _write(1, buffer, static_cast<unsigned int>(size))
 #else
 #include <unistd.h>
-#define CALAFITE_READ(buffer, size) read(0, buffer, size)
-#define CALAFITE_WRITE(buffer, size) write(1, buffer, size)
+#define MAISTRIE_READ(buffer, size) read(0, buffer, size)
+#define MAISTRIE_WRITE(buffer, size) write(1, buffer, size)
 #endif
 
 #if defined(__GNUC__) || defined(__clang__)
-#define CALAFITE_UNLIKELY(x) __builtin_expect(!!(x), 0)
-#define CALAFITE_LIKELY(x) __builtin_expect(!!(x), 1)
+#define MAISTRIE_UNLIKELY(x) __builtin_expect(!!(x), 0)
+#define MAISTRIE_LIKELY(x) __builtin_expect(!!(x), 1)
 #else
-#define CALAFITE_UNLIKELY(x) (x)
-#define CALAFITE_LIKELY(x) (x)
+#define MAISTRIE_UNLIKELY(x) (x)
+#define MAISTRIE_LIKELY(x) (x)
 #endif
 
-namespace calafite {
+namespace maistrie {
     namespace io {
         class Printer {
+          public:
           public:
             static constexpr size_t BUFFER_SIZE = 1 << 17;
 
@@ -54,20 +55,20 @@ namespace calafite {
 
             inline void flush() {
                 if (pointer != buffer) {
-                    CALAFITE_WRITE(buffer, pointer - buffer);
+                    MAISTRIE_WRITE(buffer, pointer - buffer);
                     pointer = buffer;
                 }
             }
 
             inline void putChar(char character) {
-                if (CALAFITE_UNLIKELY(pointer + 1 >= buffer + BUFFER_SIZE))
+                if (MAISTRIE_UNLIKELY(pointer + 1 >= buffer + BUFFER_SIZE))
                     flush();
                 *pointer++ = character;
             }
 
             template <typename Type>
             inline std::enable_if_t<std::is_integral_v<Type>, Printer&> operator<<(Type value) {
-                if (CALAFITE_UNLIKELY(pointer + 32 >= buffer + BUFFER_SIZE))
+                if (MAISTRIE_UNLIKELY(pointer + 32 >= buffer + BUFFER_SIZE))
                     flush();
 
                 char* p = pointer;
@@ -135,7 +136,7 @@ namespace calafite {
                 char* p = pointer;
 
                 for (int i = 0, v = start; i < count; ++i, v += step) {
-                    if (CALAFITE_UNLIKELY(p + 11 >= buffer + BUFFER_SIZE)) {
+                    if (MAISTRIE_UNLIKELY(p + 11 >= buffer + BUFFER_SIZE)) {
                         pointer = p;
                         flush();
                         p = pointer;
@@ -179,10 +180,10 @@ namespace calafite {
             inline Printer& operator<<(const char* string) {
                 assert(string != nullptr);
                 size_t len = std::strlen(string);
-                if (CALAFITE_UNLIKELY(pointer + len >= buffer + BUFFER_SIZE)) {
+                if (MAISTRIE_UNLIKELY(pointer + len >= buffer + BUFFER_SIZE)) {
                     flush();
                     if (len >= BUFFER_SIZE) {
-                        CALAFITE_WRITE(string, len);
+                        MAISTRIE_WRITE(string, len);
                         return *this;
                     }
                 }
@@ -193,10 +194,10 @@ namespace calafite {
 
             inline Printer& operator<<(const std::string& string) {
                 size_t len = string.length();
-                if (CALAFITE_UNLIKELY(pointer + len >= buffer + BUFFER_SIZE)) {
+                if (MAISTRIE_UNLIKELY(pointer + len >= buffer + BUFFER_SIZE)) {
                     flush();
                     if (len >= BUFFER_SIZE) {
-                        CALAFITE_WRITE(string.data(), len);
+                        MAISTRIE_WRITE(string.data(), len);
                         return *this;
                     }
                 }
@@ -244,6 +245,7 @@ namespace calafite {
 
         class Scanner {
           public:
+          public:
             static constexpr size_t BUFFER_SIZE = 1 << 17;
 
           private:
@@ -257,7 +259,7 @@ namespace calafite {
 
             inline bool reload() {
                 out.flush();
-                int result = CALAFITE_READ(buffer, BUFFER_SIZE);
+                int result = MAISTRIE_READ(buffer, BUFFER_SIZE);
                 if (result <= 0) {
                     endOfFileFlag = true;
                     return false;
@@ -268,7 +270,7 @@ namespace calafite {
             }
 
             inline int getChar() {
-                if (CALAFITE_UNLIKELY(pointer == end)) {
+                if (MAISTRIE_UNLIKELY(pointer == end)) {
                     if (endOfFileFlag || !reload())
                         return EOF;
                 }
@@ -296,7 +298,7 @@ namespace calafite {
             inline std::enable_if_t<std::is_integral_v<Type>, Scanner&> operator>>(Type& value) {
                 value = 0;
                 int character = skipWhitespace();
-                if (CALAFITE_UNLIKELY(character == EOF))
+                if (MAISTRIE_UNLIKELY(character == EOF))
                     return *this;
 
                 bool negative = false;
@@ -307,7 +309,7 @@ namespace calafite {
                     }
                 }
 
-                if (CALAFITE_LIKELY(end - pointer >= 32)) {
+                if (MAISTRIE_LIKELY(end - pointer >= 32)) {
                     value = character - '0';
                     char* p = pointer;
                     while (static_cast<unsigned char>(*p - '0') < 10) {
@@ -339,7 +341,7 @@ namespace calafite {
             inline Scanner& operator>>(std::string& string) {
                 string.clear();
                 int character = skipWhitespace();
-                if (CALAFITE_UNLIKELY(character == EOF))
+                if (MAISTRIE_UNLIKELY(character == EOF))
                     return *this;
 
                 string.push_back(static_cast<char>(character));
@@ -368,7 +370,7 @@ namespace calafite {
             inline Scanner& operator>>(char* string) {
                 assert(string != nullptr);
                 int character = skipWhitespace();
-                if (CALAFITE_UNLIKELY(character == EOF)) {
+                if (MAISTRIE_UNLIKELY(character == EOF)) {
                     *string = '\0';
                     return *this;
                 }
@@ -442,4 +444,4 @@ namespace calafite {
             out << '\n';
         }
     } // namespace io
-} // namespace calafite
+} // namespace maistrie

@@ -8,22 +8,23 @@
 #include <utility>
 #include <vector>
 
-namespace calafite {
+namespace maistrie {
     namespace search {
 
-        template <typename WeightType> struct Dijkstra {
+        template <typename WeightType> class Dijkstra {
+          public:
             static constexpr size_t unvisited = static_cast<size_t>(-1);
 
             core::FastVector<WeightType> distances;
             core::FastVector<size_t> parents;
             WeightType unreachable;
 
-            Dijkstra(
-                size_t start, //
-                const core::FastVector<core::FastVector<std::pair<size_t, WeightType>>>& adjacencyList, //
-                bool recordPaths = false, //
-                WeightType unreachableValue = std::numeric_limits<WeightType>::max() //
-            ) //
+            Dijkstra(size_t start, //
+                     const core::FastVector<core::FastVector<std::pair<size_t, WeightType>>>&
+                         adjacencyList,                                                   //
+                     bool recordPaths = false,                                            //
+                     WeightType unreachableValue = std::numeric_limits<WeightType>::max() //
+                     )                                                                    //
                 : unreachable(unreachableValue) {
                 size_t nodeCount = adjacencyList.size();
                 assert(start < nodeCount);
@@ -64,12 +65,12 @@ namespace calafite {
                 }
             }
 
-            Dijkstra(
-                const core::FastVector<size_t>& starts, //
-                const core::FastVector<core::FastVector<std::pair<size_t, WeightType>>>& adjacencyList, //
-                bool recordPaths = false, //
-                WeightType unreachableValue = std::numeric_limits<WeightType>::max() //
-            ) //
+            Dijkstra(const core::FastVector<size_t>& starts, //
+                     const core::FastVector<core::FastVector<std::pair<size_t, WeightType>>>&
+                         adjacencyList,                                                   //
+                     bool recordPaths = false,                                            //
+                     WeightType unreachableValue = std::numeric_limits<WeightType>::max() //
+                     )                                                                    //
                 : unreachable(unreachableValue) {
 
                 size_t nodeCount = adjacencyList.size();
@@ -117,7 +118,7 @@ namespace calafite {
 
             core::FastVector<size_t> getPath(size_t target) const {
                 assert(!parents.empty() &&
-                       "Paths were not tracked. Initialize the Dijkstra struct with recordPaths = "
+                       "Paths were not tracked. Initialize the Dijkstra class with recordPaths = "
                        "true.");
                 assert(target < distances.size());
 
@@ -135,4 +136,4 @@ namespace calafite {
         };
 
     } // namespace search
-} // namespace calafite
+} // namespace maistrie

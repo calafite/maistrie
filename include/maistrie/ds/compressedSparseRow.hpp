@@ -6,9 +6,10 @@
 #include <type_traits>
 #include <utility>
 
-namespace calafite {
+namespace maistrie {
     namespace ds {
         template <typename WeightType = void> class CSRGraph {
+          public:
           public:
             static constexpr bool isWeighted = !std::is_same_v<WeightType, void>;
             using EdgeType = std::conditional_t<isWeighted, std::pair<size_t, WeightType>, size_t>;
@@ -107,6 +108,7 @@ namespace calafite {
 
             class AdjacencyList {
               public:
+              public:
                 const EdgeType* beginPtr;
                 const EdgeType* endPtr;
 
@@ -137,4 +139,4 @@ namespace calafite {
             }
         };
     } // namespace ds
-} // namespace calafite
+} // namespace maistrie

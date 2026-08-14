@@ -9,10 +9,11 @@
 #include <type_traits>
 #include <utility>
 
-namespace calafite {
+namespace maistrie {
     namespace mathematics {
 
         class Complex {
+          public:
           private:
             double real;
             double imaginary;
@@ -150,4 +151,4 @@ namespace calafite {
         }
 
     } // namespace mathematics
-} // namespace calafite
+} // namespace maistrie

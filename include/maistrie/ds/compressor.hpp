@@ -5,12 +5,15 @@
 #include <cassert>
 #include <cstddef>
 
-namespace calafite {
+namespace maistrie {
     namespace ds {
 
-        template <typename Type> struct Compressor {
+        template <typename Type> class Compressor {
+
+          private:
             core::FastVector<Type> values;
 
+          public:
             Compressor() = default;
 
             explicit Compressor(const core::FastVector<Type>& initialValues)
@@ -51,4 +54,4 @@ namespace calafite {
         };
 
     } // namespace ds
-} // namespace calafite
+} // namespace maistrie

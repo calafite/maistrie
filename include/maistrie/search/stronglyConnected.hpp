@@ -8,7 +8,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace calafite {
+namespace maistrie {
     namespace search {
         template <typename EdgeType> constexpr size_t getEndpoint(const EdgeType& edge) {
             if constexpr (std::is_integral_v<EdgeType>) {
@@ -19,6 +19,7 @@ namespace calafite {
         }
 
         class StronglyConnectedComponents {
+          public:
           public:
             size_t componentCount;
             core::FastVector<size_t> componentId;
@@ -115,4 +116,4 @@ namespace calafite {
             }
         };
     } // namespace search
-} // namespace calafite
+} // namespace maistrie

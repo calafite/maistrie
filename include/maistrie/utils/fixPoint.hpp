@@ -1,11 +1,14 @@
 #pragma once
 #include <utility>
 
-namespace calafite {
+namespace maistrie {
     namespace utility {
-        template <typename Functor> struct FixedPoint {
+        template <typename Functor> class FixedPoint {
+
+          private:
             Functor functor;
 
+          public:
             template <typename GeneratorType>
             explicit FixedPoint(GeneratorType&& generator)
                 : functor(std::forward<GeneratorType>(generator)) {}
@@ -17,4 +20,4 @@ namespace calafite {
 
         template <typename Functor> FixedPoint(Functor) -> FixedPoint<Functor>;
     } // namespace utility
-} // namespace calafite
+} // namespace maistrie

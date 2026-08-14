@@ -8,19 +8,18 @@
 #include <bit>
 #endif
 
-namespace calafite {
+namespace maistrie {
     namespace mathematics {
         constexpr std::size_t BITS_PER_BYTE = 8;
 
-        template <typename Type>
-        constexpr int countSetBits(Type value) noexcept {
+        template <typename Type> constexpr int countSetBits(Type value) noexcept {
             static_assert(std::is_integral_v<Type>, "Must be an integral type");
             using UnsignedType = std::make_unsigned_t<Type>;
             UnsignedType uValue = static_cast<UnsignedType>(value);
 
-            #if __cplusplus >= 202002L
+#if __cplusplus >= 202002L
             return std::popcount(uValue);
-            #else
+#else
             if constexpr (sizeof(UnsignedType) <= sizeof(unsigned int)) {
                 return __builtin_popcount(uValue);
             } else if constexpr (sizeof(UnsignedType) <= sizeof(unsigned long)) {
@@ -29,13 +28,12 @@ namespace calafite {
                 return __builtin_popcountll(uValue);
             } else {
                 return __builtin_popcountll(static_cast<unsigned long long>(uValue)) +
-                       __builtin_popcountll(static_cast<unsigned long long>(uValue >> 64));
+                    __builtin_popcountll(static_cast<unsigned long long>(uValue >> 64));
             }
-            #endif
+#endif
         }
 
-        template <typename Type>
-        constexpr int countLeadingZeros(Type value) noexcept {
+        template <typename Type> constexpr int countLeadingZeros(Type value) noexcept {
             static_assert(std::is_integral_v<Type>, "Must be an integral type");
             using UnsignedType = std::make_unsigned_t<Type>;
             UnsignedType uValue = static_cast<UnsignedType>(value);
@@ -44,16 +42,17 @@ namespace calafite {
                 return sizeof(UnsignedType) * BITS_PER_BYTE;
             }
 
-            #if __cplusplus >= 202002L
+#if __cplusplus >= 202002L
             return std::countl_zero(uValue);
-            #else
+#else
             int bits = sizeof(UnsignedType) * BITS_PER_BYTE;
             if constexpr (sizeof(UnsignedType) <= sizeof(unsigned int)) {
                 return __builtin_clz(uValue) - (sizeof(unsigned int) * BITS_PER_BYTE - bits);
             } else if constexpr (sizeof(UnsignedType) <= sizeof(unsigned long)) {
                 return __builtin_clzl(uValue) - (sizeof(unsigned long) * BITS_PER_BYTE - bits);
             } else if constexpr (sizeof(UnsignedType) <= sizeof(unsigned long long)) {
-                return __builtin_clzll(uValue) - (sizeof(unsigned long long) * BITS_PER_BYTE - bits);
+                return __builtin_clzll(uValue) -
+                    (sizeof(unsigned long long) * BITS_PER_BYTE - bits);
             } else {
                 unsigned long long upper = static_cast<unsigned long long>(uValue >> 64);
                 if (upper != 0) {
@@ -61,11 +60,10 @@ namespace calafite {
                 }
                 return 64 + __builtin_clzll(static_cast<unsigned long long>(uValue));
             }
-            #endif
+#endif
         }
 
-        template <typename Type>
-        constexpr int countTrailingZeros(Type value) noexcept {
+        template <typename Type> constexpr int countTrailingZeros(Type value) noexcept {
             static_assert(std::is_integral_v<Type>, "Must be an integral type");
             using UnsignedType = std::make_unsigned_t<Type>;
             UnsignedType uValue = static_cast<UnsignedType>(value);
@@ -74,9 +72,9 @@ namespace calafite {
                 return sizeof(UnsignedType) * BITS_PER_BYTE;
             }
 
-            #if __cplusplus >= 202002L
+#if __cplusplus >= 202002L
             return std::countr_zero(uValue);
-            #else
+#else
             if constexpr (sizeof(UnsignedType) <= sizeof(unsigned int)) {
                 return __builtin_ctz(uValue);
             } else if constexpr (sizeof(UnsignedType) <= sizeof(unsigned long)) {
@@ -90,7 +88,7 @@ namespace calafite {
                 }
                 return 64 + __builtin_ctzll(static_cast<unsigned long long>(uValue >> 64));
             }
-            #endif
+#endif
         }
 
         template <typename Type>
@@ -117,8 +115,7 @@ namespace calafite {
             return (value & (static_cast<Type>(1) << bitPosition)) != 0;
         }
 
-        template <typename Type>
-        [[nodiscard]] constexpr bool isPowerOfTwo(Type value) noexcept {
+        template <typename Type> [[nodiscard]] constexpr bool isPowerOfTwo(Type value) noexcept {
             static_assert(std::is_integral_v<Type>, "Must be an integral type");
             using UnsignedType = std::make_unsigned_t<Type>;
             UnsignedType uValue = static_cast<UnsignedType>(value);
@@ -133,8 +130,8 @@ namespace calafite {
             return static_cast<Type>(uValue & -uValue);
         }
 
-        template <typename Type = uint64_t>
-        class Bitmask {
+        template <typename Type = uint64_t> class Bitmask {
+          public:
             static_assert(std::is_integral_v<Type> && std::is_unsigned_v<Type>,
                           "Bitmask requires an unsigned integral type");
 
@@ -176,7 +173,8 @@ namespace calafite {
                 if (maskValue == 0) {
                     return -1;
                 }
-                return static_cast<int>(sizeof(Type) * BITS_PER_BYTE) - 1 - countLeadingZeros(maskValue);
+                return static_cast<int>(sizeof(Type) * BITS_PER_BYTE) - 1 -
+                    countLeadingZeros(maskValue);
             }
 
             constexpr Bitmask& clearAll() noexcept {
@@ -244,8 +242,7 @@ namespace calafite {
                 return (maskValue & other.maskValue) == other.maskValue;
             }
 
-            template <typename Func>
-            constexpr void forEachSubmask(Func&& callback) const {
+            template <typename Func> constexpr void forEachSubmask(Func&& callback) const {
                 Type submask = maskValue;
                 do {
                     callback(Bitmask<Type>(submask));
@@ -273,4 +270,4 @@ namespace calafite {
         }
 
     } // namespace mathematics
-} // namespace calafite
+} // namespace maistrie
