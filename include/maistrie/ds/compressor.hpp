@@ -1,9 +1,12 @@
 #pragma once
 
 #include "../core/fastVector.hpp"
+#include "range.hpp"
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
+#include <iterator>
+#include <type_traits>
 
 namespace maistrie {
     namespace ds {
@@ -16,10 +19,19 @@ namespace maistrie {
           public:
             Compressor() = default;
 
-            explicit Compressor(const core::FastVector<Type>& initialValues)
-                : values(initialValues) {
+            template <typename Iter>
+            Compressor(Iter first, Iter last)
+                : values(static_cast<size_t>(std::distance(first, last))) {
+                size_t index = 0;
+                for (Iter it = first; it != last; ++it, ++index) {
+                    values[index] = *it;
+                }
                 build();
             }
+
+            template <typename Container, typename = std::enable_if_t<IsRange<Container>::value>>
+            explicit Compressor(const Container& initialValues)
+                : Compressor(std::begin(initialValues), std::end(initialValues)) {}
 
             inline void add(const Type& value) {
                 values.pushBack(value);
@@ -44,14 +56,22 @@ namespace maistrie {
                 return values.size();
             }
 
-            core::FastVector<size_t> compressArray(const core::FastVector<Type>& array) const {
-                core::FastVector<size_t> result(array.size());
-                for (size_t index = 0; index < array.size(); ++index) {
-                    result[index] = get(array[index]);
+            template <typename Container>
+            core::FastVector<size_t> compressArray(const Container& array) const {
+                core::FastVector<size_t> result(static_cast<size_t>(std::size(array)));
+                size_t index = 0;
+                for (auto it = std::begin(array); it != std::end(array); ++it, ++index) {
+                    result[index] = get(*it);
                 }
                 return result;
             }
         };
+
+        template <typename Container>
+        Compressor(const Container&) -> Compressor<typename Container::value_type>;
+
+        template <typename Iter>
+        Compressor(Iter, Iter) -> Compressor<typename std::iterator_traits<Iter>::value_type>;
 
     } // namespace ds
 } // namespace maistrie

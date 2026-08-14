@@ -1,9 +1,12 @@
 #pragma once
 
 #include "../core/fastVector.hpp"
+#include "range.hpp"
 #include <cassert>
 #include <cstddef>
 #include <functional>
+#include <iterator>
+#include <type_traits>
 #include <utility>
 
 namespace maistrie {
@@ -24,18 +27,25 @@ namespace maistrie {
           public:
             CartesianTree() : sizeValue(0), root(nullNode) {}
 
-            CartesianTree(const core::FastVector<Type>& values, Compare comp = Compare())
-                : sizeValue(values.size()), leftChild(values.size(), nullNode),
-                  rightChild(values.size(), nullNode), parent(values.size(), nullNode),
-                  root(nullNode), compare(std::move(comp)) {
+            template <typename Iter>
+            CartesianTree(Iter first, Iter last, Compare comp = Compare())
+                : sizeValue(static_cast<size_t>(std::distance(first, last))),
+                  leftChild(sizeValue, nullNode), rightChild(sizeValue, nullNode),
+                  parent(sizeValue, nullNode), root(nullNode), compare(std::move(comp)) {
 
                 if (sizeValue == 0)
                     return;
 
+                core::FastVector<Type> values(sizeValue);
+                size_t index = 0;
+                for (Iter it = first; it != last; ++it, ++index) {
+                    values[index] = *it;
+                }
+
                 core::FastVector<size_t> stack;
                 stack.reserve(sizeValue);
 
-                for (size_t index = 0; index < sizeValue; ++index) {
+                for (index = 0; index < sizeValue; ++index) {
                     size_t lastPopped = nullNode;
 
                     while (!stack.empty() && compare(values[index], values[stack.back()])) {
@@ -58,7 +68,25 @@ namespace maistrie {
 
                 root = stack.front();
             }
+
+            template <typename Container, typename = std::enable_if_t<IsRange<Container>::value>>
+            CartesianTree(const Container& values, Compare comp = Compare())
+                : CartesianTree(std::begin(values), std::end(values), std::move(comp)) {}
         };
+
+        template <typename Container>
+        CartesianTree(const Container&) -> CartesianTree<typename Container::value_type>;
+
+        template <typename Container, typename Compare>
+        CartesianTree(const Container&, Compare)
+            -> CartesianTree<typename Container::value_type, Compare>;
+
+        template <typename Iter>
+        CartesianTree(Iter, Iter) -> CartesianTree<typename std::iterator_traits<Iter>::value_type>;
+
+        template <typename Iter, typename Compare>
+        CartesianTree(Iter, Iter, Compare)
+            -> CartesianTree<typename std::iterator_traits<Iter>::value_type, Compare>;
 
     } // namespace ds
 } // namespace maistrie

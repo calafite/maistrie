@@ -1,8 +1,11 @@
 #pragma once
 
 #include "../core/fastVector.hpp"
+#include "range.hpp"
 #include <cassert>
 #include <cstddef>
+#include <iterator>
+#include <type_traits>
 
 namespace maistrie {
     namespace ds {
@@ -16,15 +19,21 @@ namespace maistrie {
           public:
             FenwickTree(size_t count) : sizeValue(count), tree(count + 1, Type(0)) {}
 
-            FenwickTree(const core::FastVector<Type>& values)
-                : sizeValue(values.size()), tree(values.size() + 1, Type(0)) {
-                for (size_t index = 1; index <= sizeValue; ++index) {
-                    tree[index] += values[index - 1];
+            template <typename Iter>
+            FenwickTree(Iter first, Iter last)
+                : FenwickTree(static_cast<size_t>(std::distance(first, last))) {
+                size_t index = 1;
+                for (Iter it = first; it != last; ++it, ++index) {
+                    tree[index] += *it;
                     size_t nextIndex = index + (index & -index);
                     if (nextIndex <= sizeValue)
                         tree[nextIndex] += tree[index];
                 }
             }
+
+            template <typename Container, typename = std::enable_if_t<IsRange<Container>::value>>
+            FenwickTree(const Container& values)
+                : FenwickTree(std::begin(values), std::end(values)) {}
 
             Type query(size_t index) const {
                 assert(index < sizeValue);
@@ -76,6 +85,12 @@ namespace maistrie {
                 return position;
             }
         };
+
+        template <typename Container>
+        FenwickTree(const Container&) -> FenwickTree<typename Container::value_type>;
+
+        template <typename Iter>
+        FenwickTree(Iter, Iter) -> FenwickTree<typename std::iterator_traits<Iter>::value_type>;
 
     } // namespace ds
 } // namespace maistrie

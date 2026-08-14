@@ -1,9 +1,12 @@
 #pragma once
 
 #include "../core/fastVector.hpp"
+#include "range.hpp"
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
+#include <iterator>
+#include <type_traits>
 #include <utility>
 
 namespace maistrie {
@@ -25,12 +28,18 @@ namespace maistrie {
             Functor combine;
 
           public:
-            SparseTable(const core::FastVector<Type>& values, Functor combine)
-                : sizeValue(values.size()), combine(std::move(combine)) {
+            template <typename Iter>
+            SparseTable(Iter first, Iter last, Functor combine)
+                : sizeValue(static_cast<size_t>(std::distance(first, last))),
+                  combine(std::move(combine)) {
                 if (sizeValue > 0) {
                     size_t levels = calculateLog2(sizeValue) + 1;
                     table.assign(levels, core::FastVector<Type>(sizeValue));
-                    table[0] = values;
+
+                    size_t index = 0;
+                    for (Iter it = first; it != last; ++it, ++index) {
+                        table[0][index] = *it;
+                    }
 
                     for (size_t level = 1; level < levels; ++level) {
                         for (size_t index = 0; index + (size_t(1) << level) <= sizeValue; ++index) {
@@ -42,6 +51,10 @@ namespace maistrie {
                 }
             }
 
+            template <typename Container, typename = std::enable_if_t<IsRange<Container>::value>>
+            SparseTable(const Container& values, Functor combine)
+                : SparseTable(std::begin(values), std::end(values), std::move(combine)) {}
+
             Type query(size_t left, size_t right) const {
                 assert(left <= right);
                 assert(right < sizeValue);
@@ -49,6 +62,14 @@ namespace maistrie {
                 return combine(table[level][left], table[level][right - (size_t(1) << level) + 1]);
             }
         };
+
+        template <typename Container, typename Functor>
+        SparseTable(const Container&, Functor)
+            -> SparseTable<typename Container::value_type, Functor>;
+
+        template <typename Iter, typename Functor>
+        SparseTable(Iter, Iter, Functor)
+            -> SparseTable<typename std::iterator_traits<Iter>::value_type, Functor>;
 
     } // namespace ds
 } // namespace maistrie

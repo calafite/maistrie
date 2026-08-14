@@ -1,9 +1,12 @@
 #pragma once
 
 #include "../core/fastVector.hpp"
+#include "range.hpp"
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
+#include <iterator>
+#include <type_traits>
 #include <utility>
 
 namespace maistrie {
@@ -35,19 +38,36 @@ namespace maistrie {
                   neutralLazy(neutralLazy), combineNode(std::move(combineNode)),
                   applyLazy(std::move(applyLazy)), composeLazy(std::move(composeLazy)) {}
 
-            LazySegmentTree(const core::FastVector<Type>& values, Type neutralNode,
-                            LazyType neutralLazy, CombineNodeOp combineNode, ApplyLazyOp applyLazy,
-                            ComposeLazyOp composeLazy)
-                : sizeValue(values.size()),
-                  tree(values.size() > 0 ? 4 * values.size() : 0, neutralNode),
-                  lazy(values.size() > 0 ? 4 * values.size() : 0, neutralLazy),
-                  hasLazy(values.size() > 0 ? 4 * values.size() : 0, 0), neutralNode(neutralNode),
-                  neutralLazy(neutralLazy), combineNode(std::move(combineNode)),
-                  applyLazy(std::move(applyLazy)), composeLazy(std::move(composeLazy)) {
+            template <typename Iter>
+            LazySegmentTree(               //
+                Iter first,                //
+                Iter last,                 //
+                Type neutralNode,          //
+                LazyType neutralLazy,      //
+                CombineNodeOp combineNode, //
+                ApplyLazyOp applyLazy,     //
+                ComposeLazyOp composeLazy  //
+                )
+                : LazySegmentTree(static_cast<size_t>(std::distance(first, last)), neutralNode,
+                                  neutralLazy, std::move(combineNode), std::move(applyLazy),
+                                  std::move(composeLazy)) {
                 if (sizeValue > 0) {
-                    buildInternal(1, 0, sizeValue - 1, values);
+                    buildInternal(1, 0, sizeValue - 1, first);
                 }
             }
+
+            template <typename Container, typename = std::enable_if_t<IsRange<Container>::value>>
+            LazySegmentTree(               //
+                const Container& values,   //
+                Type neutralNode,          //
+                LazyType neutralLazy,      //
+                CombineNodeOp combineNode, //
+                ApplyLazyOp applyLazy,     //
+                ComposeLazyOp composeLazy  //
+                )
+                : LazySegmentTree(std::begin(values), std::end(values), neutralNode, neutralLazy,
+                                  std::move(combineNode), std::move(applyLazy),
+                                  std::move(composeLazy)) {}
 
             void update(size_t left, size_t right, const LazyType& value) {
                 if (sizeValue == 0)
@@ -66,15 +86,17 @@ namespace maistrie {
             }
 
           private:
-            void buildInternal(size_t node, size_t left, size_t right,
-                               const core::FastVector<Type>& values) {
+            template <typename Iter>
+            void buildInternal(size_t node, size_t left, size_t right, Iter begin) {
                 if (left == right) {
-                    tree[node] = values[left];
+                    tree[node] = *begin;
                     return;
                 }
                 size_t mid = left + (right - left) / 2;
-                buildInternal(node << 1, left, mid, values);
-                buildInternal(node << 1 | 1, mid + 1, right, values);
+                Iter midIter = begin;
+                std::advance(midIter, static_cast<std::ptrdiff_t>(mid - left + 1));
+                buildInternal(node << 1, left, mid, begin);
+                buildInternal(node << 1 | 1, mid + 1, right, midIter);
                 tree[node] = combineNode(tree[node << 1], tree[node << 1 | 1]);
             }
 

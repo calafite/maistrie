@@ -1,8 +1,11 @@
 #pragma once
 
 #include "../core/fastVector.hpp"
+#include "range.hpp"
 #include <cassert>
 #include <cstddef>
+#include <iterator>
+#include <type_traits>
 #include <utility>
 
 namespace maistrie {
@@ -21,18 +24,24 @@ namespace maistrie {
                 : sizeValue(count), tree(2 * count, neutral), neutral(neutral),
                   combine(std::move(combine)) {}
 
-            SegmentTree(const core::FastVector<Type>& values, Type neutral, Functor combine)
-                : sizeValue(values.size()), tree(2 * values.size(), neutral), neutral(neutral),
-                  combine(std::move(combine)) {
+            template <typename Iter>
+            SegmentTree(Iter first, Iter last, Type neutral, Functor combine)
+                : SegmentTree(static_cast<size_t>(std::distance(first, last)), neutral,
+                              std::move(combine)) {
                 if (sizeValue > 0) {
-                    for (size_t index = 0; index < sizeValue; ++index) {
-                        tree[sizeValue + index] = values[index];
+                    size_t index = 0;
+                    for (Iter it = first; it != last; ++it, ++index) {
+                        tree[sizeValue + index] = *it;
                     }
                     for (size_t index = sizeValue - 1; index > 0; --index) {
                         tree[index] = combine(tree[index << 1], tree[index << 1 | 1]);
                     }
                 }
             }
+
+            template <typename Container, typename = std::enable_if_t<IsRange<Container>::value>>
+            SegmentTree(const Container& values, Type neutral, Functor combine)
+                : SegmentTree(std::begin(values), std::end(values), neutral, std::move(combine)) {}
 
             void update(size_t index, Type value) {
                 assert(index < sizeValue);
