@@ -5,7 +5,7 @@
 #include <type_traits>
 
 #if __cplusplus >= 202002L
-#include <bit>
+    #include <bit>
 #endif
 
 namespace maistrie {

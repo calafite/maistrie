@@ -3,9 +3,9 @@
 #include <ranges>
 
 #if defined(__has_include)
-#if __has_include(<version>)
-#include <version>
-#endif
+    #if __has_include(<version>)
+        #include <version>
+    #endif
 #endif
 
 #if defined(__cpp_lib_ranges)

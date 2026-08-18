@@ -12,21 +12,21 @@
 #include <vector>
 
 #if defined(_WIN32)
-#include <io.h>
-#define MAISTRIE_READ(buffer, size) _read(0, buffer, static_cast<unsigned int>(size))
-#define MAISTRIE_WRITE(buffer, size) _write(1, buffer, static_cast<unsigned int>(size))
+    #include <io.h>
+    #define MAISTRIE_READ(buffer, size) _read(0, buffer, static_cast<unsigned int>(size))
+    #define MAISTRIE_WRITE(buffer, size) _write(1, buffer, static_cast<unsigned int>(size))
 #else
-#include <unistd.h>
-#define MAISTRIE_READ(buffer, size) read(0, buffer, size)
-#define MAISTRIE_WRITE(buffer, size) write(1, buffer, size)
+    #include <unistd.h>
+    #define MAISTRIE_READ(buffer, size) read(0, buffer, size)
+    #define MAISTRIE_WRITE(buffer, size) write(1, buffer, size)
 #endif
 
 #if defined(__GNUC__) || defined(__clang__)
-#define MAISTRIE_UNLIKELY(x) __builtin_expect(!!(x), 0)
-#define MAISTRIE_LIKELY(x) __builtin_expect(!!(x), 1)
+    #define MAISTRIE_UNLIKELY(x) __builtin_expect(!!(x), 0)
+    #define MAISTRIE_LIKELY(x) __builtin_expect(!!(x), 1)
 #else
-#define MAISTRIE_UNLIKELY(x) (x)
-#define MAISTRIE_LIKELY(x) (x)
+    #define MAISTRIE_UNLIKELY(x) (x)
+    #define MAISTRIE_LIKELY(x) (x)
 #endif
 
 namespace maistrie {

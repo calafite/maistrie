@@ -4,9 +4,9 @@
 #include <cstdlib>
 
 #if defined(__GNUC__) || defined(__clang__)
-#define MAISTRIE_UNLIKELY(x) __builtin_expect(!!(x), 0)
+    #define MAISTRIE_UNLIKELY(x) __builtin_expect(!!(x), 0)
 #else
-#define MAISTRIE_UNLIKELY(x) (x)
+    #define MAISTRIE_UNLIKELY(x) (x)
 #endif
 
 namespace maistrie {
@@ -115,11 +115,11 @@ namespace maistrie {
 } // namespace maistrie
 
 #if defined(_WIN32)
-#define MAISTRIE_ALIGNED_ALLOC(alignment, size) _aligned_malloc(size, alignment)
-#define MAISTRIE_ALIGNED_FREE(pointer) _aligned_free(pointer)
+    #define MAISTRIE_ALIGNED_ALLOC(alignment, size) _aligned_malloc(size, alignment)
+    #define MAISTRIE_ALIGNED_FREE(pointer) _aligned_free(pointer)
 #else
-#define MAISTRIE_ALIGNED_ALLOC(alignment, size) std::aligned_alloc(alignment, size)
-#define MAISTRIE_ALIGNED_FREE(pointer) std::free(pointer)
+    #define MAISTRIE_ALIGNED_ALLOC(alignment, size) std::aligned_alloc(alignment, size)
+    #define MAISTRIE_ALIGNED_FREE(pointer) std::free(pointer)
 #endif
 
 #define MAISTRIE_ROUND_UP(size, alignment) (((size) + (alignment) - 1) & ~((alignment) - 1))

@@ -12,17 +12,17 @@
 #include <utility>
 
 #if defined(__has_include)
-#if __has_include(<version>)
-#include <version>
-#endif
+    #if __has_include(<version>)
+        #include <version>
+    #endif
 #endif
 
 #ifndef MAISTRIE_UNLIKELY
-#if defined(__GNUC__) || defined(__clang__)
-#define MAISTRIE_UNLIKELY(x) __builtin_expect(!!(x), 0)
-#else
-#define MAISTRIE_UNLIKELY(x) (x)
-#endif
+    #if defined(__GNUC__) || defined(__clang__)
+        #define MAISTRIE_UNLIKELY(x) __builtin_expect(!!(x), 0)
+    #else
+        #define MAISTRIE_UNLIKELY(x) (x)
+    #endif
 #endif
 
 namespace maistrie {
@@ -442,6 +442,7 @@ namespace maistrie {
                         }
                     }
                 }
+
                 data = buffer;
                 headValue = 0;
                 tailValue = currentSize;

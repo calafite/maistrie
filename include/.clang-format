@@ -10,6 +10,7 @@ TabWidth: 4
 UseTab: Never
 
 NamespaceIndentation: All
+IndentPPDirectives: BeforeHash
 
 BreakBeforeBraces: Attach
 
